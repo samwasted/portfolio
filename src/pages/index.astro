@@ -163,64 +163,69 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
   const label = document.getElementById('hero-label');
   const tags = document.getElementById('hero-tags');
   const stickyGroup = document.getElementById('hero-sticky-group');
-  const homeViewport = document.querySelector('.home-viewport') as HTMLElement;
+  const homeViewport = document.querySelector('.home-viewport');
   
+  let isTicking = false;
   window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const height = window.innerHeight;
-    
-    // 1. Hide scroll indicator
-    if (indicator) {
-      indicator.style.opacity = scrollY > 50 ? '0' : '1';
-      indicator.style.pointerEvents = scrollY > 50 ? 'none' : 'auto';
-    }
-
-    // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
-    const fadeOpacity = Math.max(0, 1 - (scrollY / 200)).toString();
-    if (greeting) greeting.style.opacity = fadeOpacity;
-    if (label) label.style.opacity = fadeOpacity;
-    if (tags) tags.style.opacity = fadeOpacity;
-
-    // 3. Keep the Name and "3rd year" text completely fixed
-    // UNTIL a certain scroll threshold is reached, then push it upwards,
-    // clamping it at the top of the screen so it stays there permanently.
-    const scrollThreshold = height * 0.4;
-    if (stickyGroup) {
-      if (scrollY > scrollThreshold) {
-        const pushUpAmount = scrollY - scrollThreshold;
-        if (stickyGroup.parentElement) {
-          const heroRect = stickyGroup.parentElement.getBoundingClientRect();
-          const initialTop = (height * 0.35) - (heroRect.height / 2);
-          const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
-          const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
-          
-          stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
-          stickyGroup.style.opacity = '1';
+    if (!isTicking) {
+      window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        const height = window.innerHeight;
+        
+        // 1. Hide scroll indicator
+        if (indicator) {
+          indicator.style.opacity = scrollY > 50 ? '0' : '1';
+          indicator.style.pointerEvents = scrollY > 50 ? 'none' : 'auto';
         }
-      } else {
-        stickyGroup.style.transform = `translateY(0px)`;
-        stickyGroup.style.opacity = '1';
-      }
-    }
 
-    // Shader and Background fades
-    if (fuji) {
-      const opacity = Math.max(0.3, 1 - (scrollY / (height * 0.6)));
-      fuji.style.opacity = opacity.toString();
-    }
-    if (bg) {
-      const blurAmount = Math.min(15, scrollY / 40);
-      bg.style.filter = `blur(${blurAmount}px) brightness(${Math.max(0.2, 1 - scrollY/800)})`;
+        // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
+        const fadeOpacity = Math.max(0, 1 - (scrollY / 200)).toString();
+        if (greeting) greeting.style.opacity = fadeOpacity;
+        if (label) label.style.opacity = fadeOpacity;
+        if (tags) tags.style.opacity = fadeOpacity;
+
+        // 3. Keep the Name and "3rd year" text completely fixed
+        const scrollThreshold = height * 0.4;
+        if (stickyGroup) {
+          if (scrollY > scrollThreshold) {
+            const pushUpAmount = scrollY - scrollThreshold;
+            if (stickyGroup.parentElement) {
+              const heroRect = stickyGroup.parentElement.getBoundingClientRect();
+              const initialTop = (height * 0.35) - (heroRect.height / 2);
+              const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
+              const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
+              
+              stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
+              stickyGroup.style.opacity = '1';
+            }
+          } else {
+            stickyGroup.style.transform = `translateY(0px)`;
+            stickyGroup.style.opacity = '1';
+          }
+        }
+
+        // Shader and Background fades
+        if (fuji) {
+          const opacity = Math.max(0.3, 1 - (scrollY / (height * 0.6)));
+          fuji.style.opacity = opacity.toString();
+        }
+        if (bg) {
+          bg.style.filter = `brightness(${Math.max(0.2, 1 - scrollY/800)})`;
+        }
+        
+        isTicking = false;
+      });
+      isTicking = true;
     }
   });
 
   // Custom smooth scroll function for butter-smooth button click
-  function customSmoothScroll(targetPosition: number, duration: number) {
+  function customSmoothScroll(targetPosition, duration) {
     const startPosition = window.scrollY;
     const distance = targetPosition - startPosition;
-    let startTime: number | null = null;
+    let startTime = null;
 
-    function animation(currentTime: number) {
+    function animation(currentTime) {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
@@ -268,14 +273,49 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
     }
   }, { passive: false });
 
-  // Smooth scroll for the down arrow
-  document.getElementById('scroll-down-btn')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (isAutoScrolling) return;
-    isAutoScrolling = true;
-    customSmoothScroll(document.body.scrollHeight - window.innerHeight, 1000);
-    setTimeout(() => { isAutoScrolling = false; }, 1200);
-  });
+  // Use event delegation in the CAPTURE phase so listeners intercept the click
+  // BEFORE Astro's ViewTransitions router can see it and trigger a reload.
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if (!target || typeof target.closest !== 'function') return;
+    
+    // Smooth scroll for the down arrow
+    if (target.closest('#scroll-down-btn')) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      
+      if (isAutoScrolling) return;
+      isAutoScrolling = true;
+      customSmoothScroll(document.body.scrollHeight - window.innerHeight, 1000);
+      setTimeout(() => { isAutoScrolling = false; }, 1200);
+      return;
+    }
+
+    // Toggle scroll for the "About me" nav link
+    if (target.closest('#nav-about-link')) {
+      // If we are on the home page, intercept the click and scroll
+      if (window.location.pathname === '/') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        if (isAutoScrolling) return;
+        
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        isAutoScrolling = true;
+        
+        // If we're at the top, scroll down to About. If we're at the bottom, scroll up to Home.
+        if (window.scrollY < maxScroll / 2) {
+          customSmoothScroll(maxScroll, 1000);
+        } else {
+          customSmoothScroll(0, 1000);
+        }
+        
+        setTimeout(() => { isAutoScrolling = false; }, 1200);
+      }
+    }
+  }, { capture: true });
 </script>
 
 <style>

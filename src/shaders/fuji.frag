@@ -61,6 +61,7 @@ void main() {
     // less internal contrast, looks more like a flat watercolor wash
     sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
     float a_sun = clamp(sunShape * 0.6, 0.0, 1.0); // lower opacity overall
+    a_sun = clamp(a_sun * 1.1, 0.0, 1.0); 
     rgb = mix(rgb, vec3(0.9, 0.15, 0.15), a_sun); // slightly softer red
     alpha = max(alpha, a_sun);
 

@@ -15,7 +15,7 @@ const { active, showBack = false } = Astro.props;
     <a href="/" class="nav-back" aria-label="Go back">&larr;</a>
   )}
   <div class="nav-group">
-    <a href="/about" class="nav-link nav-link-sm">About me</a>
+    <a href={Astro.url.pathname === '/' ? '#' : '/'} id="nav-about-link" class="nav-link nav-link-sm">About me</a>
   </div>
   <div class="nav-group">
     <a href="/projects" class="nav-link">Projects</a>

@@ -90,19 +90,20 @@
       // If canvas removed from DOM (navigated away), stop entirely
       if (!document.body.contains(canvas)) {
         window.removeEventListener('resize', handleResize);
-        return;
+        return; // Do NOT schedule another frame
       }
 
       const elapsed = now - startTime;
 
-      // Once the reveal animation is done, render one final frame and stop
-      if (elapsed > FREEZE_AFTER_MS && !frozen) {
-        frozen = true;
-        renderFrame(elapsed / 1000.0);
-        return; // Stop the loop — 0% GPU from here
+      // Once the reveal animation is done, render one final frame and STOP
+      if (elapsed > FREEZE_AFTER_MS) {
+        if (!frozen) {
+          frozen = true;
+          renderFrame(elapsed / 1000.0);
+        }
+        // Do NOT schedule another frame — loop is dead
+        return;
       }
-
-      if (frozen) return;
 
       // Cap to ~10fps (100ms between frames)
       if (now - lastFrameTime < 100) {
@@ -127,3 +128,4 @@
     }
   });
 </script>
+

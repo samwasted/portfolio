@@ -92,7 +92,7 @@
       // If canvas removed from DOM (navigated away), stop entirely
       if (!document.body.contains(canvas)) {
         window.removeEventListener('resize', handleResize);
-        return;
+        return; // Do NOT schedule another frame
       }
 
       if (lastFrameTime === 0) lastFrameTime = now;
@@ -102,18 +102,18 @@
 
       const elapsed = now - startTime;
 
-      // Once the reveal animation is done, render one final frame and stop
-      if (elapsed > FREEZE_AFTER_MS && !frozen) {
-        frozen = true;
-        renderFrame(elapsed / 1000.0);
-        return; // Stop the loop — 0% GPU from here
+      // Once the reveal animation is done, render one final frame and STOP
+      if (elapsed > FREEZE_AFTER_MS) {
+        if (!frozen) {
+          frozen = true;
+          renderFrame(elapsed / 1000.0);
+        }
+        // Do NOT schedule another frame — loop is dead
+        return;
       }
-
-      if (frozen) return;
 
       // Only draw when we've accumulated enough time
       if (accumulator >= TIME_STEP) {
-        // Keep the fractional remainder for perfectly smooth timing
         accumulator = accumulator % TIME_STEP;
         renderFrame(elapsed / 1000.0);
       }
@@ -133,3 +133,4 @@
     }
   });
 </script>
+
