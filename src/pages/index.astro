@@ -16,13 +16,16 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
   <Nav />
 
   <!-- Hero Section (Vanilla CSS) -->
+  <!-- Hero Section (Fixed in place) -->
   <div class="home-viewport">
     <main class="hero-content">
-      <h1 class="hero-greeting">Hi there!</h1>
-      <p class="hero-label">I am</p>
-      <h2 class="hero-name">Samarpan Verma</h2>
-      <p class="hero-subtitle">3rd year <span class="highlight">Mathematics &amp; Computing</span> student at <span class="highlight">IIT (BHU) Varanasi</span></p>
-      <div class="hero-tags">
+      <h1 id="hero-greeting" class="hero-greeting transition-opacity duration-300">Hi there!</h1>
+      <p id="hero-label" class="hero-label transition-opacity duration-300">I am</p>
+      <div id="hero-sticky-group" class="transition-transform duration-[0ms] ease-linear">
+        <h2 class="hero-name">Samarpan Verma</h2>
+        <p class="hero-subtitle">3rd year <span class="highlight">Mathematics &amp; Computing</span> student at <span class="highlight">IIT (BHU) Varanasi</span></p>
+      </div>
+      <div id="hero-tags" class="hero-tags transition-opacity duration-300">
         <span class="tag">C++</span>
         <span class="tag-dot">&bull;</span>
         <span class="tag">Systems</span>
@@ -31,145 +34,175 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
       </div>
     </main>
 
-    <!-- Scroll Down Icon -->
-    <a href="#about" id="scroll-down-btn" class="scroll-indicator" aria-label="Scroll to About Me">
-      <span class="scroll-text">More About Me</span>
-      <svg class="scroll-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-    </a>
+    <!-- Scroll Down Icon (will fade out on scroll) -->
+    <div id="scroll-indicator-container" class="absolute bottom-12 left-1/2 -translate-x-1/2 transition-opacity duration-300">
+      <a href="#about" id="scroll-down-btn" class="scroll-indicator" aria-label="Scroll to About Me">
+        <svg class="scroll-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        <span class="scroll-text">More About Me</span>
+      </a>
+    </div>
   </div>
 
-  <!-- About Section (Tailwind CSS) -->
-  <section id="about" class="min-h-screen w-full relative bg-[#0a0a0a]/95 backdrop-blur-md px-8 md:px-16 lg:px-[12%] xl:px-[15%] py-24 flex items-center z-20 border-t border-white/10">
-    <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+  <!-- Spacer to push the scroll content down by one screen height -->
+  <div class="h-[100vh] w-full relative z-0 pointer-events-none"></div>
+
+  <!-- About Section (Scrolls up) -->
+  <!-- We leave the left side empty so the fixed Hero text shows through perfectly -->
+  <section id="about" class="min-h-screen w-full relative z-10 flex px-8 md:px-[12%] py-32 bg-gradient-to-b from-transparent via-[#0a0a0a]/80 to-[#0a0a0a]">
+    <div class="w-full flex justify-end">
       
-      <div class="lg:col-span-8 space-y-16">
-        <!-- Typography play -->
-        <div>
-          <h2 class="text-[#D4C594] font-mono text-sm tracking-[0.2em] uppercase mb-6 flex items-center gap-4">
-            <span class="w-12 h-px bg-[#D4C594]/50"></span>
-            About Me
-          </h2>
-          <h3 class="text-white font-display text-5xl md:text-7xl font-medium leading-[1.1] mb-8">
-            Samarpan Verma
-          </h3>
-          <p class="text-white/80 font-sans text-lg md:text-xl leading-relaxed max-w-2xl">
-            3rd year <span class="text-[#FFF3C7] font-semibold">Mathematics & Computing</span> student at <span class="text-[#FFF3C7] font-semibold">IIT (BHU) Varanasi</span>.
-          </p>
-          <p class="text-white/80 font-sans text-lg md:text-xl leading-relaxed mt-4">
-            Competitive Programmer &mdash; <a href="https://codeforces.com/" target="_blank" class="text-[#D4C594] hover:text-[#FFF3C7] underline decoration-[#D4C594]/30 hover:decoration-[#FFF3C7] underline-offset-4 transition-all">Codeforces Account</a>
-          </p>
+      <!-- Right Side Content Area -->
+      <div class="w-full lg:w-5/12 space-y-24 text-white">
+        
+        <div class="space-y-8 mt-[40vh]">
+          <!-- Content temporarily removed for testing -->
         </div>
-
-        <!-- Achievements & Recent Work -->
-        <div class="space-y-8">
-          <h4 class="text-[#D4C594] font-mono text-xs tracking-[0.15em] uppercase border-b border-white/10 pb-4">Achievements & Recent Work</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <a href="/projects" class="group block p-8 border border-white/10 hover:border-[#D4C594]/50 bg-white/[0.02] hover:bg-[#D4C594]/5 transition-all duration-500 relative overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-br from-[#D4C594]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <h5 class="text-white font-serif text-2xl mb-3 group-hover:text-[#FFF3C7] transition-colors relative z-10">Projects</h5>
-              <p class="text-white/50 font-sans text-sm leading-relaxed relative z-10">View my latest technical builds, systems engineering work, and algorithmic implementations.</p>
-              <div class="mt-6 flex items-center text-[#D4C594] font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                Explore <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-              </div>
-            </a>
-            <a href="/editorials" class="group block p-8 border border-white/10 hover:border-[#D4C594]/50 bg-white/[0.02] hover:bg-[#D4C594]/5 transition-all duration-500 relative overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-br from-[#D4C594]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <h5 class="text-white font-serif text-2xl mb-3 group-hover:text-[#FFF3C7] transition-colors relative z-10">Editorials</h5>
-              <p class="text-white/50 font-sans text-sm leading-relaxed relative z-10">Read my deep dives into algorithms, competitive programming concepts, and computer vision.</p>
-              <div class="mt-6 flex items-center text-[#D4C594] font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                Read More <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <!-- Resume Download -->
-        <div class="pt-12 border-t border-white/10">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 bg-white/[0.02] p-8 border border-white/5">
-            <div>
-              <h4 class="text-white font-serif text-2xl mb-2">Still prefer PDFs?</h4>
-              <p class="text-white/50 font-sans text-sm">Download my formal resume for a traditional overview.</p>
-            </div>
-            <a href="/resume.pdf" target="_blank" class="shrink-0 inline-flex items-center px-6 py-4 border border-[#D4C594]/40 text-[#D4C594] font-mono text-xs uppercase tracking-[0.15em] hover:bg-[#D4C594] hover:text-[#0a0a0a] transition-all duration-300 group">
-              Download Resume
-              <svg class="w-4 h-4 ml-3 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-            </a>
-          </div>
-        </div>
+        
+        <div class="h-[60vh]"></div>
       </div>
 
-      <!-- Timeline on the right -->
-      <div class="lg:col-span-4 lg:pl-12 pt-4">
-        <div class="sticky top-24 border-l border-white/10 pl-8 space-y-12">
-          <h4 class="text-[#D4C594] font-mono text-xs tracking-[0.15em] uppercase mb-8 flex items-center">
-            Timeline
-          </h4>
-          
-          <div class="relative group">
-            <div class="absolute w-2 h-2 bg-[#D4C594] rounded-full -left-[37px] top-1.5 shadow-[0_0_15px_rgba(212,197,148,0.6)] group-hover:scale-125 transition-transform duration-300"></div>
-            <p class="text-[#FFF3C7] font-mono text-xs mb-2 tracking-widest uppercase">Present</p>
-            <h5 class="text-white font-serif text-xl mb-1">IIT (BHU) Varanasi</h5>
-            <p class="text-white/60 font-sans text-sm leading-relaxed">Pursuing B.Tech in Mathematics & Computing.</p>
-          </div>
-
-          <div class="relative opacity-60 hover:opacity-100 transition-opacity duration-300 group">
-            <div class="absolute w-2 h-2 bg-white/40 rounded-full -left-[36px] top-1.5 group-hover:bg-white/80 transition-colors"></div>
-            <p class="text-white/50 font-mono text-xs mb-2 tracking-widest uppercase group-hover:text-white/80 transition-colors">2021</p>
-            <h5 class="text-white font-serif text-lg mb-1">High School</h5>
-            <p class="text-white/50 font-sans text-sm leading-relaxed group-hover:text-white/70 transition-colors">Started coding competitively and exploring systems programming.</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 </BaseLayout>
 
 <script>
-  // Fade out Fuji shader and blur background based on scroll
+  // Fade out Fuji shader, blur background, and hide scroll arrow based on scroll
   const fuji = document.getElementById('fuji-shader-overlay');
   const bg = document.getElementById('image-bg');
+  const indicator = document.getElementById('scroll-indicator-container');
+  
+  // Hero text elements
+  const greeting = document.getElementById('hero-greeting');
+  const label = document.getElementById('hero-label');
+  const tags = document.getElementById('hero-tags');
+  const stickyGroup = document.getElementById('hero-sticky-group');
   
   window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
     const height = window.innerHeight;
     
+    // 1. Hide scroll indicator
+    if (indicator) {
+      indicator.style.opacity = scrollY > 50 ? '0' : '1';
+      indicator.style.pointerEvents = scrollY > 50 ? 'none' : 'auto';
+    }
+
+    // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
+    const fadeOpacity = Math.max(0, 1 - (scrollY / 200)).toString();
+    if (greeting) greeting.style.opacity = fadeOpacity;
+    if (label) label.style.opacity = fadeOpacity;
+    if (tags) tags.style.opacity = fadeOpacity;
+
+    // 3. Keep the Name and "3rd year" text completely fixed
+    // UNTIL a certain scroll threshold is reached, then push it upwards.
+    const scrollThreshold = height * 0.4; // Start pushing up much earlier
+    if (stickyGroup) {
+      if (scrollY > scrollThreshold) {
+        // Push the text up at the same speed as the user scrolls
+        const pushUpAmount = scrollY - scrollThreshold;
+        
+        // Calculate the maximum we can push it up before it hits the top border (1rem = 16px)
+        // Let's leave 2rem (32px) padding from the top
+        const heroRect = stickyGroup.parentElement.getBoundingClientRect();
+        // Since parent (.hero-content) has a fixed top (35%), we calculate distance from top
+        const initialTop = (height * 0.35) - (heroRect.height / 2);
+        
+        // Max push up is the distance from initial top to the 32px padding
+        const maxPushUp = Math.max(0, initialTop - 32);
+        
+        // Clamp the upward movement so it never crosses the white border
+        const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
+        
+        stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
+      } else {
+        stickyGroup.style.transform = `translateY(0px)`;
+      }
+    }
+
+    // Shader and Background fades
     if (fuji) {
-      // Fade out completely by the time we scroll 80% of a screen
-      const opacity = Math.max(0, 1 - (scrollY / (height * 0.8)));
+      const opacity = Math.max(0, 1 - (scrollY / (height * 0.6)));
       fuji.style.opacity = opacity.toString();
     }
-    
     if (bg) {
-      // Add a slight blur effect to the background image as we scroll down
-      const blurAmount = Math.min(10, scrollY / 50);
-      bg.style.filter = `blur(${blurAmount}px) brightness(${Math.max(0.3, 1 - scrollY/1000)})`;
+      const blurAmount = Math.min(15, scrollY / 40);
+      bg.style.filter = `blur(${blurAmount}px) brightness(${Math.max(0.2, 1 - scrollY/800)})`;
     }
   });
+
+  // Custom smooth scroll function for butter-smooth button click
+  function customSmoothScroll(targetPosition, duration) {
+    const startPosition = window.scrollY;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    function animation(currentTime) {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      
+      // Easing function (easeInOutCubic)
+      const ease = progress < 0.5 
+        ? 4 * progress * progress * progress 
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      window.scrollTo(0, startPosition + distance * ease);
+
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animation);
+      }
+    }
+    requestAnimationFrame(animation);
+  }
+
+  // Auto-scroll logic via wheel event
+  let isAutoScrolling = false;
+  
+  window.addEventListener('wheel', (e) => {
+    if (isAutoScrolling) {
+      e.preventDefault();
+      return;
+    }
+
+    const scrollY = window.scrollY;
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    const scrollingDown = e.deltaY > 0;
+
+    // If at the top and scrolling down
+    if (scrollingDown && scrollY < 50) {
+      e.preventDefault();
+      isAutoScrolling = true;
+      customSmoothScroll(maxScroll, 1000);
+      setTimeout(() => { isAutoScrolling = false; }, 1200);
+    }
+    // If at the bottom and scrolling up
+    else if (!scrollingDown && scrollY > maxScroll - 50) {
+      e.preventDefault();
+      isAutoScrolling = true;
+      customSmoothScroll(0, 1000);
+      setTimeout(() => { isAutoScrolling = false; }, 1200);
+    }
+  }, { passive: false });
 
   // Smooth scroll for the down arrow
   document.getElementById('scroll-down-btn')?.addEventListener('click', (e) => {
     e.preventDefault();
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      window.scrollTo({
-        top: aboutSection.offsetTop,
-        behavior: 'smooth'
-      });
-    }
+    if (isAutoScrolling) return;
+    isAutoScrolling = true;
+    customSmoothScroll(document.body.scrollHeight - window.innerHeight, 1000);
+    setTimeout(() => { isAutoScrolling = false; }, 1200);
   });
 </script>
 
 <style>
-  /* Scroll behavior for the whole page */
   html {
-    scroll-behavior: smooth;
+    /* No scroll-snap, we handle it via JS now to avoid pulling bugs */
   }
 
   .home-viewport {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    z-index: 2;
+    position: fixed;
+    inset: 0;
+    z-index: 20;
     overflow: hidden;
     pointer-events: none;
   }
@@ -288,8 +321,9 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    gap: 0.75rem;
     color: #D4C594;
     opacity: 0.7;
     transition: opacity 0.3s ease;
@@ -303,15 +337,16 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
 
   .scroll-text {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
+    white-space: nowrap;
   }
 
   .scroll-arrow {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
     animation: bounce 2s infinite;
   }
 
