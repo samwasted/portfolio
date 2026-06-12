@@ -2,9 +2,18 @@
 /**
  * Nav — Fixed navigation across all pages.
  */
+export interface Props {
+  active?: 'about' | 'projects' | 'editorials' | 'contact';
+  showBack?: boolean;
+}
+
+const { active, showBack = false } = Astro.props;
 ---
 
 <nav id="main-nav" class="fixed-nav">
+  {showBack && (
+    <a href="/" class="nav-back" aria-label="Go back">&larr;</a>
+  )}
   <div class="nav-main">
     <a href="/projects" class="nav-link">Projects</a>
     <a href="/editorials" class="nav-link">Editorials</a>
@@ -26,6 +35,23 @@
     align-items: flex-end;
     gap: 1.2rem;
     z-index: 100;
+  }
+
+  .nav-back {
+    position: fixed;
+    top: 2rem;
+    left: 2.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    z-index: 100;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav-back:hover {
+    opacity: 1;
   }
 
   .nav-main,

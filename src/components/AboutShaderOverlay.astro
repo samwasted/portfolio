@@ -10,10 +10,10 @@
 <style>
   #about-shader-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 1rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+    height: calc(100% - 2rem);
     z-index: 10;
     pointer-events: none;
   }
@@ -45,8 +45,8 @@
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    // Downscale for performance (watercolor shader can be intense)
-    const DOWNSCALE_FACTOR = 2;
+    // Run at native resolution for crisp watercolor edges
+    const DOWNSCALE_FACTOR = 1;
     const dpr = window.devicePixelRatio / DOWNSCALE_FACTOR;
     let startTime = performance.now();
     let animId: number;

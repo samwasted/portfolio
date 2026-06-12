@@ -61,10 +61,10 @@ void main() {
     // animation times
     float t = iTime * 0.8; 
     float t_sun     = clamp((t - 0.5) / 1.5, 0.0, 1.0); 
-    float t_mnt     = clamp((t - 2.0) / 2.0, 0.0, 1.0); 
-    float t_branch  = clamp((t - 4.0) / 2.0, 0.0, 1.0); 
-    float t_flowers = clamp((t - 6.0) / 2.5, 0.0, 1.0); 
-    float swayStrength = 0.02 * (1.0 - smoothstep(6.0, 8.0, t));
+    // Skipped mountain time (was at t-2.0)
+    float t_branch  = clamp((t - 1.5) / 2.0, 0.0, 1.0); 
+    float t_flowers = clamp((t - 3.5) / 2.5, 0.0, 1.0); 
+    float swayStrength = 0.02 * (1.0 - smoothstep(3.5, 5.5, t));
     
     vec3 rgb = vec3(0.0);
     float alpha = 0.0;
@@ -79,41 +79,11 @@ void main() {
     
     sunShape *= (fbm(uv * 50.0) * 0.5 + 0.5) * sunReveal;
     float a_sun = clamp(sunShape * 0.9, 0.0, 1.0);
-    rgb = mix(rgb, vec3(0.8, 0.15, 0.15), a_sun);
-    alpha = max(alpha, a_sun);
+    rgb = mix(rgb, vec3(1.0, 0.2, 0.15), a_sun); // Bright luminous red
+    alpha = max(alpha, a_sun); // Full opacity
 
-    // 3. MOUNTAIN
-    vec2 mntUV = uv;
-    mntUV.x += fbm(uv * 10.0) * 0.05;
-    mntUV.y += fbm(uv * 15.0) * 0.03;
-    
-    float fujiX = mntUV.x + 0.05; 
-    float mountainShape = -0.1 - pow(abs(fujiX), 0.8) * 0.6; 
-    float mountainMask = smoothstep(0.0, 0.02, mountainShape - mntUV.y);
-    
-    float outlineDist = abs(mountainShape - mntUV.y);
-    float mntOutline = smoothstep(0.01, 0.002, outlineDist) * smoothstep(0.0, 0.05, mntUV.y + 0.15);
-    float ridgeTexture = fbm(vec2(mntUV.x * 25.0, mntUV.y * 5.0)); 
-    float lightSide = smoothstep(-0.15, 0.25, fujiX + ridgeTexture * 0.1);
-    
-    vec3 deepBlackInk = vec3(0.04, 0.04, 0.05);
-    vec3 grayWaterWash = vec3(0.6, 0.6, 0.65);
-    vec3 baseMntColor = mix(deepBlackInk, grayWaterWash, lightSide);
-    baseMntColor *= (0.6 + 0.4 * fbm(uv * 40.0)); 
-
-    float snowLine = -0.22 + abs(fujiX) * 0.5 + (fbm(uv * 30.0) * 0.04);
-    float snowCap = smoothstep(snowLine - 0.01, snowLine + 0.01, mntUV.y);
-    vec3 mountainColor = mix(baseMntColor, vec3(0.98, 0.99, 1.0), snowCap);
-    mountainColor = mix(mountainColor, vec3(0.02), mntOutline); 
-
-    float mntReveal = smoothstep(0.05, -0.05, mntUV.x - (t_mnt * 2.0 - 1.0) + wetEdgeJitter);
-    float a_mnt = mountainMask * mntReveal;
-    
-    // Grayscale
-    vec3 mntColorDesat = vec3(dot(mountainColor, vec3(0.333)));
-    
-    rgb = mix(rgb, mntColorDesat, a_mnt);
-    alpha = max(alpha, a_mnt);
+    // 3. MOUNTAIN (Skipped)
+    float a_mnt = 0.0; 
 
     // 4. BRANCHES
     vec2 branchUV = uv;
@@ -151,9 +121,13 @@ void main() {
     float branchMask = smoothstep(0.004, -0.002, bd);
     float branchReveal = smoothstep(0.05, -0.05, branchUV.x - (t_branch * 1.5 - 1.0) + wetEdgeJitter);
     
+    // Bright luminous silver/white texture to stand out against the dark void
+    float branchTex = fbm(branchUV * 40.0);
+    vec3 branchColor = mix(vec3(0.7, 0.75, 0.8), vec3(0.9, 0.95, 1.0), branchTex);
+    
     float a_branch = branchMask * branchReveal;
-    rgb = mix(rgb, vec3(0.04), a_branch);
-    alpha = max(alpha, a_branch);
+    rgb = mix(rgb, branchColor, a_branch);
+    alpha = max(alpha, a_branch); // Full opacity
 
     // 5. FLOWERS 
     float flowerMask = 0.0;
@@ -180,9 +154,9 @@ void main() {
     }
     
     float a_flower = flowerMask;
-    rgb = mix(rgb, vec3(0.85, 0.1, 0.2), a_flower);
-    alpha = max(alpha, a_flower);
+    rgb = mix(rgb, vec3(1.0, 0.4, 0.5), a_flower); // Vibrant glowing pink
+    alpha = max(alpha, a_flower); // Full opacity
 
-    // Output transparent colors for overlapping
+    // Output transparent colors for overlapping (NO global opacity reduction)
     fragColor = vec4(rgb, alpha);
 }
