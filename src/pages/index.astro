@@ -6,27 +6,31 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
+import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
 ---
 
 <BaseLayout title="Samarpan Verma — Portfolio" bodyClass="no-scroll">
   <ShaderBackground />
+  <FujiShaderOverlay />
   <div class="page-frame" aria-hidden="true"></div>
   <Nav />
 
   <div class="home-viewport">
-    <!-- Bird figure — top-right corner -->
-    <img
-      src="/img2-fly.png"
-      alt="Bird in flight"
-      class="hero-figure"
-      loading="eager"
-    />
+
 
     <!-- Hero text -->
     <main class="hero-content">
       <h1 class="hero-greeting">Hi there!</h1>
       <p class="hero-label">I am</p>
       <h2 class="hero-name">Samarpan Verma</h2>
+      <p class="hero-subtitle">3rd year <span class="highlight">Mathematics &amp; Computing</span> student at <span class="highlight">IIT (BHU) Varanasi</span></p>
+      <div class="hero-tags">
+        <span class="tag">C++</span>
+        <span class="tag-dot">&bull;</span>
+        <span class="tag">Systems</span>
+        <span class="tag-dot">&bull;</span>
+        <span class="tag">Algorithms</span>
+      </div>
     </main>
   </div>
 </BaseLayout>
@@ -63,35 +67,88 @@ import Nav from '../components/Nav.astro';
   .hero-content {
     position: absolute;
     left: 8%;
-    top: 50%;
+    top: 45%;
     transform: translateY(-50%);
     z-index: 2;
   }
 
   .hero-greeting {
-    font-family: var(--font-sans);
-    font-size: var(--text-3xl);
-    font-weight: 400;
-    color: var(--text-primary);
-    margin-bottom: var(--space-md);
-    letter-spacing: -0.01em;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    color: #D4C594; /* Phosphor Amber */
+    margin: 0 0 0.2rem 0;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
   }
 
   .hero-label {
-    font-family: var(--font-sans);
-    font-size: var(--text-base);
-    font-weight: 300;
-    color: var(--text-secondary);
-    margin-bottom: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #D4C594;
+    opacity: 0.8;
+    margin: 0 0 0.2rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .hero-name {
-    font-family: var(--font-sans);
-    font-size: var(--text-4xl);
-    font-weight: 400;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
+    font-family: 'EB Garamond', serif;
+    font-size: 5rem;
+    font-weight: 500;
+    color: #FFFFFF;
+    letter-spacing: -0.01em;
     line-height: 1.1;
+    margin: 0;
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(212, 197, 148, 0.7); /* #D4C594 at 70% opacity */
+    margin: 1.2rem 0 0 0;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .hero-subtitle .highlight {
+    color: #FFF3C7;
+    font-weight: 600;
+  }
+
+  .hero-tags {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 1.2rem 0 0 0;
+  }
+
+  .hero-tags .tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #D4C594;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.35rem 0.6rem 0.3rem 0.6rem;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero-tags .tag-dot {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.8rem;
+    line-height: 1;
   }
 
   /* --- Mobile --- */

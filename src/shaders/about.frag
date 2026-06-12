@@ -73,14 +73,15 @@ void main() {
 
     // 2. THE RED SUN 
     vec2 sunUV = uv - vec2(0.6, 0.3); 
-    float sunRadius = 0.15;
-    float sunDist = length(sunUV) - sunRadius + fbm(uv * 20.0) * 0.07;
-    float sunShape = smoothstep(0.01, -0.01, sunDist);
+    float sunRadius = 0.18; // slightly larger
+    float sunDist = length(sunUV) - sunRadius + fbm(uv * 10.0) * 0.04; // softer, less intense noise displacement
+    float sunShape = smoothstep(0.05, -0.05, sunDist); // much softer edges
     float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
     
-    sunShape *= (fbm(uv * 50.0) * 0.8 + 0.2) * sunReveal;
-    float a_sun = clamp(sunShape * 0.9, 0.0, 1.0);
-    rgb = mix(rgb, vec3(1.0, 0.2, 0.15), a_sun);
+    // less internal contrast, looks more like a flat watercolor wash
+    sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
+    float a_sun = clamp(sunShape * 0.6, 0.0, 1.0); // lower opacity overall
+    rgb = mix(rgb, vec3(0.9, 0.15, 0.15), a_sun); // slightly softer red
     alpha = max(alpha, a_sun);
 
     // 3. MOUNTAIN (Skipped)
