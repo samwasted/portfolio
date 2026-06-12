@@ -50,7 +50,8 @@ body {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-serif: 'Libre Baskerville', 'Georgia', 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
+  
+  /* Typography scale */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -133,6 +134,22 @@ body.no-scroll {
   overflow: hidden;
   height: 100vh;
 }
+
+/* ============================================
+   FILM GRAIN CANVAS OVERLAY
+   ============================================ */
+#film-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.12;
+  z-index: 50;
+}
+
 
 /* ============================================
    NAV COMPONENT STYLES

@@ -103,8 +103,8 @@
 
       if (frozen) return;
 
-      // Cap to ~30fps (33ms between frames) — halves GPU cost vs 60fps
-      if (now - lastFrameTime < 33) {
+      // Cap to ~10fps (100ms between frames)
+      if (now - lastFrameTime < 100) {
         animId = requestAnimationFrame(render);
         return;
       }
@@ -120,7 +120,8 @@
   // Init directly when component mounts
   initFujiShader();
   document.addEventListener('astro:after-swap', () => {
-    if (document.getElementById('fuji-shader-overlay')) {
+    const canvas = document.getElementById('fuji-shader-overlay') as HTMLCanvasElement;
+    if (canvas && !(canvas as any).__fuji_init) {
       initFujiShader();
     }
   });

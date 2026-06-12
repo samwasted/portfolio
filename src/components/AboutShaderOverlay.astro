@@ -15,7 +15,7 @@
 <style>
   #about-shader-overlay {
     position: fixed;
-    top: 1rem;z
+    top: 1rem;
     left: 1rem;
     width: calc(100% - 2rem);
     height: calc(100% - 2rem);
@@ -104,8 +104,8 @@
 
       if (frozen) return;
 
-      // Cap to ~30fps (33ms between frames) — halves GPU cost vs 60fps
-      if (now - lastFrameTime < 33) {
+      // Cap to ~10fps (100ms between frames)
+      if (now - lastFrameTime < 100) {
         animId = requestAnimationFrame(render);
         return;
       }
@@ -121,7 +121,8 @@
   // Init directly when component mounts
   initAboutShader();
   document.addEventListener('astro:after-swap', () => {
-    if (document.getElementById('about-shader-overlay')) {
+    const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
+    if (canvas && !(canvas as any).__about_init) {
       initAboutShader();
     }
   });
