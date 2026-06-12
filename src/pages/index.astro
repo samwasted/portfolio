@@ -103,17 +103,19 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
         
         // Calculate the maximum we can push it up before it hits the top border (1rem = 16px)
         // Let's leave 2rem (32px) padding from the top
-        const heroRect = stickyGroup.parentElement.getBoundingClientRect();
-        // Since parent (.hero-content) has a fixed top (35%), we calculate distance from top
-        const initialTop = (height * 0.35) - (heroRect.height / 2);
-        
-        // Max push up is the distance from initial top to the 32px padding
-        const maxPushUp = Math.max(0, initialTop - 32);
-        
-        // Clamp the upward movement so it never crosses the white border
-        const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
-        
-        stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
+        if (stickyGroup.parentElement) {
+          const heroRect = stickyGroup.parentElement.getBoundingClientRect();
+          // Since parent (.hero-content) has a fixed top (35%), we calculate distance from top
+          const initialTop = (height * 0.35) - (heroRect.height / 2);
+          
+          // Max push up is the distance from initial top to the 32px padding
+          const maxPushUp = Math.max(0, initialTop - 32);
+          
+          // Clamp the upward movement so it never crosses the white border
+          const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
+          
+          stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
+        }
       } else {
         stickyGroup.style.transform = `translateY(0px)`;
       }
@@ -131,12 +133,12 @@ import FujiShaderOverlay from '../components/FujiShaderOverlay.astro';
   });
 
   // Custom smooth scroll function for butter-smooth button click
-  function customSmoothScroll(targetPosition, duration) {
+  function customSmoothScroll(targetPosition: number, duration: number) {
     const startPosition = window.scrollY;
     const distance = targetPosition - startPosition;
-    let startTime = null;
+    let startTime: number | null = null;
 
-    function animation(currentTime) {
+    function animation(currentTime: number) {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);

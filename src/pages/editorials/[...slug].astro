@@ -4,7 +4,7 @@
  * Uses [...slug].astro catch-all for /editorials/<slug> routes.
  */
 import EditorialLayout from '../../layouts/EditorialLayout.astro';
-import { loadEditorials, loadEditorial } from '../../lib/editorial-loader';
+import { loadEditorials } from '../../lib/editorial-loader';
 
 export function getStaticPaths() {
   const editorials = loadEditorials();
