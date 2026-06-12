@@ -63,13 +63,17 @@
     // Animation completes around 4s
     const FREEZE_AFTER_MS = 4000;
 
+    let resizeTimeout: number | null = null;
     function handleResize() {
-      resizeCanvasToDisplaySize(canvas, dpr);
-      gl!.viewport(0, 0, canvas.width, canvas.height);
-      // If frozen and resized, re-render one frame at the new size
-      if (frozen) {
-        renderFrame((performance.now() - startTime) / 1000.0);
-      }
+      if (resizeTimeout !== null) clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        resizeCanvasToDisplaySize(canvas, dpr);
+        gl!.viewport(0, 0, canvas.width, canvas.height);
+        // If frozen and resized, re-render one frame at the new size
+        if (frozen) {
+          renderFrame((performance.now() - startTime) / 1000.0);
+        }
+      }, 100);
     }
 
     window.addEventListener('resize', handleResize);
