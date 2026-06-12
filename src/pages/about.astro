@@ -1,17 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
+import AboutShaderOverlay from '../components/AboutShaderOverlay.astro';
 import Nav from '../components/Nav.astro';
-import HeroComponent from '../components/Hero.astro';
 ---
 
 <BaseLayout title="About — Samarpan Verma">
   <ShaderBackground />
+  <AboutShaderOverlay />
   <Nav active="about" showBack={true} />
-  <div class="page-frame" aria-hidden="true"></div>
 
   <main class="page-content">
-    <HeroComponent />
+    <!-- About me content can go here later, for now it's just the shader -->
   </main>
 </BaseLayout>
 

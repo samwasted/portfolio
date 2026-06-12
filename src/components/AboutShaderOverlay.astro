@@ -1,0 +1,87 @@
+---
+/**
+ * AboutShaderOverlay — Transparent WebGL canvas overlay
+ * Renders the Mt Fuji watercolor shader over the existing background.
+ */
+---
+
+<canvas id="about-shader-overlay" aria-hidden="true"></canvas>
+
+<style>
+  #about-shader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { createShaderProgram, createFullscreenQuad, resizeCanvasToDisplaySize } from '../lib/webgl-utils';
+  import vertSrc from '../shaders/background.vert?raw';
+  import fragSrc from '../shaders/about.frag?raw';
+
+  function initAboutShader() {
+    const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    // Must be alpha: true for transparent overlay
+    const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: false });
+    if (!gl) return;
+
+    const program = createShaderProgram(gl, vertSrc, fragSrc);
+    if (!program) return;
+
+    const quad = createFullscreenQuad(gl);
+    if (!quad) return;
+
+    const uTime = gl.getUniformLocation(program, 'uTime');
+    const uResolution = gl.getUniformLocation(program, 'uResolution');
+
+    // Enable blending for transparency
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    // Downscale for performance (watercolor shader can be intense)
+    const DOWNSCALE_FACTOR = 2;
+    const dpr = window.devicePixelRatio / DOWNSCALE_FACTOR;
+    let startTime = performance.now();
+    let animId: number;
+
+    function handleResize() {
+      resizeCanvasToDisplaySize(canvas, dpr);
+      gl!.viewport(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    function render() {
+      gl!.clearColor(0, 0, 0, 0);
+      gl!.clear(gl!.COLOR_BUFFER_BIT);
+
+      gl!.useProgram(program);
+      gl!.uniform1f(uTime, (performance.now() - startTime) / 1000.0);
+      gl!.uniform2f(uResolution, canvas.width, canvas.height);
+
+      gl!.bindVertexArray(quad);
+      gl!.drawArrays(gl!.TRIANGLES, 0, 6);
+
+      animId = requestAnimationFrame(render);
+    }
+
+    render();
+  }
+
+  // Init directly when component mounts (on this page only)
+  initAboutShader();
+  document.addEventListener('astro:after-swap', () => {
+    // Re-init if navigating to about page
+    if (document.getElementById('about-shader-overlay')) {
+      initAboutShader();
+    }
+  });
+</script>
