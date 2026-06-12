@@ -1,0 +1,79 @@
+---
+/**
+ * Hero — Landing section (= "About me" nav target).
+ * "Hi there! I am Samarpan Verma"
+ */
+---
+
+<section id="hero" class="section hero">
+  <div class="hero-content">
+    <h1 class="hero-greeting">Hi there!</h1>
+    <p class="hero-label">I am</p>
+    <h2 class="hero-name">Samarpan Verma</h2>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 4rem var(--page-padding);
+    overflow: hidden;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    padding-left: 8%;
+  }
+
+  .hero-greeting {
+    font-family: var(--font-sans);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.01em;
+  }
+
+  .hero-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .hero-name {
+    font-family: var(--font-sans);
+    font-size: var(--text-4xl);
+    font-weight: 400;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+
+
+  @media (max-width: 768px) {
+    .hero {
+      padding-top: 5rem;
+    }
+
+    .hero-content {
+      padding-left: 5%;
+    }
+
+    .hero-greeting {
+      font-size: var(--text-2xl);
+    }
+
+    .hero-name {
+      font-size: var(--text-3xl);
+    }
+  }
+</style>

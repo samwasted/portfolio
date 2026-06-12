@@ -1,0 +1,74 @@
+<section id="introduction" class="level2">
+<h2>Introduction</h2>
+<p>Gradient descent is the cornerstone optimization algorithm in machine learning. Given a differentiable loss function <span class="math inline">\mathcal{L}(\theta)</span>, the goal is to find parameters <span class="math inline">\theta^*</span> that minimize it:</p>
+<span class="math display">\theta^* = \arg\min_\theta \mathcal{L}(\theta)</span>
+<p>The algorithm iteratively updates parameters in the direction of the negative gradient:</p>
+<span class="math display">\theta_{t+1} = \theta_t - \eta \nabla_\theta \mathcal{L}(\theta_t)</span>
+<p>where <span class="math inline">\eta &gt; 0</span> is the learning rate.</p>
+</section>
+
+<section id="variants" class="level2">
+<h2>Variants</h2>
+
+<section id="stochastic-gradient-descent" class="level3">
+<h3>Stochastic Gradient Descent</h3>
+<p>Instead of computing the gradient over the entire dataset, SGD samples a mini-batch <span class="math inline">\mathcal{B} \subset \mathcal{D}</span>:</p>
+<span class="math display">\theta_{t+1} = \theta_t - \eta \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \nabla_\theta \ell(f_\theta(x_i), y_i)</span>
+<p>This introduces variance but allows for faster iterations and better generalization.</p>
+</section>
+
+<section id="adam-optimizer" class="level3">
+<h3>Adam Optimizer</h3>
+<p>Adam <a href="#ref-kingma2015adam">[1]</a> combines momentum and adaptive learning rates. It maintains running estimates of the first moment <span class="math inline">m_t</span> and second moment <span class="math inline">v_t</span>:</p>
+<span class="math display">\begin{aligned}
+m_t &amp;= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
+v_t &amp;= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2
+\end{aligned}</span>
+<p>with bias-corrected estimates:</p>
+<span class="math display">\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t</span>
+</section>
+</section>
+
+<section id="convergence-analysis" class="level2">
+<h2>Convergence Analysis</h2>
+<p>For a convex function with <span class="math inline">L</span>-Lipschitz continuous gradients, vanilla gradient descent achieves:</p>
+<span class="math display">\mathcal{L}(\theta_T) - \mathcal{L}(\theta^*) \leq \frac{L \|\theta_0 - \theta^*\|^2}{2T}</span>
+<p>This gives an <span class="math inline">O(1/T)</span> convergence rate. For strongly convex functions with parameter <span class="math inline">\mu</span>, the rate improves to:</p>
+<span class="math display">\|\theta_T - \theta^*\|^2 \leq \left(1 - \frac{\mu}{L}\right)^T \|\theta_0 - \theta^*\|^2</span>
+<p>which is linear (geometric) convergence.</p>
+</section>
+
+<section id="practical-considerations" class="level2">
+<h2>Practical Considerations</h2>
+<table>
+<caption>Comparison of optimizer properties</caption>
+<thead>
+<tr><th>Optimizer</th><th>Adaptive LR</th><th>Momentum</th><th>Memory</th></tr>
+</thead>
+<tbody>
+<tr><td>SGD</td><td>No</td><td>Optional</td><td><span class="math inline">O(n)</span></td></tr>
+<tr><td>Adam</td><td>Yes</td><td>Yes</td><td><span class="math inline">O(3n)</span></td></tr>
+<tr><td>AdaGrad</td><td>Yes</td><td>No</td><td><span class="math inline">O(2n)</span></td></tr>
+<tr><td>RMSProp</td><td>Yes</td><td>No</td><td><span class="math inline">O(2n)</span></td></tr>
+</tbody>
+</table>
+<p>Learning rate scheduling is critical. Common strategies include:</p>
+<ul>
+<li><strong>Step decay</strong>: Reduce <span class="math inline">\eta</span> by a factor every <span class="math inline">k</span> epochs</li>
+<li><strong>Cosine annealing</strong>: <span class="math inline">\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min})(1 + \cos(\frac{t\pi}{T}))</span></li>
+<li><strong>Warm-up</strong>: Linearly increase <span class="math inline">\eta</span> from 0 to target over initial steps</li>
+</ul>
+</section>
+
+<section id="conclusion" class="level2">
+<h2>Conclusion</h2>
+<p>Gradient descent remains fundamental to modern deep learning. While Adam is widely used as a default, recent work suggests SGD with momentum and proper scheduling can achieve better generalization on many tasks.</p>
+<p>For more details, see <a href="https://arxiv.org/abs/1412.6980">the original Adam paper</a>.</p>
+</section>
+
+<section id="references" class="editorial-references">
+<h2>References</h2>
+<ol>
+<li id="ref-kingma2015adam">D. P. Kingma and J. Ba, "Adam: A Method for Stochastic Optimization," in <em>Proc. ICLR</em>, 2015.</li>
+</ol>
+</section>

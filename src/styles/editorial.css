@@ -1,0 +1,319 @@
+/* ============================================
+   EDITORIAL LAYOUT — IEEE Two-Column Style
+   ============================================ */
+
+.editorial-page {
+  background: #fafaf8;
+  color: #1a1a1a;
+  min-height: 100vh;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+.editorial-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+/* --- Title Section (spans full width) --- */
+.editorial-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.editorial-header h1 {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111;
+  margin-bottom: 0.75rem;
+}
+
+.editorial-header .author {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.editorial-header .date {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* --- Abstract (spans full width) --- */
+.editorial-abstract {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: #333;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-left: 3px solid #333;
+  background: #f5f5f3;
+}
+
+.editorial-abstract strong {
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* --- Body Base --- */
+.editorial-body {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  color: #222;
+}
+
+/* --- IEEE Two-Column Body --- */
+.layout-ieee .editorial-body {
+  column-count: 2;
+  column-gap: 2rem;
+  column-rule: 1px solid #e0e0e0;
+}
+
+/* --- Single Column Body --- */
+.layout-single .editorial-body {
+  column-count: auto;
+  max-width: 750px;
+  margin: 0 auto;
+  font-size: 10.5pt;
+  /* slightly larger for readability on single column */
+  line-height: 1.7;
+}
+
+/* Prevent orphaned headings */
+.editorial-body h2,
+.editorial-body h3,
+.editorial-body h4 {
+  break-after: avoid;
+  column-span: none;
+}
+
+.editorial-body h2 {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+
+.editorial-body h3 {
+  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  margin-top: 1rem;
+  margin-bottom: 0.4rem;
+  color: #222;
+}
+
+.editorial-body h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 0.8rem;
+  margin-bottom: 0.3rem;
+}
+
+.editorial-body p {
+  margin-bottom: 0.6rem;
+  text-indent: 1.2em;
+}
+
+.editorial-body p:first-child,
+.editorial-body h2+p,
+.editorial-body h3+p,
+.editorial-body h4+p {
+  text-indent: 0;
+}
+
+/* --- Figures --- */
+.editorial-body figure {
+  break-inside: auto;
+  margin: 2rem 0;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.editorial-body figure img {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.editorial-body figcaption {
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 0.4rem;
+  font-style: italic;
+}
+
+/* Full-width figures */
+.editorial-body .figure-full {
+  column-span: all;
+}
+
+/* --- Tables --- */
+.editorial-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  break-inside: avoid;
+}
+
+.editorial-body th,
+.editorial-body td {
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.editorial-body th {
+  background: #f0f0ee;
+  font-weight: 700;
+}
+
+.editorial-body caption {
+  font-size: 0.8rem;
+  font-style: italic;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+/* --- Lists --- */
+.editorial-body ul,
+.editorial-body ol {
+  margin: 0.5rem 0 0.5rem 1.5rem;
+}
+
+.editorial-body li {
+  margin-bottom: 0.25rem;
+  text-indent: 0;
+}
+
+/* --- Code --- */
+.editorial-body code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  background: #f0f0ee;
+  padding: 0.1em 0.3em;
+  border-radius: 2px;
+}
+
+.editorial-body pre {
+  break-inside: avoid;
+  background: #f5f5f3;
+  padding: 0.8rem 1rem;
+  border-radius: 3px;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  border: 1px solid #e0e0e0;
+}
+
+.editorial-body pre code {
+  background: none;
+  padding: 0;
+}
+
+/* --- Links --- */
+.editorial-body a {
+  color: #1a5276;
+  text-decoration: underline;
+  text-decoration-color: rgba(26, 82, 118, 0.3);
+  text-underline-offset: 2px;
+}
+
+.editorial-body a:hover {
+  text-decoration-color: rgba(26, 82, 118, 0.8);
+  opacity: 1;
+}
+
+/* --- Blockquotes --- */
+.editorial-body blockquote {
+  border-left: 3px solid #ccc;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #555;
+  font-style: italic;
+}
+
+/* --- References --- */
+.editorial-references {
+  column-span: all;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.editorial-references h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.editorial-references ol {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding-left: 1.5rem;
+}
+
+.editorial-references li {
+  margin-bottom: 0.3rem;
+}
+
+/* --- Responsive: single column on mobile --- */
+@media (max-width: 768px) {
+  .editorial-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .editorial-body {
+    column-count: 1;
+    font-size: 10pt;
+  }
+
+  .editorial-header h1 {
+    font-size: 1.3rem;
+  }
+}
+
+/* --- Tags on listing --- */
+.editorial-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.editorial-tag {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}

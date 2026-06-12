@@ -1,0 +1,113 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\title{A Brief Introduction to Gradient Descent Optimization}
+\author{Samarpan Verma}
+\date{2026-06-01}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report provides a concise overview of gradient descent optimization, covering the fundamental algorithm, its variants (SGD, Adam), convergence properties, and practical considerations for training deep neural networks. We discuss learning rate scheduling, momentum, and adaptive methods.
+\end{abstract}
+
+\section{Introduction}
+
+Gradient descent is the cornerstone optimization algorithm in machine learning. Given a differentiable loss function $\mathcal{L}(\theta)$, the goal is to find parameters $\theta^*$ that minimize it:
+
+\begin{equation}
+\theta^* = \arg\min_\theta \mathcal{L}(\theta)
+\end{equation}
+
+The algorithm iteratively updates parameters in the direction of the negative gradient:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \eta \nabla_\theta \mathcal{L}(\theta_t)
+\end{equation}
+
+where $\eta > 0$ is the learning rate.
+
+\section{Variants}
+
+\subsection{Stochastic Gradient Descent}
+
+Instead of computing the gradient over the entire dataset, SGD samples a mini-batch $\mathcal{B} \subset \mathcal{D}$:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \eta \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \nabla_\theta \ell(f_\theta(x_i), y_i)
+\end{equation}
+
+This introduces variance but allows for faster iterations and better generalization.
+
+\subsection{Adam Optimizer}
+
+Adam \cite{kingma2015adam} combines momentum and adaptive learning rates. It maintains running estimates of the first moment $m_t$ and second moment $v_t$:
+
+\begin{align}
+m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\
+v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2
+\end{align}
+
+with bias-corrected estimates:
+
+\begin{equation}
+\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
+\end{equation}
+
+\section{Convergence Analysis}
+
+For a convex function with $L$-Lipschitz continuous gradients, vanilla gradient descent achieves:
+
+\begin{equation}
+\mathcal{L}(\theta_T) - \mathcal{L}(\theta^*) \leq \frac{L \|\theta_0 - \theta^*\|^2}{2T}
+\end{equation}
+
+This gives an $O(1/T)$ convergence rate. For strongly convex functions with parameter $\mu$, the rate improves to:
+
+\begin{equation}
+\|\theta_T - \theta^*\|^2 \leq \left(1 - \frac{\mu}{L}\right)^T \|\theta_0 - \theta^*\|^2
+\end{equation}
+
+which is linear (geometric) convergence.
+
+\section{Practical Considerations}
+
+\begin{table}[h]
+\centering
+\caption{Comparison of optimizer properties}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Optimizer} & \textbf{Adaptive LR} & \textbf{Momentum} & \textbf{Memory} \\
+\midrule
+SGD & No & Optional & $O(n)$ \\
+Adam & Yes & Yes & $O(3n)$ \\
+AdaGrad & Yes & No & $O(2n)$ \\
+RMSProp & Yes & No & $O(2n)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Learning rate scheduling is critical. Common strategies include:
+
+\begin{itemize}
+\item \textbf{Step decay}: Reduce $\eta$ by a factor every $k$ epochs
+\item \textbf{Cosine annealing}: $\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min})(1 + \cos(\frac{t\pi}{T}))$
+\item \textbf{Warm-up}: Linearly increase $\eta$ from 0 to target over initial steps
+\end{itemize}
+
+\section{Conclusion}
+
+Gradient descent remains fundamental to modern deep learning. While Adam is widely used as a default, recent work suggests SGD with momentum and proper scheduling can achieve better generalization on many tasks.
+
+For more details, see \href{https://arxiv.org/abs/1412.6980}{the original Adam paper}.
+
+\begin{thebibliography}{1}
+\bibitem{kingma2015adam}
+D.~P. Kingma and J.~Ba, ``Adam: A Method for Stochastic Optimization,'' in \emph{Proc. ICLR}, 2015.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,122 @@
+---
+/**
+ * Nav — Right-aligned navigation.
+ * Desktop: vertical stack on the right.
+ * Mobile: horizontal bar at top.
+ */
+export interface Props {
+  active?: 'about' | 'projects' | 'editorials' | 'contact';
+  showBack?: boolean;
+}
+
+const { active, showBack = false } = Astro.props;
+
+const links = [
+  { id: 'about', label: 'About me', href: '/#hero' },
+  { id: 'projects', label: 'Projects', href: '/#projects' },
+  { id: 'editorials', label: 'Editorials', href: '/editorials' },
+  { id: 'contact', label: 'Contact', href: '/#contact' },
+];
+---
+
+<nav id="main-nav" class="nav">
+  {showBack && (
+    <a href="/" class="nav-back" aria-label="Go back">&larr;</a>
+  )}
+  <div class="nav-links">
+    {links.map(link => (
+      <a
+        href={link.href}
+        class:list={['nav-link', { active: active === link.id }]}
+      >
+        {link.label}
+      </a>
+    ))}
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 2rem;
+    right: 2.5rem;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  .nav-back {
+    position: fixed;
+    top: 2rem;
+    left: 2.5rem;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    z-index: 50;
+    line-height: 1;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+  }
+
+  .nav-link {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.2rem 0;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+    opacity: 1;
+  }
+
+  .nav-link.active {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  /* Mobile: horizontal top bar */
+  @media (max-width: 768px) {
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      flex-direction: row;
+      justify-content: center;
+      padding: 1rem 1.5rem;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-back {
+      top: 0.85rem;
+      left: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      flex-direction: row;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 0.8rem;
+    }
+  }
+</style>

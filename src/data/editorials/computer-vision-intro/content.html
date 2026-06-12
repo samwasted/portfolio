@@ -1,0 +1,41 @@
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Computer Vision (CV) has undergone a dramatic transformation over the past decade. What once relied heavily on hand-crafted feature extractors like SIFT and HOG has now been entirely subsumed by deep learning architectures. This editorial explores the paradigm shifts in visual recognition systems and experiments with how we present image-heavy content in a single-column format.</p>
+<p>The primary goal of a computer vision system is to map an image <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>H</mi><mo>×</mo><mi>W</mi><mo>×</mo><mn>3</mn></mrow></msup></mrow><annotation encoding="application/x-tex">I \in \mathbb{R}^{H \times W \times 3}</annotation></semantics></math> to a specific semantic understanding, whether that is a class label <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>∈</mo><mi>𝒴</mi></mrow><annotation encoding="application/x-tex">y \in \mathcal{Y}</annotation></semantics></math> or a dense pixel-wise segmentation map.</p>
+</section>
+<section id="the-deep-learning-revolution" class="level1">
+<h1>The Deep Learning Revolution</h1>
+<p>Before 2012, image classification was constrained by the limits of human intuition in designing edge detectors and corner algorithms. The breakthrough came with Convolutional Neural Networks (CNNs), which autonomously learn hierarchical feature representations.</p>
+<figure>
+<img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&amp;w=800&amp;auto=format&amp;fit=crop" />
+<figcaption>The complexity of computer vision ranges from simple classification to abstract perception in complex scenes.</figcaption>
+</figure>
+<p>The core mathematical operation driving this revolution is the discrete convolution, defined for a 2D image <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math> and a kernel <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math> as:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>I</mi><mo>*</mo><mi>K</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munder><mo>∑</mo><mi>m</mi></munder><munder><mo>∑</mo><mi>n</mi></munder><mi>I</mi><mo stretchy="false" form="prefix">(</mo><mi>i</mi><mo>−</mo><mi>m</mi><mo>,</mo><mi>j</mi><mo>−</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo><mi>K</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><mo>,</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(I * K)(i, j) = \sum_{m} \sum_{n} I(i - m, j - n) K(m, n)</annotation></semantics></math></p>
+<p>By stacking these convolutional layers, networks like AlexNet, VGG, and ResNet were able to capture increasingly complex concepts. ResNet introduced skip connections, which solved the vanishing gradient problem in extremely deep networks:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℋ</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>ℱ</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">\mathcal{H}(x) = \mathcal{F}(x) + x</annotation></semantics></math></p>
+<p>where <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℋ</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{H}(x)</annotation></semantics></math> is the desired underlying mapping, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℱ</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{F}(x)</annotation></semantics></math> is the residual mapping to be learned.</p>
+</section>
+<section id="the-shift-to-transformers" class="level1">
+<h1>The Shift to Transformers</h1>
+<p>While CNNs rely on local receptive fields, the Vision Transformer (ViT) treats an image as a sequence of patches, leveraging the self-attention mechanism originally designed for natural language processing.</p>
+<figure>
+<img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&amp;w=800&amp;auto=format&amp;fit=crop" />
+<figcaption>Artificial neural networks have evolved to process vast amounts of unstructured visual data.</figcaption>
+</figure>
+<p>The self-attention mechanism computes the response at a position in a sequence by attending to all positions within the same sequence:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Attention</mtext><mo stretchy="false" form="prefix">(</mo><mi>Q</mi><mo>,</mo><mi>K</mi><mo>,</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mtext mathvariant="normal">softmax</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><msqrt><msub><mi>d</mi><mi>k</mi></msub></msqrt></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V</annotation></semantics></math></p>
+<p>This allows the network to build global context immediately, at the cost of a quadratic computational complexity with respect to the number of patches.</p>
+</section>
+<section id="modern-applications" class="level1">
+<h1>Modern Applications</h1>
+<p>Today, computer vision powers everything from autonomous driving to medical image analysis. Object detection systems like YOLO (You Only Look Once) approach the problem as a single regression task, directly predicting bounding boxes and class probabilities from full images in one evaluation.</p>
+<figure>
+<img src="https://images.unsplash.com/photo-1506443432602-ac2fcd6f54e0?q=80&amp;w=800&amp;auto=format&amp;fit=crop" />
+<figcaption>Autonomous systems rely heavily on real-time computer vision inference.</figcaption>
+</figure>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>As computational power continues to scale and architectures become increasingly multimodal, the boundary between textual understanding and visual perception is blurring. The future of computer vision lies in models that can not only identify objects but reason about their physical properties and relationships in a 3D world.</p>
+</section>

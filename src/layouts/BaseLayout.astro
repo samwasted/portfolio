@@ -1,0 +1,44 @@
+---
+import { ClientRouter } from 'astro:transitions';
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Portfolio of Samarpan Verma' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Samarpan Verma" />
+    <title>{title}</title>
+    <ClientRouter />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- KaTeX CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
+
+    <!-- Global Styles -->
+    <style>
+      @import '../styles/global.css';
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

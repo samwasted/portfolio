@@ -1,0 +1,139 @@
+---
+/**
+ * Editorials — Preview listing for the main page.
+ * Shows recent editorials with links to full pages.
+ */
+import { loadEditorials } from '../lib/editorial-loader';
+
+const editorials = loadEditorials().slice(0, 4);
+---
+
+<section id="editorials" class="section editorials-section">
+  <div class="editorials-content">
+    <div class="editorials-header">
+      <h2 class="editorials-title">Editorials</h2>
+      <a href="/editorials" class="editorials-view-all">View all →</a>
+    </div>
+
+    {editorials.length > 0 ? (
+      <div class="editorials-grid">
+        {editorials.map(editorial => (
+          <a href={`/editorials/${editorial.slug}`} class="editorial-card">
+            <time class="editorial-date">{editorial.date}</time>
+            <h3 class="editorial-card-title">{editorial.title}</h3>
+            <p class="editorial-card-abstract">{editorial.abstract}</p>
+            {editorial.tags.length > 0 && (
+              <div class="editorial-tags">
+                {editorial.tags.map(tag => (
+                  <span class="editorial-tag">{tag}</span>
+                ))}
+              </div>
+            )}
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="editorials-empty">Editorials coming soon...</p>
+    )}
+  </div>
+</section>
+
+<style>
+  .editorials-section {
+    min-height: 80vh;
+    padding: 4rem var(--page-padding);
+    display: flex;
+    align-items: center;
+  }
+
+  .editorials-content {
+    width: 100%;
+    max-width: var(--page-max-width);
+    margin: 0 auto;
+  }
+
+  .editorials-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .editorials-title {
+    font-size: var(--text-xl);
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+
+  .editorials-view-all {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .editorials-view-all:hover {
+    color: var(--text-primary);
+    opacity: 1;
+  }
+
+  .editorials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .editorial-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+  }
+
+  .editorial-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    opacity: 1;
+  }
+
+  .editorial-date {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-mono);
+  }
+
+  .editorial-card-title {
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.4;
+  }
+
+  .editorial-card-abstract {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .editorials-empty {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+
+  @media (max-width: 768px) {
+    .editorials-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

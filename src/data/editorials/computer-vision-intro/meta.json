@@ -1,0 +1,9 @@
+{
+  "title": "The Evolution of Computer Vision: From Pixels to Perception",
+  "author": "Samarpan Verma",
+  "date": "2026-06-12",
+  "abstract": "A brief look at how computer vision shifted from hand-crafted feature extractors to deep learning architectures like CNNs and Vision Transformers.",
+  "tags": ["computer-vision", "deep-learning", "AI"],
+  "draft": false,
+  "layout": "single"
+}

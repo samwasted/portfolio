@@ -1,0 +1,42 @@
+/* ============================================
+   KATEX OVERRIDES — Enhanced readability
+   ============================================ */
+
+/* Display math: proper spacing and centering */
+.editorial-body .katex-display {
+  margin: 1.2rem 0;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.editorial-body .katex-display > .katex {
+  text-align: center;
+}
+
+/* Inline math: slight size bump for readability */
+.editorial-body .katex {
+  font-size: 1.05em;
+}
+
+/* Equation numbering */
+.editorial-body .katex-display .tag {
+  position: absolute;
+  right: 0;
+  font-size: 0.85em;
+}
+
+/* Prevent equations from breaking across columns */
+.editorial-body .katex-display {
+  break-inside: avoid;
+}
+
+/* Ensure KaTeX doesn't get too wide in columns */
+.editorial-body .katex-html {
+  max-width: 100%;
+}
+
+/* Fix KaTeX color for paper background */
+.editorial-body .katex {
+  color: #1a1a1a;
+}

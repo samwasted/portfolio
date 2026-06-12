@@ -1,0 +1,28 @@
+---
+/**
+ * Dynamic editorial page — renders pre-converted HTML from .tex files.
+ * Uses [...slug].astro catch-all for /editorials/<slug> routes.
+ */
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+import { loadEditorials, loadEditorial } from '../../lib/editorial-loader';
+
+export function getStaticPaths() {
+  const editorials = loadEditorials();
+  return editorials.map(e => ({
+    params: { slug: e.slug },
+    props: { editorial: e },
+  }));
+}
+
+const { editorial } = Astro.props;
+---
+
+<EditorialLayout
+  title={editorial.title}
+  author={editorial.author}
+  date={editorial.date}
+  abstract={editorial.abstract}
+  layout_type={editorial.layout}
+>
+  <Fragment set:html={editorial.html} />
+</EditorialLayout>

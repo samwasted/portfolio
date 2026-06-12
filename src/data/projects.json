@@ -1,0 +1,34 @@
+[
+  {
+    "name": "2d-metaverse",
+    "category": "webdev",
+    "description": "The about/description of project, extracted from github",
+    "detail": "How and what the project is, and what it implements vaguely. For eg. I used Websockets for live connection, and shift to HTTP when user is not in close proximity to visit the screen. When the user is very close, it connects them to WebRTC video call",
+    "techStack": ["Typescript", "Websockets", "NextJS", "WebRTC", "TailwindCSS", "ExpressJS", "Docker", "PostGRE-SQL"],
+    "github": "https://www.github.com/samwasted/2d-metaverse"
+  },
+  {
+    "name": "Music recommendation system",
+    "category": "machine learning",
+    "description": "ML-based music recommendation engine",
+    "detail": "A collaborative filtering system that analyzes listening patterns to suggest new music. Built with Python and scikit-learn.",
+    "techStack": ["Python", "scikit-learn", "Pandas", "Flask"],
+    "github": "https://www.github.com/samwasted/music-recommendation"
+  },
+  {
+    "name": "C Http server",
+    "category": "systems",
+    "description": "HTTP/1.1 server written from scratch in C",
+    "detail": "A minimal HTTP server implementation supporting GET/POST, static file serving, and basic routing. Written in pure C with POSIX sockets.",
+    "techStack": ["C", "POSIX", "Sockets", "Makefile"],
+    "github": "https://www.github.com/samwasted/c-http-server"
+  },
+  {
+    "name": "OS in Rust",
+    "category": "systems",
+    "description": "A minimal operating system kernel written in Rust",
+    "detail": "Bare-metal kernel targeting x86_64 with VGA text output, interrupt handling, and basic memory management.",
+    "techStack": ["Rust", "x86_64", "QEMU", "Assembly"],
+    "github": "https://www.github.com/samwasted/rust-os"
+  }
+]

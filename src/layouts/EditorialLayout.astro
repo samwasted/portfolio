@@ -1,0 +1,124 @@
+---
+import { ClientRouter } from 'astro:transitions';
+export interface Props {
+  title: string;
+  author?: string;
+  date?: string;
+  abstract?: string;
+  layout_type?: string;
+}
+
+const { title, author, date, abstract, layout_type = 'ieee' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={abstract || `Editorial: ${title}`} />
+    <title>{title} — Samarpan Verma</title>
+    <ClientRouter />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- KaTeX CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
+
+    <style is:global>
+      @import '../styles/global.css';
+      @import '../styles/editorial.css';
+      @import '../styles/katex-overrides.css';
+    </style>
+  </head>
+  <body>
+    <div class="editorial-page">
+      <nav class="editorial-nav">
+        <a href="/" class="editorial-nav-back">&larr; Back</a>
+        <a href="/editorials" class="editorial-nav-link">All Editorials</a>
+      </nav>
+
+      <article class={`editorial-container layout-${layout_type}`}>
+        <header class="editorial-header">
+          <h1>{title}</h1>
+          {author && <p class="author">{author}</p>}
+          {date && <p class="date">{date}</p>}
+        </header>
+
+        {abstract && (
+          <div class="editorial-abstract">
+            <strong>Abstract — </strong>{abstract}
+          </div>
+        )}
+
+        <div class="editorial-body">
+          <slot />
+        </div>
+      </article>
+    </div>
+
+    <style>
+      .editorial-nav {
+        max-width: 900px;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+      }
+      .editorial-nav a {
+        color: #555;
+        text-decoration: none;
+      }
+      .editorial-nav a:hover {
+        color: #111;
+      }
+    </style>
+
+    <!-- KaTeX auto-render: processes .math.inline and .math.display spans -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous" is:inline></script>
+    <script is:inline>
+      function renderMath() {
+        if (typeof katex === 'undefined') {
+          setTimeout(renderMath, 50); // wait for script to load
+          return;
+        }
+        // Render inline math
+        document.querySelectorAll('.math.inline:not([data-rendered])').forEach(el => {
+          try {
+            katex.render(el.textContent || '', el, { throwOnError: false, displayMode: false });
+            el.setAttribute('data-rendered', 'true');
+          } catch (e) { console.warn('KaTeX inline error:', e); }
+        });
+        // Render display math
+        document.querySelectorAll('.math.display:not([data-rendered])').forEach(el => {
+          try {
+            katex.render(el.textContent || '', el, { throwOnError: false, displayMode: true });
+            el.setAttribute('data-rendered', 'true');
+          } catch (e) { console.warn('KaTeX display error:', e); }
+        });
+      }
+
+      // Run on initial load and after Astro View Transitions
+      document.addEventListener('astro:page-load', renderMath);
+      
+      // Fallback for direct loads if astro:page-load fires too early/late
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderMath);
+      } else {
+        renderMath();
+      }
+    </script>
+  </body>
+</html>
