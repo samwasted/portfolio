@@ -63,17 +63,17 @@ void main() {
     tuv.x += sin(tuv.y*frequency+speed)/amplitude;
     tuv.y += sin(tuv.x*frequency*1.5+speed)/(amplitude*.5);
     
-    // Light gradient colors
-    vec3 amberYellow = vec3(299.0, 186.0, 137.0) / vec3(255.0);
-    vec3 deepBlue = vec3(49.0, 98.0, 238.0) / vec3(255.0);
-    vec3 pink = vec3(246.0, 146.0, 146.0) / vec3(255.0);
-    vec3 blue = vec3(89.0, 181.0, 243.0) / vec3(255.0);
+    // Light gradient colors (Mapped to soft, volumetric spotlight greys)
+    vec3 amberYellow = vec3(45.0, 48.0, 52.0) / vec3(255.0);
+    vec3 deepBlue = vec3(35.0, 35.0, 38.0) / vec3(255.0);
+    vec3 pink = vec3(40.0, 42.0, 45.0) / vec3(255.0);
+    vec3 blue = vec3(50.0, 50.0, 52.0) / vec3(255.0);
     
-    // Dark gradient colors
-    vec3 purpleHaze = vec3(105.0, 49.0, 245.0) / vec3(255.0);
-    vec3 swampyBlack = vec3(32.0, 42.0, 50.0) / vec3(255.0);
-    vec3 persimmonOrange = vec3(233.0, 51.0, 52.0) / vec3(255.0);
-    vec3 darkAmber = vec3(233.0, 160.0, 75.0) / vec3(255.0);
+    // Dark gradient colors (Mapped to deep void charcoals and off-blacks)
+    vec3 purpleHaze = vec3(12.0, 12.0, 14.0) / vec3(255.0);
+    vec3 swampyBlack = vec3(5.0, 5.0, 6.0) / vec3(255.0);
+    vec3 persimmonOrange = vec3(18.0, 18.0, 18.0) / vec3(255.0);
+    vec3 darkAmber = vec3(8.0, 8.0, 10.0) / vec3(255.0);
     
     // Interpolate between light and dark gradient
     float cycle = sin(uTime * 0.5);

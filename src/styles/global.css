@@ -118,15 +118,19 @@ a:hover {
 /* --- Page frame border (from reference) --- */
 .page-frame {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 100;
-  border: 1px solid var(--border);
-  margin: 1rem;
+  top: 1rem;
+  left: 1rem;
   width: calc(100% - 2rem);
   height: calc(100% - 2rem);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 2px;
+  pointer-events: none;
+  z-index: 200;
 }
+
+/* --- No-scroll utility (single-viewport pages) --- */
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+

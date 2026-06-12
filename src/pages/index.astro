@@ -1,33 +1,133 @@
 ---
 /**
- * Main page — All sections composed together.
+ * Main page — Single viewport landing with hero + nav.
+ * Projects, Editorials, Contact are separate pages.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
-import ShaderBackground2 from '../components/ShaderBackground2.astro';
 import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import Projects from '../components/Projects.astro';
-import Editorials from '../components/Editorials.astro';
-import Contact from '../components/Contact.astro';
 ---
 
-<BaseLayout title="Samarpan Verma — Portfolio">
+<BaseLayout title="Samarpan Verma — Portfolio" bodyClass="no-scroll">
   <ShaderBackground />
-  <Nav active="about" />
   <div class="page-frame" aria-hidden="true"></div>
+  <Nav />
 
-  <main>
-    <Hero />
-    <Projects />
-    <Editorials />
-    <Contact />
-  </main>
+  <div class="home-viewport">
+    <!-- Bird figure — top-right corner -->
+    <img
+      src="/img2-fly.png"
+      alt="Bird in flight"
+      class="hero-figure"
+      loading="eager"
+    />
+
+    <!-- Hero text -->
+    <main class="hero-content">
+      <h1 class="hero-greeting">Hi there!</h1>
+      <p class="hero-label">I am</p>
+      <h2 class="hero-name">Samarpan Verma</h2>
+    </main>
+  </div>
 </BaseLayout>
 
 <style>
-  main {
-    position: relative;
+  .home-viewport {
+    position: fixed;
+    inset: 1rem;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .home-viewport > * {
+    pointer-events: auto;
+  }
+
+  /* --- Bird figure — bleeds out of top-right corner --- */
+  .hero-figure {
+    position: absolute;
+    top: -2%;
+    right: -2%;
+    width: clamp(220px, 22vw, 380px);
+    height: auto;
+    object-fit: contain;
     z-index: 1;
+    filter: grayscale(0.2);
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* --- Hero text — left-center area --- */
+  .hero-content {
+    position: absolute;
+    left: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+
+  .hero-greeting {
+    font-family: var(--font-sans);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.01em;
+  }
+
+  .hero-label {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
+  }
+
+  .hero-name {
+    font-family: var(--font-sans);
+    font-size: var(--text-4xl);
+    font-weight: 400;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /* --- Mobile --- */
+  @media (max-width: 768px) {
+    .hero-figure {
+      width: 160px;
+      top: -1%;
+      right: -3%;
+    }
+
+    .home-nav {
+      top: auto;
+      bottom: 3rem;
+      right: 50%;
+      transform: translateX(50%);
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-main,
+    .nav-secondary {
+      align-items: center;
+    }
+
+    .hero-content {
+      left: 6%;
+      top: 45%;
+    }
+
+    .hero-greeting {
+      font-size: var(--text-2xl);
+    }
+
+    .hero-name {
+      font-size: var(--text-3xl);
+    }
   }
 </style>

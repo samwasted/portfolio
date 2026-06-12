@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShaderBackground from '../components/ShaderBackground.astro';
+import Nav from '../components/Nav.astro';
+import HeroComponent from '../components/Hero.astro';
+---
+
+<BaseLayout title="About — Samarpan Verma">
+  <ShaderBackground />
+  <Nav active="about" showBack={true} />
+  <div class="page-frame" aria-hidden="true"></div>
+
+  <main class="page-content">
+    <HeroComponent />
+  </main>
+</BaseLayout>
+
+<style>
+  .page-content {
+    position: relative;
+    z-index: 1;
+  }
+</style>

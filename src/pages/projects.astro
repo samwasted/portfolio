@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShaderBackground from '../components/ShaderBackground.astro';
+import Nav from '../components/Nav.astro';
+import ProjectsComponent from '../components/Projects.astro';
+---
+
+<BaseLayout title="Projects — Samarpan Verma">
+  <ShaderBackground />
+  <Nav active="projects" showBack={true} />
+  <div class="page-frame" aria-hidden="true"></div>
+
+  <main class="page-content">
+    <ProjectsComponent />
+  </main>
+</BaseLayout>
+
+<style>
+  .page-content {
+    position: relative;
+    z-index: 1;
+  }
+</style>
