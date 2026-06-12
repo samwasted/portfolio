@@ -85,12 +85,20 @@
       gl!.drawArrays(gl!.TRIANGLES, 0, 6);
     }
 
+    let accumulator = 0;
+    const TIME_STEP = 1000 / 30; // ~33.33ms for 30fps
+
     function render(now: number) {
       // If canvas removed from DOM (navigated away), stop entirely
       if (!document.body.contains(canvas)) {
         window.removeEventListener('resize', handleResize);
         return;
       }
+
+      if (lastFrameTime === 0) lastFrameTime = now;
+      const deltaTime = now - lastFrameTime;
+      lastFrameTime = now;
+      accumulator += deltaTime;
 
       const elapsed = now - startTime;
 
@@ -103,14 +111,13 @@
 
       if (frozen) return;
 
-      // Cap to ~10fps (100ms between frames)
-      if (now - lastFrameTime < 100) {
-        animId = requestAnimationFrame(render);
-        return;
+      // Only draw when we've accumulated enough time
+      if (accumulator >= TIME_STEP) {
+        // Keep the fractional remainder for perfectly smooth timing
+        accumulator = accumulator % TIME_STEP;
+        renderFrame(elapsed / 1000.0);
       }
-      lastFrameTime = now;
 
-      renderFrame(elapsed / 1000.0);
       animId = requestAnimationFrame(render);
     }
 
