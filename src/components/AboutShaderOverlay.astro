@@ -2,6 +2,11 @@
 /**
  * AboutShaderOverlay — Transparent WebGL canvas overlay
  * Renders the Mt Fuji watercolor shader over the existing background.
+ * 
+ * Performance strategy:
+ *  1. Downscale canvas to 1/3 native resolution (matches main background)
+ *  2. Cap framerate to 30fps during animation
+ *  3. Freeze completely once the reveal animation finishes (~8s)
  */
 ---
 
@@ -10,7 +15,7 @@
 <style>
   #about-shader-overlay {
     position: fixed;
-    top: 1rem;
+    top: 1rem;z
     left: 1rem;
     width: calc(100% - 2rem);
     height: calc(100% - 2rem);
@@ -28,8 +33,11 @@
     const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
     if (!canvas) return;
 
-    // Must be alpha: true for transparent overlay
-    const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, premultipliedAlpha: false });
+    // Prevent double-init
+    if ((canvas as any).__about_init) return;
+    (canvas as any).__about_init = true;
+
+    const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: false });
     if (!gl) return;
 
     const program = createShaderProgram(gl, vertSrc, fragSrc);
@@ -41,45 +49,78 @@
     const uTime = gl.getUniformLocation(program, 'uTime');
     const uResolution = gl.getUniformLocation(program, 'uResolution');
 
-    // Enable blending for transparency
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    // Run at native resolution for crisp watercolor edges
-    const DOWNSCALE_FACTOR = 1;
+    // Downscale to 1/3 native resolution — matches main background shader
+    const DOWNSCALE_FACTOR = 3;
     const dpr = window.devicePixelRatio / DOWNSCALE_FACTOR;
     let startTime = performance.now();
     let animId: number;
+    let lastFrameTime = 0;
+    let frozen = false;
+
+    // Animation completes at t_flowers end: t*0.8 needs to reach ~8.5s => t ~10.6s
+    // At that point swayStrength is also 0. So after ~11s, freeze forever.
+    const FREEZE_AFTER_MS = 11000;
 
     function handleResize() {
       resizeCanvasToDisplaySize(canvas, dpr);
       gl!.viewport(0, 0, canvas.width, canvas.height);
+      // If frozen and resized, re-render one frame at the new size
+      if (frozen) {
+        renderFrame((performance.now() - startTime) / 1000.0);
+      }
     }
 
     window.addEventListener('resize', handleResize);
     handleResize();
 
-    function render() {
+    function renderFrame(time: number) {
       gl!.clearColor(0, 0, 0, 0);
       gl!.clear(gl!.COLOR_BUFFER_BIT);
-
       gl!.useProgram(program);
-      gl!.uniform1f(uTime, (performance.now() - startTime) / 1000.0);
+      gl!.uniform1f(uTime, time);
       gl!.uniform2f(uResolution, canvas.width, canvas.height);
-
       gl!.bindVertexArray(quad);
       gl!.drawArrays(gl!.TRIANGLES, 0, 6);
+    }
 
+    function render(now: number) {
+      // If canvas removed from DOM (navigated away), stop entirely
+      if (!document.body.contains(canvas)) {
+        window.removeEventListener('resize', handleResize);
+        return;
+      }
+
+      const elapsed = now - startTime;
+
+      // Once the reveal animation is done, render one final frame and stop
+      if (elapsed > FREEZE_AFTER_MS && !frozen) {
+        frozen = true;
+        renderFrame(elapsed / 1000.0);
+        return; // Stop the loop — 0% GPU from here
+      }
+
+      if (frozen) return;
+
+      // Cap to ~30fps (33ms between frames) — halves GPU cost vs 60fps
+      if (now - lastFrameTime < 33) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = now;
+
+      renderFrame(elapsed / 1000.0);
       animId = requestAnimationFrame(render);
     }
 
-    render();
+    animId = requestAnimationFrame(render);
   }
 
-  // Init directly when component mounts (on this page only)
+  // Init directly when component mounts
   initAboutShader();
   document.addEventListener('astro:after-swap', () => {
-    // Re-init if navigating to about page
     if (document.getElementById('about-shader-overlay')) {
       initAboutShader();
     }

@@ -7,11 +7,11 @@
  */
 ---
 
-<canvas id="shader-bg" aria-hidden="true" transition:persist="shader-bg"></canvas>
+<div id="image-bg" aria-hidden="true" transition:persist="image-bg"></div>
 <div id="noise-overlay" aria-hidden="true" transition:persist="noise-overlay"></div>
 
 <style>
-  #shader-bg {
+  #image-bg {
     position: fixed;
     top: 0;
     left: 0;
@@ -19,6 +19,9 @@
     height: 100%;
     z-index: 0;
     pointer-events: none;
+    background-image: url('/bg.png');
+    background-size: cover;
+    background-position: center;
   }
 
   #noise-overlay {
@@ -29,7 +32,7 @@
     height: 100%;
     z-index: 1;
     pointer-events: none;
-    opacity: 0.1;
+    opacity: 0.45;
     mix-blend-mode: overlay;
     background-repeat: repeat;
     background-size: 128px 128px;
@@ -55,7 +58,7 @@
       noiseEl.style.backgroundImage = `url("${noiseDataUri}")`;
     }
 
-    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false });
+    const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, powerPreference: 'low-power' });
     if (!gl) {
       console.warn('[ShaderBackground] WebGL2 not supported');
       return;
@@ -70,10 +73,12 @@
     const uTime = gl.getUniformLocation(program, 'uTime');
     const uResolution = gl.getUniformLocation(program, 'uResolution');
 
-    const DOWNSCALE_FACTOR = 3;
+    // Heavy downscale — this is a blurry dark gradient, doesn't need resolution
+    const DOWNSCALE_FACTOR = 4;
     const dpr = window.devicePixelRatio / DOWNSCALE_FACTOR;
     let startTime = performance.now();
     let animId: number;
+    let lastFrameTime = 0;
 
     function handleResize() {
       resizeCanvasToDisplaySize(canvas, dpr);
@@ -83,9 +88,17 @@
     window.addEventListener('resize', handleResize);
     handleResize(); // Initial sizing
 
-    function render() {
+    function render(now: number) {
+      // Cap to ~10fps (100ms between frames) — this gradient moves so slowly
+      // that 10fps is perceptually identical to 60fps
+      if (now - lastFrameTime < 100) {
+        animId = requestAnimationFrame(render);
+        return;
+      }
+      lastFrameTime = now;
+
       gl!.useProgram(program);
-      gl!.uniform1f(uTime, (performance.now() - startTime) / 1000.0);
+      gl!.uniform1f(uTime, (now - startTime) / 1000.0);
       gl!.uniform2f(uResolution, canvas.width, canvas.height);
 
       gl!.bindVertexArray(quad);
@@ -94,7 +107,7 @@
       animId = requestAnimationFrame(render);
     }
 
-    render();
+    animId = requestAnimationFrame(render);
 
     // No cleanup or re-init needed on view transitions!
     // Astro's transition:persist="shader-bg" keeps this exact DOM element 
@@ -102,5 +115,5 @@
   }
 
   // Init once on initial page load
-  initBackground();
+  // initBackground(); // WebGL background temporarily disabled
 </script>
