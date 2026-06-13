@@ -24,11 +24,11 @@ const allEditorials = [...editorials, ...dummyEditorials];
 
 <BaseLayout title="Editorials - Samarpan Verma" description="Technical editorials and reports" preloadMath={true}>
   <ShaderBackground />
-  <AboutShaderOverlay position="top-right" />
   <Nav active="editorials" showBack />
   <div class="page-frame" aria-hidden="true"></div>
 
   <main class="editorials-page">
+    <AboutShaderOverlay position="top-right" />
     <div class="editorials-page-content">
       <h1 class="page-title">Editorials</h1>
       <p class="page-subtitle">Technical reports and writings</p>
@@ -70,12 +70,21 @@ const allEditorials = [...editorials, ...dummyEditorials];
 
   .editorials-page-content {
     width: 100%;
-    margin: 0 auto;
+    max-width: calc(100% - 10rem);
+    margin: 0; /* Align left with strict max width to prevent overlap */
+  }
+
+  @media (max-width: 768px) {
+    .editorials-page-content {
+      max-width: 100%; /* Reset on mobile where navbar is different */
+    }
   }
 
   .page-title {
-    font-size: var(--text-2xl);
+    font-family: 'EB Garamond', 'Libre Baskerville', serif;
+    font-size: 5rem;
     font-weight: 400;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
     margin-bottom: var(--space-sm);
   }
@@ -101,8 +110,7 @@ const allEditorials = [...editorials, ...dummyEditorials];
     border-bottom: 1px solid var(--border-strong);
     text-decoration: none;
     color: inherit;
-    /* Removed the global opacity drop on hover so the glow pops */
-    transition: all 0.5s ease;
+    /* Removed global transition:all to prevent layout flinching on page load */
   }
 
   .editorial-list-item:hover {

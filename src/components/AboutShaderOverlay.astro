@@ -1,8 +1,7 @@
 ---
 /**
  * AboutShaderOverlay — Transparent WebGL canvas overlay
- * Renders the about shader (flipped, half size, configurable position).
- * Renders exactly once (final state) for performance.
+ * Debugging State: Hardcoded to bottom-right with red debug background.
  */
 export interface Props {
   position?: 'bottom-right' | 'top-right';
@@ -15,11 +14,13 @@ const { position = 'bottom-right' } = Astro.props;
 
 <style>
   #about-shader-overlay {
-    position: fixed;
+    position: absolute;
     width: 50vw;
     height: 50vh;
-    z-index: 0; /* Placed behind text */
+    z-index: 9999;
     pointer-events: none;
+    opacity: 0.3;
+    filter: saturate(0.5) brightness(0.8);
   }
 
   .pos-bottom-right {
@@ -31,7 +32,7 @@ const { position = 'bottom-right' } = Astro.props;
   .pos-top-right {
     top: 0;
     right: 0;
-    transform: scale(-1, -1); /* Flip vertically to anchor to top */
+    transform: scaleX(-1) scaleY(-1);
   }
 
   @media (max-width: 768px) {
@@ -52,9 +53,6 @@ const { position = 'bottom-right' } = Astro.props;
 
     const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
     if (!canvas) return;
-    
-    // Don't run WebGL on mobile since it's hidden
-    if (window.getComputedStyle(canvas).display === 'none') return;
 
     // Prevent double-init
     if ((canvas as any).__about_init) return;
@@ -118,9 +116,10 @@ const { position = 'bottom-right' } = Astro.props;
     const TIME_STEP = 1000 / 30; // ~33.33ms for 30fps
 
     function render(now: number) {
-      // Stop completely if navigated away
+      // Stop completely if navigated away to prevent WebGL context leaks
       if (!document.body.contains(canvas)) {
         window.removeEventListener('resize', handleResize);
+        gl!.getExtension('WEBGL_lose_context')?.loseContext();
         return; 
       }
 
@@ -152,12 +151,7 @@ const { position = 'bottom-right' } = Astro.props;
     animId = requestAnimationFrame(render);
   }
 
-  // Init directly when component mounts
-  initAboutShader();
-  document.addEventListener('astro:after-swap', () => {
-    const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
-    if (canvas && !(canvas as any).__about_init) {
-      initAboutShader();
-    }
-  });
+  // Astro's View Transitions lifecycle hook
+  // astro:page-load fires on initial load AND every subsequent navigation
+  document.addEventListener('astro:page-load', initAboutShader);
 </script>
