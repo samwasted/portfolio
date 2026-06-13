@@ -53,6 +53,7 @@ if (fs.existsSync(projectsPath)) {
 
     <!-- Detail Panel (65%) -->
     <article class="projects-detail" id="projects-detail">
+
       <button id="mobile-detail-close" class="mobile-close-btn" aria-label="Close details">
         <div class="drag-handle"></div>
       </button>
@@ -377,6 +378,8 @@ if (fs.existsSync(projectsPath)) {
   .detail-panes-wrapper {
     display: grid;
     grid-template-areas: "stack";
+    position: relative;
+    z-index: 1;
   }
 
   .projects-section {
@@ -526,6 +529,8 @@ if (fs.existsSync(projectsPath)) {
     padding: 6rem 4rem 2rem 4rem;
     overflow-y: auto;
     position: relative;
+    z-index: 1;
+    background-color: transparent;
   }
 
   .detail-container {

@@ -1,0 +1,93 @@
+---
+/**
+ * NoiseOverlay — A performant, pixelated film grain overlay.
+ * Uses a single small canvas scaled up via CSS `image-rendering: pixelated` 
+ * to achieve a cinematic effect with minimal CPU/GPU overhead.
+ */
+interface Props {
+  id?: string;
+  alpha?: number;
+  canvasSize?: number;
+  classes?: string;
+}
+
+const { 
+  id = "global-noise-canvas", 
+  alpha = 40, 
+  canvasSize = 256,
+  classes = ""
+} = Astro.props;
+---
+
+<canvas 
+  id={id} 
+  class={`pointer-events-none noise-overlay-canvas ${classes}`} 
+  data-alpha={alpha} 
+  data-size={canvasSize}
+  style="image-rendering: pixelated; position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 9999;"
+></canvas>
+
+<script>
+  function initNoiseCanvas() {
+    const canvases = document.querySelectorAll('.noise-overlay-canvas');
+    if (canvases.length === 0) return;
+
+    canvases.forEach(canvas => {
+      const ctx = (canvas as HTMLCanvasElement).getContext("2d", { alpha: true });
+      if (!ctx) return;
+
+      const alpha = parseInt(canvas.getAttribute('data-alpha') || '40', 10);
+      const size = parseInt(canvas.getAttribute('data-size') || '256', 10);
+      
+      (canvas as HTMLCanvasElement).width = size;
+      (canvas as HTMLCanvasElement).height = size;
+
+      let frame = 0;
+      let animationId: number;
+      const patternRefreshInterval = 2;
+
+      const imageData = ctx.createImageData(size, size);
+
+      const drawGrain = () => {
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 8) {
+          const value = Math.random() * 255;
+          
+          data[i] = value;     // R
+          data[i + 1] = value; // G
+          data[i + 2] = value; // B
+          data[i + 3] = alpha; // A
+          
+          // Duplicate horizontally to halve Math.random() calculations
+          if (i + 4 < data.length) {
+            data[i + 4] = value;
+            data[i + 5] = value;
+            data[i + 6] = value;
+            data[i + 7] = alpha;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+      };
+
+      const loop = () => {
+        if (frame % patternRefreshInterval === 0) {
+          drawGrain();
+        }
+        frame++;
+        animationId = window.requestAnimationFrame(loop);
+      };
+
+      // Clean up previous loops if astro:after-swap triggers multiple times
+      if ((canvas as any).__noiseAnimationId) {
+        window.cancelAnimationFrame((canvas as any).__noiseAnimationId);
+      }
+      
+      loop();
+      (canvas as any).__noiseAnimationId = animationId;
+    });
+  }
+
+  // Run on initial load and view transitions
+  initNoiseCanvas();
+  document.addEventListener('astro:after-swap', initNoiseCanvas);
+</script>
