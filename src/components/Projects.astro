@@ -129,20 +129,32 @@ if (fs.existsSync(projectsPath)) {
 
 <script>
   class ProjectController {
+    projects: any[];
+    cards: HTMLElement[];
+    panes: HTMLElement[];
+    layout: HTMLElement | null;
+    projectsList: HTMLElement | null;
+    closeBtn: HTMLElement | null;
+    lockedIndex: number;
+    previewIndex: number;
+    hoverTimeout: any;
+    isAnimating: boolean;
+
     constructor() {
       this.projects = (window as any).__PROJECTS_DATA__ || [];
-      if (this.projects.length === 0) return;
-
-      this.cards = Array.from(document.querySelectorAll('.project-card'));
-      this.panes = Array.from(document.querySelectorAll('.detail-container'));
-      this.layout = document.querySelector('.projects-layout');
-      this.projectsList = document.querySelector('.projects-list');
+      
+      this.cards = Array.from(document.querySelectorAll('.project-card')) as HTMLElement[];
+      this.panes = Array.from(document.querySelectorAll('.detail-container')) as HTMLElement[];
+      this.layout = document.querySelector('.projects-layout') as HTMLElement | null;
+      this.projectsList = document.querySelector('.projects-list') as HTMLElement | null;
       this.closeBtn = document.getElementById('mobile-detail-close');
       
       this.lockedIndex = -1;
       this.previewIndex = 0;
-      this.hoverTimeout = null as any;
+      this.hoverTimeout = null;
       this.isAnimating = false;
+
+      if (this.projects.length === 0) return;
 
       this.bindEvents();
       this.initDefaultState();
@@ -288,7 +300,7 @@ if (fs.existsSync(projectsPath)) {
     initMobileDrag() {
       if (!this.closeBtn) return;
       
-      const newCloseBtn = this.closeBtn.cloneNode(true);
+      const newCloseBtn = this.closeBtn.cloneNode(true) as HTMLElement;
       this.closeBtn.parentNode?.replaceChild(newCloseBtn, this.closeBtn);
 
       let startY = 0;
@@ -304,7 +316,7 @@ if (fs.existsSync(projectsPath)) {
         startHeight = detailPane.offsetHeight;
         isDragging = true;
         detailPane.classList.add('is-dragging');
-        (newCloseBtn as HTMLElement).setPointerCapture(e.pointerId);
+        newCloseBtn.setPointerCapture(e.pointerId);
       });
 
       newCloseBtn.addEventListener('pointermove', (e: PointerEvent) => {
@@ -320,7 +332,7 @@ if (fs.existsSync(projectsPath)) {
         if (!isDragging || !detailPane) return;
         isDragging = false;
         detailPane.classList.remove('is-dragging');
-        (newCloseBtn as HTMLElement).releasePointerCapture(e.pointerId);
+        newCloseBtn.releasePointerCapture(e.pointerId);
         
         const deltaY = currentY - startY;
         const finalHeight = startHeight - deltaY;
