@@ -20,7 +20,7 @@ let projects: Project[] = projectsData as Project[];
 ---
 
 <section id="projects" class="section projects-section">
-  <div class="projects-layout">
+  <div class="projects-layout" data-projects={JSON.stringify(projects)}>
     <!-- Sidebar / Explorer (35%) -->
     <aside class="projects-sidebar">
       <div class="sidebar-header">
@@ -118,10 +118,7 @@ let projects: Project[] = projectsData as Project[];
   </div>
 </section>
 
-<!-- Pass projects data to client-side JS -->
-<script define:vars={{ projectsJson: JSON.stringify(projects) }}>
-  window.__PROJECTS_DATA__ = JSON.parse(projectsJson);
-</script>
+
 
 <script>
   class ProjectController {
@@ -137,7 +134,15 @@ let projects: Project[] = projectsData as Project[];
     isAnimating: boolean;
 
     constructor() {
-      this.projects = (window as any).__PROJECTS_DATA__ || [];
+      this.layout = document.querySelector('.projects-layout') as HTMLElement | null;
+      if (!this.layout) return;
+
+      try {
+        const rawData = this.layout.dataset.projects;
+        this.projects = rawData ? JSON.parse(rawData) : [];
+      } catch (e) {
+        this.projects = [];
+      }
       
       this.cards = Array.from(document.querySelectorAll('.project-card')) as HTMLElement[];
       this.panes = Array.from(document.querySelectorAll('.detail-container')) as HTMLElement[];
@@ -361,12 +366,13 @@ let projects: Project[] = projectsData as Project[];
     }
   }
 
-  function initProjects() {
-    new ProjectController();
-  }
-
-  initProjects();
-  document.addEventListener('astro:after-swap', initProjects);
+  // Use Astro's official page-load hook to re-initialize on every navigation
+  document.addEventListener('astro:page-load', () => {
+    // Only init if we are actually on a page that contains projects
+    if (document.querySelector('.projects-layout')) {
+      new ProjectController();
+    }
+  });
 </script>
 
 <style>

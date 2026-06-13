@@ -4,8 +4,7 @@ import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
 import ContactComponent from '../components/Contact.astro';
 
-// Import Astro's native Image optimization component
-import { Image } from 'astro:assets';
+// Bypassing Astro Image optimizer for Cloudflare Edge compatibility
 
 // Import the background images
 import bgImage from '../../public/hands.png';
@@ -20,9 +19,9 @@ import bgImage3 from '../../public/residue.png';
   <div class="master-animation-group fixed z-0 pointer-events-none mix-blend-screen isolate">
     <!-- Base Hands Image -->
     <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-90">
-      <Image 
+      <img 
         id="base-hands-layer"
-        src={bgImage}
+        src={bgImage.src}
         alt=""
         class="base-wave absolute inset-0 w-full h-full object-contain object-center"
         fetchpriority="high"
