@@ -36,7 +36,7 @@ if (fs.existsSync(projectsPath)) {
       <div class="projects-list" id="projects-list">
         {projects.map((project, i) => (
           <button
-            class:list={['project-card', { active: i === 0 }]}
+            class="project-card"
             data-index={i}
           >
             <div class="card-content">
@@ -57,65 +57,67 @@ if (fs.existsSync(projectsPath)) {
         <div class="drag-handle"></div>
       </button>
       
-      {projects.length > 0 ? (
-        <div class="detail-container" id="detail-container">
-          <!-- Top: Title & Summary -->
-          <header class="detail-header">
-            <h1 class="detail-name" id="detail-name">{projects[0].name}</h1>
-            <hr class="detail-divider" />
-            <p class="detail-summary" id="detail-summary">{projects[0].summary}</p>
-          </header>
+      <div class="detail-panes-wrapper">
+        {projects.length > 0 ? projects.map((p, index) => (
+          <div class={`detail-container ${index === 0 ? 'active-pane' : ''}`} data-pane-index={index}>
+            <!-- Top: Title & Summary -->
+            <header class="detail-header">
+              <h1 class="detail-name">{p.name}</h1>
+              <hr class="detail-divider" />
+              <p class="detail-summary">{p.summary}</p>
+            </header>
 
-          <!-- Center: Visual Area -->
-          <div class="detail-visual">
-            <div class="visual-pattern"></div>
-          </div>
+            <!-- Center: Visual Area -->
+            <div class="detail-visual">
+              <div class="visual-pattern"></div>
+            </div>
 
-          <!-- Bottom: Description & Tech -->
-          <div class="detail-body">
-            <div class="detail-text-area">
-              <p class="detail-description" id="detail-description">{projects[0].description}</p>
-              
-              <div class="detail-extended" id="detail-extended">
-                <div class="features-list" id="detail-features">
-                  <h4 class="section-heading">Key Features</h4>
-                  <ul>
-                    {projects[0].features.map(feature => (
-                      <li>{feature}</li>
+            <!-- Bottom: Description & Tech -->
+            <div class="detail-body">
+              <div class="detail-text-area">
+                <p class="detail-description">{p.description}</p>
+                
+                <div class="detail-extended">
+                  <div class="features-list">
+                    <h4 class="section-heading">Key Features</h4>
+                    <ul>
+                      {p.features.map(feature => (
+                        <li>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-meta">
+                <div class="detail-tech">
+                  <h4 class="section-heading">Technologies</h4>
+                  <div class="tech-tags">
+                    {p.techStack.map(tech => (
+                      <span class="tech-tag">{tech}</span>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="detail-meta">
-              <div class="detail-tech" id="detail-tech">
-                <h4 class="section-heading">Technologies</h4>
-                <div class="tech-tags">
-                  {projects[0].techStack.map(tech => (
-                    <span class="tech-tag">{tech}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <!-- Footer: Links -->
+            <footer class="detail-footer">
+              <a class="github-link" href={p.github} target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span class="github-text">{p.github.replace('https://github.com/', '')}</span>
+                <span class="external-arrow">↗</span>
+              </a>
+            </footer>
           </div>
-
-          <!-- Footer: Links -->
-          <footer class="detail-footer">
-            <a class="github-link" id="detail-github" href={projects[0].github} target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-              </svg>
-              <span id="detail-github-text" class="github-text">{projects[0].github.replace('https://github.com/', '')}</span>
-              <span class="external-arrow">↗</span>
-            </a>
-          </footer>
-        </div>
-      ) : (
-        <div class="detail-container">
-          <p class="projects-empty">Select a project to view details</p>
-        </div>
-      )}
+        )) : (
+          <div class="detail-container active-pane">
+            <p class="projects-empty">Select a project to view details</p>
+          </div>
+        )}
+      </div>
     </article>
   </div>
 </section>
@@ -126,158 +128,169 @@ if (fs.existsSync(projectsPath)) {
 </script>
 
 <script>
-  function initProjects() {
-    const projects = (window as any).__PROJECTS_DATA__ || [];
-    if (projects.length === 0) return;
+  class ProjectController {
+    constructor() {
+      this.projects = (window as any).__PROJECTS_DATA__ || [];
+      if (this.projects.length === 0) return;
 
-    let lockedIndex = -1;
-    let previewIndex = 0;
-    const projectsList = document.querySelector('.projects-list');
-    const cards = document.querySelectorAll('.project-card');
-    const detailContainer = document.getElementById('detail-container');
-    const layout = document.querySelector('.projects-layout');
-    const closeBtn = document.getElementById('mobile-detail-close');
-    
-    // DOM Elements
-    const detailName = document.getElementById('detail-name');
-    const detailSummary = document.getElementById('detail-summary');
-    const detailDesc = document.getElementById('detail-description');
-    const detailFeatures = document.getElementById('detail-features');
-    const detailTech = document.getElementById('detail-tech');
-    const detailGithub = document.getElementById('detail-github') as HTMLAnchorElement;
-    const detailGithubText = document.getElementById('detail-github-text');
+      this.cards = Array.from(document.querySelectorAll('.project-card'));
+      this.panes = Array.from(document.querySelectorAll('.detail-container'));
+      this.layout = document.querySelector('.projects-layout');
+      this.projectsList = document.querySelector('.projects-list');
+      this.closeBtn = document.getElementById('mobile-detail-close');
+      
+      this.lockedIndex = -1;
+      this.previewIndex = 0;
+      this.hoverTimeout = null as any;
+      this.isAnimating = false;
 
-    // Read More Logic
-    // Removed read-more logic
-    
-    
+      this.bindEvents();
+      this.initDefaultState();
+      this.initMobileDrag();
+    }
 
-    function selectProject(index: number, isHover = false) {
-      const p = projects[index];
-      if (!p) return;
+    get isMobile() {
+      return window.innerWidth <= 900;
+    }
 
-      const isMobile = window.innerWidth <= 900;
-      let wasClosed = false;
-
-      if (layout && isMobile) {
-        if (!layout.classList.contains('has-active-project')) {
-          wasClosed = true;
-          layout.classList.add('has-active-project');
-        }
+    initDefaultState() {
+      if (!this.isMobile) {
+        this.lockedIndex = -1;
+        this.previewIndex = 0;
+        this.updateActiveCards();
+        this.updateActivePane();
+      } else {
+        this.cards.forEach(c => c.classList.remove('active'));
+        if (this.layout) this.layout.classList.remove('has-active-project');
       }
+    }
 
-      // Update active state on cards
-      cards.forEach((card, i) => {
-        if (isMobile) {
-          card.classList.toggle('active', i === index);
+    updateActiveCards() {
+      this.cards.forEach((card, i) => {
+        if (this.isMobile) {
+          card.classList.toggle('active', i === this.previewIndex);
         } else {
-          card.classList.toggle('active', i === lockedIndex);
+          card.classList.toggle('active', i === this.lockedIndex);
         }
       });
+    }
 
-      const updateContent = () => {
-        // Reset scroll position to top for the new project
-        const detailPane = document.getElementById('projects-detail');
-        if (detailPane) {
-          detailPane.scrollTop = 0;
-          detailPane.style.height = ''; // Always default back to CSS 60dvh
-          detailPane.classList.remove('expanded-pane');
-        }
-
-        if (detailName) detailName.textContent = p.name;
-        if (detailSummary) detailSummary.textContent = p.summary;
-        if (detailDesc) detailDesc.textContent = p.description;
-        
-        if (detailFeatures) {
-          detailFeatures.innerHTML = `
-            <h4 class="section-heading">Key Features</h4>
-            <ul>
-              ${p.features.map((f: string) => `<li>${f}</li>`).join('')}
-            </ul>
-          `;
-        }
-
-        if (detailTech) {
-          detailTech.innerHTML = `
-            <h4 class="section-heading">Technologies</h4>
-            <div class="tech-tags">
-              ${p.techStack.map((t: string) => `<span class="tech-tag">${t}</span>`).join('')}
-            </div>
-          `;
-        }
-
-        if (detailGithub) detailGithub.href = p.github;
-        if (detailGithubText) detailGithubText.textContent = p.github.replace('https://github.com/', '');
-
-        // (Read More reset removed)
-      };
-
-      if (detailContainer) {
-        if (isMobile && wasClosed) {
-          // Opening from closed on mobile: update instantly so it slides up fully populated
-          detailContainer.style.transition = 'none';
-          updateContent();
-          detailContainer.style.opacity = '1';
-          detailContainer.style.transform = 'translateY(0)';
-          void detailContainer.offsetWidth;
-          detailContainer.style.transition = '';
-        } else if (isHover && !isMobile) {
-          // Fast preview on desktop hover: Instant update
-          detailContainer.style.transition = 'none';
-          updateContent();
-          detailContainer.style.opacity = '1';
-          detailContainer.style.transform = 'translateY(0)';
-          void detailContainer.offsetWidth;
-          detailContainer.style.transition = '';
+    updateActivePane() {
+      this.panes.forEach((pane, i) => {
+        if (i === this.previewIndex) {
+          pane.classList.add('active-pane');
         } else {
-          // Desktop click-to-lock or mobile switch: manual CSS fade
-          detailContainer.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-          detailContainer.style.opacity = '0';
-          detailContainer.style.transform = 'translateY(5px)';
-          setTimeout(() => {
-            updateContent();
-            detailContainer.style.opacity = '1';
-            detailContainer.style.transform = 'translateY(0)';
-          }, 200);
+          pane.classList.remove('active-pane');
         }
+      });
+      
+      // Reset scroll state on mobile wrapper
+      const detailPane = document.getElementById('projects-detail');
+      if (detailPane) {
+        detailPane.scrollTop = 0;
+        detailPane.style.height = ''; 
+        detailPane.classList.remove('expanded-pane');
       }
 
-      if (isMobile) {
-        const activeCard = cards[index] as HTMLElement;
+      if (this.isMobile) {
+        const activeCard = this.cards[this.previewIndex] as HTMLElement;
         if (activeCard) {
-          // Wait 150ms to ensure the layout has fully repainted the instant padding
           setTimeout(() => {
             const cardRect = activeCard.getBoundingClientRect();
-            // The top 40dvh is visible. If the bottom of the card is below 35dvh, scroll it up!
             const bottomThreshold = window.innerHeight * 0.35; 
             const topThreshold = window.innerHeight * 0.10;
             
             if (cardRect.bottom > bottomThreshold || cardRect.top < topThreshold) {
-              // Native robust scroll using CSS scroll-margin-top
               activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-          }, 150);
+          }, 50);
         }
       }
     }
 
-    // Initial state setup
-    if (window.innerWidth > 900) {
-      if (cards.length > 0) {
-        lockedIndex = -1;
-        previewIndex = 0;
-        selectProject(0, true); // Initial default render
-      }
-    } else {
-      cards.forEach(c => c.classList.remove('active'));
-      if (layout) layout.classList.remove('has-active-project');
+    transitionTo(index: number) {
+      if (this.previewIndex === index) return;
+      this.previewIndex = index;
+      
+      this.updateActiveCards();
+      this.updateActivePane();
     }
 
-    if (closeBtn) {
-      const newCloseBtn = closeBtn.cloneNode(true);
-      closeBtn.parentNode?.replaceChild(newCloseBtn, closeBtn);
+    bindEvents() {
+      this.cards.forEach((card) => {
+        const idx = parseInt((card as HTMLElement).dataset.index || '0');
 
-      // Advanced drag physics for resizing/closing
+        card.addEventListener('click', () => {
+          if (this.isMobile) {
+            const isActive = card.classList.contains('active');
+            if (isActive && this.layout && this.layout.classList.contains('has-active-project')) {
+              this.layout.classList.remove('has-active-project');
+              this.cards.forEach(c => c.classList.remove('active'));
+            } else {
+              if (this.layout) this.layout.classList.add('has-active-project');
+              this.transitionTo(idx); // Instant switch on mobile
+            }
+          } else {
+            // Desktop click-to-lock
+            if (this.lockedIndex === idx) {
+              this.lockedIndex = -1;
+              this.updateActiveCards();
+            } else {
+              this.lockedIndex = idx;
+              this.updateActiveCards();
+              this.transitionTo(idx);
+            }
+          }
+        });
+
+        card.addEventListener('mouseenter', () => {
+          if (!this.isMobile) {
+            if (this.lockedIndex !== -1) return; // Locked ignores hover
+            
+            // Debounce the hover
+            clearTimeout(this.hoverTimeout);
+            this.hoverTimeout = setTimeout(() => {
+              this.transitionTo(idx);
+            }, 50);
+          }
+        });
+      });
+
+      if (this.projectsList) {
+        this.projectsList.addEventListener('mouseleave', () => {
+          if (!this.isMobile) {
+            clearTimeout(this.hoverTimeout);
+            if (this.lockedIndex === -1 && this.previewIndex !== 0) {
+              this.hoverTimeout = setTimeout(() => {
+                this.transitionTo(0);
+              }, 50);
+            }
+          }
+        });
+      }
+
+      document.addEventListener('click', (e) => {
+        if (this.isMobile) return;
+        const sidebar = document.querySelector('.projects-sidebar');
+        if (sidebar && sidebar.contains(e.target as Node)) {
+          const isCard = (e.target as Element).closest('.project-card');
+          if (!isCard) {
+            this.lockedIndex = -1;
+            this.updateActiveCards();
+            if (this.previewIndex !== 0) {
+               this.transitionTo(0);
+            }
+          }
+        }
+      });
+    }
+
+    initMobileDrag() {
+      if (!this.closeBtn) return;
+      
+      const newCloseBtn = this.closeBtn.cloneNode(true);
+      this.closeBtn.parentNode?.replaceChild(newCloseBtn, this.closeBtn);
+
       let startY = 0;
       let currentY = 0;
       let startHeight = 0;
@@ -286,20 +299,19 @@ if (fs.existsSync(projectsPath)) {
 
       newCloseBtn.addEventListener('pointerdown', (e: PointerEvent) => {
         startY = e.clientY;
-        currentY = startY; // Initialize currentY safely
+        currentY = startY;
         if (!detailPane) return;
         startHeight = detailPane.offsetHeight;
         isDragging = true;
         detailPane.classList.add('is-dragging');
-        newCloseBtn.setPointerCapture(e.pointerId);
+        (newCloseBtn as HTMLElement).setPointerCapture(e.pointerId);
       });
 
       newCloseBtn.addEventListener('pointermove', (e: PointerEvent) => {
         if (!isDragging || !detailPane) return;
         e.preventDefault();
         currentY = e.clientY;
-        const deltaY = currentY - startY; // positive = dragging down
-        
+        const deltaY = currentY - startY;
         const newHeight = startHeight - deltaY;
         detailPane.style.height = `${newHeight}px`;
       });
@@ -308,35 +320,30 @@ if (fs.existsSync(projectsPath)) {
         if (!isDragging || !detailPane) return;
         isDragging = false;
         detailPane.classList.remove('is-dragging');
-        newCloseBtn.releasePointerCapture(e.pointerId);
+        (newCloseBtn as HTMLElement).releasePointerCapture(e.pointerId);
         
         const deltaY = currentY - startY;
         const finalHeight = startHeight - deltaY;
-        
-        detailPane.style.height = ''; // Let CSS take over
+        detailPane.style.height = ''; 
         
         const windowHeight = window.innerHeight;
         const vh60 = windowHeight * 0.6;
         const vh85 = windowHeight * 0.85;
         
-        // If it was just a tap (deltaY is tiny), close the pane.
         if (Math.abs(deltaY) < 5) {
-          if (layout) layout.classList.remove('has-active-project');
-          cards.forEach(c => c.classList.remove('active'));
+          if (this.layout) this.layout.classList.remove('has-active-project');
+          this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
           return;
         }
         
         if (finalHeight < vh60 * 0.8) {
-          // Dragged down significantly below 60% -> Close
-          if (layout) layout.classList.remove('has-active-project');
-          cards.forEach(c => c.classList.remove('active'));
+          if (this.layout) this.layout.classList.remove('has-active-project');
+          this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
         } else if (finalHeight > (vh60 + (vh85 - vh60) * 0.25)) {
-          // Dragged up towards 85% -> Snap to 85%
           detailPane.classList.add('expanded-pane');
         } else {
-          // Snap back to 60%
           detailPane.classList.remove('expanded-pane');
         }
       };
@@ -344,77 +351,10 @@ if (fs.existsSync(projectsPath)) {
       newCloseBtn.addEventListener('pointerup', handlePointerUp);
       newCloseBtn.addEventListener('pointercancel', handlePointerUp);
     }
+  }
 
-    cards.forEach((card) => {
-      const idx = parseInt((card as HTMLElement).dataset.index || '0');
-
-      card.addEventListener('click', () => {
-        const isActive = card.classList.contains('active');
-        
-        if (window.innerWidth <= 900) {
-          if (isActive && layout && layout.classList.contains('has-active-project')) {
-            // Close the pane if clicking the active project again on mobile
-            layout.classList.remove('has-active-project');
-            cards.forEach(c => c.classList.remove('active'));
-          } else {
-            selectProject(idx);
-          }
-        } else {
-          // Desktop behavior
-          if (lockedIndex === idx) {
-            lockedIndex = -1; // Release lock if clicking the locked project
-            cards.forEach(c => c.classList.remove('active'));
-          } else {
-            lockedIndex = idx; // Lock the clicked project
-            cards.forEach((c, i) => c.classList.toggle('active', i === lockedIndex));
-            if (previewIndex !== idx) {
-              previewIndex = idx;
-              selectProject(idx);
-            }
-          }
-        }
-      });
-
-      card.addEventListener('mouseenter', () => {
-        if (window.innerWidth > 900) {
-          if (lockedIndex !== -1) return; // If something is locked, hover does nothing
-          if (previewIndex !== idx) {
-            previewIndex = idx;
-            selectProject(idx, true); // Preview the hovered project
-          }
-        }
-      });
-    });
-
-    if (projectsList) {
-      projectsList.addEventListener('mouseleave', () => {
-        if (window.innerWidth > 900) {
-          if (lockedIndex === -1 && previewIndex !== 0) {
-            // If unlocked, reverting mouse leaves it to default (0)
-            previewIndex = 0;
-            selectProject(0, true);
-          }
-        }
-      });
-    }
-
-    // Release lock by clicking empty space on the left side (sidebar)
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 900) return;
-      const sidebar = document.querySelector('.projects-sidebar');
-      if (sidebar && sidebar.contains(e.target as Node)) {
-        const isCard = (e.target as Element).closest('.project-card');
-        if (!isCard) {
-          lockedIndex = -1;
-          cards.forEach(c => c.classList.remove('active'));
-          // Mouse is in sidebar empty space, not over a card, so revert to default
-          if (previewIndex !== 0) {
-             previewIndex = 0;
-             selectProject(0, true);
-          }
-        }
-      }
-    });
+  function initProjects() {
+    new ProjectController();
   }
 
   initProjects();
@@ -422,6 +362,11 @@ if (fs.existsSync(projectsPath)) {
 </script>
 
 <style>
+  .detail-panes-wrapper {
+    display: grid;
+    grid-template-areas: "stack";
+  }
+
   .projects-section {
     min-height: 100vh;
     padding: 0;
@@ -572,11 +517,23 @@ if (fs.existsSync(projectsPath)) {
   }
 
   .detail-container {
+    grid-area: stack;
     max-width: 800px;
-    min-height: 100%;
     display: flex;
     flex-direction: column;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    filter: blur(2px);
+    transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+  }
+
+  .detail-container.active-pane {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    filter: blur(0);
   }
 
   .detail-header {
