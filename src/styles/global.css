@@ -252,18 +252,23 @@ body.no-scroll {
   pointer-events: auto;
 }
 
-.nav-left-group::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4.5rem;
-  z-index: -1;
-  background: rgba(10, 10, 10, 0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  pointer-events: none;
+/* Only show the solid navbar lining on editorials, projects, and connect, and ONLY on mobile */
+@media (max-width: 900px) {
+  .nav-editorials .nav-left-group::before,
+  .nav-projects .nav-left-group::before,
+  .nav-connect .nav-left-group::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4.5rem;
+    z-index: -1;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    pointer-events: none;
+  }
 }
 
 .nav-sidebar-header {
@@ -289,7 +294,6 @@ body.no-scroll {
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
   letter-spacing: 0.05em;
-  margin-top: -0.1rem;
 }
 
 .nav-back {

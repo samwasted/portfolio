@@ -446,6 +446,19 @@ let projects: Project[] = projectsData as Project[];
     padding: 6rem 2rem 2rem 4rem; /* Top padding clears Nav */
     background: linear-gradient(to right, rgba(10,10,10,0.8) 0%, rgba(10,10,10,0.4) 100%);
     backdrop-filter: blur(5px);
+    position: relative;
+  }
+
+  /* Desktop white line separator for Explorer header */
+  .projects-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 4.5rem;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 10;
   }
 
   .projects-list {
@@ -650,7 +663,7 @@ let projects: Project[] = projectsData as Project[];
   }
 
   .mobile-header-link {
-    display: none;
+    display: none !important;
   }
 
   .detail-meta {
@@ -784,6 +797,11 @@ let projects: Project[] = projectsData as Project[];
       overscroll-behavior: contain;
     }
 
+    /* Hide the desktop structural line since global mobile nav handles it */
+    .projects-sidebar::before {
+      display: none;
+    }
+
     .projects-layout.has-active-project .projects-list::after {
       content: '';
       display: block;
@@ -862,7 +880,7 @@ let projects: Project[] = projectsData as Project[];
     }
 
     .mobile-header-link {
-      display: inline-flex;
+      display: inline-flex !important;
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
     }

@@ -16,7 +16,7 @@ const { active, showBack = false, backUrl = "/", backText, hideLinks = false, si
 const isHome = Astro.url.pathname === '/';
 ---
 
-<nav id="main-nav" class={`fixed-nav ${isHome ? 'is-home' : 'is-page'}`}>
+<nav id="main-nav" class={`fixed-nav ${isHome ? 'is-home' : 'is-page'} nav-${active || 'default'}`}>
   <div class="nav-left-group">
     {
       showBack && (
