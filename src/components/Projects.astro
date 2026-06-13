@@ -3,8 +3,7 @@
  * Projects — Cinematic IDE-like Sidebar list + detail panel.
  * Reads from src/data/projects.json config file.
  */
-import fs from 'node:fs';
-import path from 'node:path';
+import projectsData from '../data/projects.json';
 
 interface Project {
   name: string;
@@ -17,11 +16,7 @@ interface Project {
   github: string;
 }
 
-let projects: Project[] = [];
-const projectsPath = path.resolve('src/data/projects.json');
-if (fs.existsSync(projectsPath)) {
-  projects = JSON.parse(fs.readFileSync(projectsPath, 'utf-8'));
-}
+let projects: Project[] = projectsData as Project[];
 ---
 
 <section id="projects" class="section projects-section">
