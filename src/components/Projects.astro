@@ -59,6 +59,13 @@ let projects: Project[] = projectsData as Project[];
             <!-- Top: Title & Summary -->
             <header class="detail-header">
               <h1 class="detail-name">{p.name}</h1>
+              <a class="github-link mobile-header-link" href={p.github} target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                <span class="github-text">{p.github.replace('https://github.com/', '')}</span>
+                <span class="external-arrow">↗</span>
+              </a>
               <hr class="detail-divider" />
               <p class="detail-summary">{p.summary}</p>
             </header>
@@ -302,8 +309,10 @@ let projects: Project[] = projectsData as Project[];
 
     initMobileDrag() {
       const detailPane = document.getElementById('projects-detail');
-      if (!detailPane) return;
+      const closeBtn = document.getElementById('mobile-detail-close');
+      if (!detailPane || !closeBtn) return;
 
+      // --- 1. Content Pull-to-Close (Instagram Style) ---
       let touchStartY = 0;
       let isTouchOnPane = false;
 
@@ -317,9 +326,9 @@ let projects: Project[] = projectsData as Project[];
         const deltaY = e.touches[0].clientY - touchStartY;
         const atTop = detailPane.scrollTop === 0;
 
-        // Scrolling down (finger moving down = deltaY positive) while at top = close
-        if (atTop && deltaY > 10) {
-          e.preventDefault(); // stop scroll bounce
+        // Require a firm 60px pull down to close, so it's not overly sensitive
+        if (atTop && deltaY > 60) {
+          e.preventDefault();
           this.layout?.classList.remove('has-active-project');
           this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
@@ -331,14 +340,69 @@ let projects: Project[] = projectsData as Project[];
         isTouchOnPane = false;
       });
 
-      // Keep the drag handle as a tap-to-close fallback
-      const closeBtn = document.getElementById('mobile-detail-close');
-      if (!closeBtn) return;
-      closeBtn.addEventListener('click', () => {
-        this.layout?.classList.remove('has-active-project');
-        this.cards.forEach(c => c.classList.remove('active'));
-        detailPane.classList.remove('expanded-pane');
+      // --- 2. Handle Drag-to-Resize (Restoring 85% Stretch) ---
+      const newCloseBtn = closeBtn.cloneNode(true) as HTMLElement;
+      closeBtn.parentNode?.replaceChild(newCloseBtn, closeBtn);
+
+      let dragStartY = 0;
+      let dragCurrentY = 0;
+      let startHeight = 0;
+      let isDragging = false;
+
+      newCloseBtn.addEventListener('pointerdown', (e: PointerEvent) => {
+        dragStartY = e.clientY;
+        dragCurrentY = dragStartY;
+        startHeight = detailPane.offsetHeight;
+        isDragging = true;
+        detailPane.classList.add('is-dragging');
+        newCloseBtn.setPointerCapture(e.pointerId);
       });
+
+      newCloseBtn.addEventListener('pointermove', (e: PointerEvent) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        dragCurrentY = e.clientY;
+        const deltaY = dragCurrentY - dragStartY;
+        const newHeight = startHeight - deltaY;
+        detailPane.style.height = `${newHeight}px`;
+      });
+
+      const handlePointerUp = (e: PointerEvent) => {
+        if (!isDragging) return;
+        isDragging = false;
+        detailPane.classList.remove('is-dragging');
+        newCloseBtn.releasePointerCapture(e.pointerId);
+        
+        const deltaY = dragCurrentY - dragStartY;
+        const finalHeight = startHeight - deltaY;
+        detailPane.style.height = ''; 
+        
+        const windowHeight = window.innerHeight;
+        const vh60 = windowHeight * 0.6;
+        const vh85 = windowHeight * 0.85;
+        
+        // Tap or tiny drag to close fallback
+        if (Math.abs(deltaY) < 5) {
+          this.layout?.classList.remove('has-active-project');
+          this.cards.forEach(c => c.classList.remove('active'));
+          detailPane.classList.remove('expanded-pane');
+          return;
+        }
+        
+        // Snap logic: Close if dragged down far enough, expand to 85% if dragged up
+        if (finalHeight < vh60 * 0.8) {
+          this.layout?.classList.remove('has-active-project');
+          this.cards.forEach(c => c.classList.remove('active'));
+          detailPane.classList.remove('expanded-pane');
+        } else if (finalHeight > (vh60 + (vh85 - vh60) * 0.25)) {
+          detailPane.classList.add('expanded-pane');
+        } else {
+          detailPane.classList.remove('expanded-pane');
+        }
+      };
+
+      newCloseBtn.addEventListener('pointerup', handlePointerUp);
+      newCloseBtn.addEventListener('pointercancel', handlePointerUp);
     }
   }
 
@@ -609,6 +673,14 @@ let projects: Project[] = projectsData as Project[];
     flex: 2;
   }
 
+  .detail-footer {
+    display: block;
+  }
+
+  .mobile-header-link {
+    display: none;
+  }
+
   .detail-meta {
     flex: 1;
   }
@@ -815,6 +887,16 @@ let projects: Project[] = projectsData as Project[];
 
     .detail-name {
       font-size: 2.5rem;
+    }
+
+    .mobile-header-link {
+      display: inline-flex;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-footer {
+      display: none;
     }
   }
 
