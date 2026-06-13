@@ -354,7 +354,6 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   const label = document.getElementById("hero-label");
   const tags = document.getElementById("hero-tags");
   const stickyGroup = document.getElementById("hero-sticky-group");
-  const homeViewport = document.querySelector(".home-viewport");
 
   let isTicking = false;
   window.addEventListener("scroll", () => {
@@ -416,12 +415,12 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   });
 
   // Custom smooth scroll function for butter-smooth button click
-  function customSmoothScroll(targetPosition, duration) {
+  function customSmoothScroll(targetPosition: number, duration: number) {
     const startPosition = window.scrollY;
     const distance = targetPosition - startPosition;
-    let startTime = null;
+    let startTime: number | null = null;
 
-    function animation(currentTime) {
+    function animation(currentTime: number) {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
@@ -483,7 +482,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   document.addEventListener(
     "click",
     (e) => {
-      const target = e.target;
+      const target = e.target as Element;
       if (!target || typeof target.closest !== "function") return;
 
       // Smooth scroll for the down arrow

@@ -4,7 +4,10 @@ import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
 import ContactComponent from '../components/Contact.astro';
 
-// Import the new background image
+// Import Astro's native Image optimization component
+import { Image } from 'astro:assets';
+
+// Import the background images
 import bgImage from '../../public/hands.png';
 import bgImage2 from '../../public/handss.png';
 import bgImage3 from '../../public/residue.png';
@@ -13,46 +16,42 @@ import bgImage3 from '../../public/residue.png';
 <BaseLayout title="Connect — Samarpan Verma">
   <ShaderBackground />
   
-  <!-- Base Hands Image -->
-  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-90">
-    <img 
-      src={bgImage.src}
-      alt=""
-      class="absolute inset-0 w-full h-full object-contain object-center"
-      fetchpriority="high"
-      loading="eager"
-      decoding="sync"
-    />
-  </div>
+  <!-- Master Animation Group (Isolates the dimming effect so it doesn't darken the page background) -->
+  <div class="master-animation-group fixed z-0 pointer-events-none mix-blend-screen isolate">
+    <!-- Base Hands Image -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-90">
+      <Image 
+        id="base-hands-layer"
+        src={bgImage}
+        alt=""
+        class="base-wave absolute inset-0 w-full h-full object-contain object-center"
+        fetchpriority="high"
+        loading="eager"
+        decoding="sync"
+      />
+    </div>
 
-  <!-- Expanding Residue Overlay -->
-  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-90">
-    <div 
-      id="residue-layer"
-      class="residue-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
-      style={`background-image: url('${bgImage3.src}');`}
-    ></div>
-  </div>
+    <!-- Expanding Residue Overlay -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-90">
+      <div 
+        id="residue-layer"
+        class="residue-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
+        style={`background-image: url('${bgImage3.src}');`}
+      ></div>
+    </div>
 
-  <!-- Sweeping Glow Ring -->
-  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-60">
-    <!-- The sweeping wave animation -->
-    <div 
-      id="glow-layer"
-      class="glow-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
-      style={`background-image: url('${bgImage2.src}');`}
-    ></div>
-  </div>
+    <!-- Sweeping Glow Ring -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-60">
+      <!-- The sweeping wave animation -->
+      <div 
+        id="glow-layer"
+        class="glow-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
+        style={`background-image: url('${bgImage2.src}');`}
+      ></div>
+    </div>
 
-  <!-- Cinematic Film Grain Overlay -->
-  <div class="fixed inset-0 w-full h-full pointer-events-none" style="z-index: 0; mix-blend-mode: soft-light; opacity: 0.15;">
-    <svg width="100%" height="100%">
-      <filter id="film-noise">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
-        <feColorMatrix type="matrix" values="1 0 0 0 0, 1 0 0 0 0, 1 0 0 0 0, 0 0 0 1 0" />
-      </filter>
-      <rect width="100%" height="100%" filter="url(#film-noise)"></rect>
-    </svg>
+    <!-- Center Readability Dimmer -->
+    <div id="readability-dimmer" class="readability-dimmer absolute inset-0 w-full h-full mix-blend-normal"></div>
   </div>
 
   <Nav active="connect" showBack={true} />
@@ -68,17 +67,20 @@ import bgImage3 from '../../public/residue.png';
   document.addEventListener('astro:page-load', () => {
     const glowLayer = document.getElementById('glow-layer');
     const residueLayer = document.getElementById('residue-layer');
+    const baseLayer = document.getElementById('base-hands-layer');
     
-    if (glowLayer && residueLayer) {
+    if (glowLayer && residueLayer && baseLayer) {
       // Synchronously reset and trigger animations to avoid async setTimeout glitches
       glowLayer.classList.remove('is-animating');
       residueLayer.classList.remove('is-animating');
+      baseLayer.classList.remove('is-animating');
       
       // Force browser reflow
       void glowLayer.offsetWidth;
       
       glowLayer.classList.add('is-animating');
       residueLayer.classList.add('is-animating');
+      baseLayer.classList.add('is-animating');
     }
   });
 </script>
@@ -89,10 +91,37 @@ import bgImage3 from '../../public/residue.png';
     z-index: 1;
   }
 
+  /* Master Animation Group ensuring a perfect aspect ratio regardless of rotation */
+  .master-animation-group {
+    width: 100vmax;
+    height: 100vmax;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Rotate the entire animation sequence on mobile screens to fill the vertical space */
+  @media (max-width: 768px) {
+    .master-animation-group {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+  }
+
   .glow-wave {
     /* Create a distinct, thick ring mask */
     -webkit-mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
     mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0;
+  }
+
+  .base-wave {
+    /* Create a solid expanding circle mask identical to the residue wave */
+    -webkit-mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
+    mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
     -webkit-mask-position: center;
     mask-position: center;
     -webkit-mask-repeat: no-repeat;
@@ -124,12 +153,24 @@ import bgImage3 from '../../public/residue.png';
   }
 
   /* Only play the animation when injected by Javascript */
+  .base-wave.is-animating {
+    animation: sweepResidue 2.5s ease-in-out forwards;
+  }
+
   .glow-wave.is-animating {
     animation: sweepRadial 2.5s ease-in-out forwards;
+    animation-delay: 0.3s;
   }
   
   .residue-wave.is-animating {
     animation: sweepResidue 2.5s ease-in-out forwards;
+    animation-delay: 0.3s;
+  }
+
+  .readability-dimmer {
+    /* Focuses the dimming squarely on the center connection point to protect the text links */
+    background: radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.65) 12%, transparent 35%);
+    opacity: 1;
   }
 
   @keyframes sweepRadial {
