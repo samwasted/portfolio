@@ -16,6 +16,7 @@ export interface Editorial {
   tags: string[];
   draft: boolean;
   layout?: string;
+  cover?: string;
   html: string;
 }
 
@@ -60,6 +61,7 @@ export function loadEditorials(): Editorial[] {
         tags: meta.tags || [],
         draft: meta.draft || false,
         layout: meta.layout || 'single',
+        cover: meta.cover || null,
         html,
       });
     } catch (err) {
@@ -97,6 +99,7 @@ export function loadEditorial(slug: string): Editorial | null {
       tags: meta.tags || [],
       draft: meta.draft || false,
       layout: meta.layout || 'single',
+      cover: meta.cover || null,
       html,
     };
   } catch {

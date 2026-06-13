@@ -82,6 +82,13 @@
       font-size: 0.8rem;
     }
   }
+
+  /* Prevent layout shift when text changes to "copied!" */
+  #copy-text {
+    display: inline-block;
+    min-width: 6.5rem;
+    text-align: left;
+  }
 </style>
 
 <script>

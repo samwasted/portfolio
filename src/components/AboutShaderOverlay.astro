@@ -1,23 +1,37 @@
 ---
 /**
  * AboutShaderOverlay — Transparent WebGL canvas overlay
- * Renders the about shader (flipped, half size, bottom right).
+ * Renders the about shader (flipped, half size, configurable position).
  * Renders exactly once (final state) for performance.
  */
+export interface Props {
+  position?: 'bottom-right' | 'top-right';
+}
+
+const { position = 'bottom-right' } = Astro.props;
 ---
 
-<canvas id="about-shader-overlay" aria-hidden="true"></canvas>
+<canvas id="about-shader-overlay" class={`pos-${position}`} aria-hidden="true"></canvas>
 
 <style>
   #about-shader-overlay {
     position: fixed;
-    bottom: 0;
-    right: 0;
     width: 50vw;
     height: 50vh;
-    z-index: 10;
+    z-index: 0; /* Placed behind text */
     pointer-events: none;
-    transform: scaleX(-1); /* Flip horizontally */
+  }
+
+  .pos-bottom-right {
+    bottom: 0;
+    right: 0;
+    transform: scaleX(-1);
+  }
+
+  .pos-top-right {
+    top: 0;
+    right: 0;
+    transform: scale(-1, -1); /* Flip vertically to anchor to top */
   }
 
   @media (max-width: 768px) {

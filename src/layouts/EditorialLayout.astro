@@ -22,7 +22,7 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
   <ShaderBackground />
 
   <div class="editorial-page">
-    <Nav active="editorials" showBack={true} backUrl="/editorials" />
+    <Nav active="editorials" showBack={true} backUrl="/editorials" backText="Go Back" hideLinks={true} />
 
     <article class={`editorial-container layout-${layout_type}`}>
       <header class="editorial-header">
@@ -45,47 +45,20 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
 
   <style>
     .editorial-page {
-      position: relative;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      width: calc(100% - 2rem);
+      height: calc(100vh - 2rem);
+      overflow-y: auto;
       z-index: 1;
       padding-top: 4rem; /* Ensure space for the global nav */
-    }
-    .editorial-body {
-      opacity: 0;
-      transition: opacity 0.15s ease-in;
-    }
-    .editorial-body.ready {
-      opacity: 1;
+      scrollbar-width: thin;
     }
   </style>
 
-  <!-- KaTeX auto-render: processes .math.inline and .math.display spans -->
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous" is:inline></script>
   <script>
-    function renderEditorialFeatures() {
-      // --- Render Math ---
-      // @ts-ignore
-      const katex = window.katex;
-      if (typeof katex === 'undefined') {
-        setTimeout(renderEditorialFeatures, 50); // wait for script to load
-        return;
-      }
-      
-      // Render inline math
-      document.querySelectorAll<HTMLElement>('.math.inline:not([data-rendered])').forEach(el => {
-        try {
-          katex.render(el.textContent || '', el, { throwOnError: false, displayMode: false });
-          el.setAttribute('data-rendered', 'true');
-        } catch (e) { console.warn('KaTeX inline error:', e); }
-      });
-      // Render display math
-      document.querySelectorAll<HTMLElement>('.math.display:not([data-rendered])').forEach(el => {
-        try {
-          katex.render(el.textContent || '', el, { throwOnError: false, displayMode: true });
-          el.setAttribute('data-rendered', 'true');
-        } catch (e) { console.warn('KaTeX display error:', e); }
-      });
-
-      // --- Setup Copy Buttons ---
+    function setupCopyButtons() {
       document.querySelectorAll<HTMLElement>('.editorial-body pre:not([data-copy-added])').forEach(pre => {
         pre.setAttribute('data-copy-added', 'true');
         const btn = document.createElement('button');
@@ -105,19 +78,14 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
         
         pre.appendChild(btn);
       });
-
-      // Show the content now that everything is safely rendered
-      document.querySelector('.editorial-body')?.classList.add('ready');
     }
 
-    // Run on initial load
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', renderEditorialFeatures);
+      document.addEventListener('DOMContentLoaded', setupCopyButtons);
     } else {
-      renderEditorialFeatures();
+      setupCopyButtons();
     }
     
-    // Run BEFORE the new page is painted during View Transitions to prevent flinch
-    document.addEventListener('astro:after-swap', renderEditorialFeatures);
+    document.addEventListener('astro:after-swap', setupCopyButtons);
   </script>
 </BaseLayout>

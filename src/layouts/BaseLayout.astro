@@ -4,6 +4,7 @@ export interface Props {
   title: string;
   description?: string;
   bodyClass?: string;
+  preloadMath?: boolean;
 }
 
 import "../styles/global.css";
@@ -12,6 +13,7 @@ const {
   title,
   description = "Portfolio of Samarpan Verma",
   bodyClass = "",
+  preloadMath = false,
 } = Astro.props;
 ---
 
@@ -29,9 +31,14 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=block"
       rel="stylesheet"
     />
+
+    <!-- KaTeX JS Engine (Opt-in) -->
+    {preloadMath && (
+      <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous" is:inline></script>
+    )}
 
     <!-- KaTeX CSS -->
     <link
@@ -43,5 +50,33 @@ const {
   <body class={bodyClass}>
     <div class="page-frame" aria-hidden="true"></div>
     <slot />
+
+    <script is:inline>
+      function renderMath(doc) {
+        if (typeof window.katex === 'undefined') return;
+        
+        doc.querySelectorAll('.math.inline:not([data-rendered])').forEach(el => {
+          try {
+            window.katex.render(el.textContent || '', el, { throwOnError: false, displayMode: false });
+            el.setAttribute('data-rendered', 'true');
+          } catch (e) {}
+        });
+        
+        doc.querySelectorAll('.math.display:not([data-rendered])').forEach(el => {
+          try {
+            window.katex.render(el.textContent || '', el, { throwOnError: false, displayMode: true });
+            el.setAttribute('data-rendered', 'true');
+          } catch (e) {}
+        });
+      }
+
+      // Initial page load
+      document.addEventListener('DOMContentLoaded', () => renderMath(document));
+
+      // Intercept View Transitions BEFORE the snapshot is taken!
+      document.addEventListener('astro:before-swap', (e) => {
+        renderMath(e.newDocument);
+      });
+    </script>
   </body>
 </html>

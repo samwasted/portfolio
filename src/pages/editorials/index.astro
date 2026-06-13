@@ -4,14 +4,27 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ShaderBackground from '../../components/ShaderBackground.astro';
+import AboutShaderOverlay from '../../components/AboutShaderOverlay.astro';
 import Nav from '../../components/Nav.astro';
 import { loadEditorials } from '../../lib/editorial-loader';
 
 const editorials = loadEditorials();
+
+// INJECT DUMMY DATA TO TEST SCROLLABILITY
+const dummyEditorials = Array.from({ length: 15 }).map((_, i) => ({
+  slug: `dummy-${i}`,
+  title: `Scroll Test Article Number ${i + 1}`,
+  date: new Date(Date.now() - i * 86400000).toISOString(),
+  tags: ['TEST'],
+  abstract: 'Just a dummy article for testing scroll bounds.',
+}));
+
+const allEditorials = [...editorials, ...dummyEditorials];
 ---
 
-<BaseLayout title="Editorials - Samarpan Verma" description="Technical editorials and reports">
+<BaseLayout title="Editorials - Samarpan Verma" description="Technical editorials and reports" preloadMath={true}>
   <ShaderBackground />
+  <AboutShaderOverlay position="top-right" />
   <Nav active="editorials" showBack />
   <div class="page-frame" aria-hidden="true"></div>
 
@@ -20,24 +33,17 @@ const editorials = loadEditorials();
       <h1 class="page-title">Editorials</h1>
       <p class="page-subtitle">Technical reports and writings</p>
 
-      {editorials.length > 0 ? (
+      {allEditorials.length > 0 ? (
         <div class="editorials-list">
-          {editorials.map(editorial => (
+          {allEditorials.map(editorial => (
             <a href={`/editorials/${editorial.slug}`} class="editorial-list-item" data-astro-prefetch="hover">
-              <div class="editorial-list-meta">
-                <time>{editorial.date}</time>
-                {editorial.tags.length > 0 && (
-                  <div class="editorial-list-tags">
-                    {editorial.tags.map(tag => (
-                      <span class="editorial-tag">{tag}</span>
-                    ))}
-                  </div>
+              <span class="card-name">{editorial.title}</span>
+              <div class="card-meta">
+                {editorial.tags && editorial.tags.length > 0 && (
+                  <span class="card-category">{editorial.tags[0]}</span>
                 )}
+                <span class="card-date">{new Date(editorial.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
               </div>
-              <h2 class="editorial-list-title">{editorial.title}</h2>
-              {editorial.abstract && (
-                <p class="editorial-list-abstract">{editorial.abstract}</p>
-              )}
             </a>
           ))}
         </div>
@@ -50,14 +56,20 @@ const editorials = loadEditorials();
 
 <style>
   .editorials-page {
-    position: relative;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+    height: calc(100vh - 2rem);
+    overflow-y: auto;
     z-index: 1;
-    min-height: 100vh;
-    padding: 6rem var(--page-padding) 4rem;
+    padding: 8rem 4rem 4rem 4rem;
+    /* Custom scrollbar to keep it sleek inside the frame */
+    scrollbar-width: thin;
   }
 
   .editorials-page-content {
-    max-width: 700px;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -77,72 +89,90 @@ const editorials = loadEditorials();
   .editorials-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    border-top: 1px solid var(--border-strong);
+    margin-top: 2rem;
   }
 
   .editorial-list-item {
-    display: block;
-    padding: 1.5rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border-strong);
     text-decoration: none;
     color: inherit;
-    background: var(--surface);
+    /* Removed the global opacity drop on hover so the glow pops */
+    transition: all 0.5s ease;
   }
 
   .editorial-list-item:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-strong);
-    opacity: 1;
+    background: transparent;
   }
 
-  .editorial-list-meta {
+  .card-name {
+    font-family: var(--font-sans);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text-secondary); /* Start slightly dimmed */
+    transition: color 0.6s ease, text-shadow 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .editorial-list-item:hover .card-name {
+    color: #ffffff; /* Peak brightness */
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.4), 0 0 32px rgba(255, 255, 255, 0.1); /* Slow blooming glow */
+    transform: translateX(10px);
+  }
+
+  .card-meta {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: var(--space-sm);
+    gap: 3rem;
   }
 
-  .editorial-list-meta time {
-    font-size: var(--text-xs);
-    color: var(--text-muted);
+  .card-date,
+  .card-category {
     font-family: var(--font-mono);
-  }
-
-  .editorial-list-tags {
-    display: flex;
-    gap: 0.4rem;
-  }
-
-  .editorial-tag {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.4rem;
-    border: 1px solid var(--border-strong);
-    border-radius: 2px;
-    color: var(--text-secondary);
-    font-family: var(--font-sans);
-  }
-
-  .editorial-list-title {
-    font-size: var(--text-lg);
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--space-xs);
-    line-height: 1.4;
-  }
-
-  .editorial-list-abstract {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .editorials-empty {
     color: var(--text-muted);
     font-size: var(--text-sm);
+  }
+
+  /* --- Responsive Design --- */
+  @media (max-width: 900px) {
+    .editorials-page {
+      padding: 6rem 2rem 4rem 2rem;
+    }
+    
+    .editorial-list-item {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1.5rem 0;
+      gap: 1rem;
+    }
+
+    .card-name {
+      font-size: 1.3rem;
+    }
+
+    .editorial-list-item:hover .card-name {
+      transform: translateX(5px);
+    }
+
+    .card-meta {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    .card-date,
+    .card-category {
+      font-size: 0.8rem;
+    }
   }
 </style>
