@@ -200,19 +200,6 @@ let projects: Project[] = projectsData as Project[];
         detailPane.classList.remove('expanded-pane');
       }
 
-      if (this.isMobile) {
-        const activeCard = this.cards[this.previewIndex] as HTMLElement;
-        if (activeCard) {
-          setTimeout(() => {
-            const cardRect = activeCard.getBoundingClientRect();
-            // Trigger native scroll if the card is under the navbar or behind the 60vh detail pane
-            if (cardRect.bottom > window.innerHeight * 0.38 || cardRect.top < window.innerHeight * 0.15) {
-              // Align to the top of the safe zone to prioritize reading the heading
-              activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }, 50);
-        }
-      }
     }
 
     transitionTo(index: number) {
@@ -230,12 +217,36 @@ let projects: Project[] = projectsData as Project[];
         card.addEventListener('click', () => {
           if (this.isMobile) {
             const isActive = card.classList.contains('active');
-            if (isActive && this.layout && this.layout.classList.contains('has-active-project')) {
-              this.layout.classList.remove('has-active-project');
+            const hasPane = this.layout?.classList.contains('has-active-project');
+
+            if (isActive && hasPane) {
+              // Close
+              this.layout?.classList.remove('has-active-project');
               this.cards.forEach(c => c.classList.remove('active'));
             } else {
-              if (this.layout) this.layout.classList.add('has-active-project');
-              this.transitionTo(idx); // Instant switch on mobile
+              const wasOpen = hasPane;
+              
+              if (!wasOpen) {
+                // If opening for the first time, wait for layout to settle before scrolling
+                this.transitionTo(idx);
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    this.layout?.classList.add('has-active-project');
+                    this.updateActiveCards();
+                    const activeCard = this.cards[idx] as HTMLElement;
+                    if (activeCard) {
+                      activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  });
+                });
+              } else {
+                // If already open, just instantly switch content and scroll without dropping the pane
+                this.transitionTo(idx);
+                const activeCard = this.cards[idx] as HTMLElement;
+                if (activeCard) {
+                  activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }
             }
           } else {
             // Desktop click-to-lock
@@ -290,70 +301,44 @@ let projects: Project[] = projectsData as Project[];
     }
 
     initMobileDrag() {
-      if (!this.closeBtn) return;
-      
-      const newCloseBtn = this.closeBtn.cloneNode(true) as HTMLElement;
-      this.closeBtn.parentNode?.replaceChild(newCloseBtn, this.closeBtn);
-
-      let startY = 0;
-      let currentY = 0;
-      let startHeight = 0;
-      let isDragging = false;
       const detailPane = document.getElementById('projects-detail');
+      if (!detailPane) return;
 
-      newCloseBtn.addEventListener('pointerdown', (e: PointerEvent) => {
-        startY = e.clientY;
-        currentY = startY;
-        if (!detailPane) return;
-        startHeight = detailPane.offsetHeight;
-        isDragging = true;
-        detailPane.classList.add('is-dragging');
-        newCloseBtn.setPointerCapture(e.pointerId);
-      });
+      let touchStartY = 0;
+      let isTouchOnPane = false;
 
-      newCloseBtn.addEventListener('pointermove', (e: PointerEvent) => {
-        if (!isDragging || !detailPane) return;
-        e.preventDefault();
-        currentY = e.clientY;
-        const deltaY = currentY - startY;
-        const newHeight = startHeight - deltaY;
-        detailPane.style.height = `${newHeight}px`;
-      });
+      detailPane.addEventListener('touchstart', (e: TouchEvent) => {
+        touchStartY = e.touches[0].clientY;
+        isTouchOnPane = true;
+      }, { passive: true });
 
-      const handlePointerUp = (e: PointerEvent) => {
-        if (!isDragging || !detailPane) return;
-        isDragging = false;
-        detailPane.classList.remove('is-dragging');
-        newCloseBtn.releasePointerCapture(e.pointerId);
-        
-        const deltaY = currentY - startY;
-        const finalHeight = startHeight - deltaY;
-        detailPane.style.height = ''; 
-        
-        const windowHeight = window.innerHeight;
-        const vh60 = windowHeight * 0.6;
-        const vh85 = windowHeight * 0.85;
-        
-        if (Math.abs(deltaY) < 5) {
-          if (this.layout) this.layout.classList.remove('has-active-project');
+      detailPane.addEventListener('touchmove', (e: TouchEvent) => {
+        if (!isTouchOnPane) return;
+        const deltaY = e.touches[0].clientY - touchStartY;
+        const atTop = detailPane.scrollTop === 0;
+
+        // Scrolling down (finger moving down = deltaY positive) while at top = close
+        if (atTop && deltaY > 10) {
+          e.preventDefault(); // stop scroll bounce
+          this.layout?.classList.remove('has-active-project');
           this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
-          return;
+          isTouchOnPane = false;
         }
-        
-        if (finalHeight < vh60 * 0.8) {
-          if (this.layout) this.layout.classList.remove('has-active-project');
-          this.cards.forEach(c => c.classList.remove('active'));
-          detailPane.classList.remove('expanded-pane');
-        } else if (finalHeight > (vh60 + (vh85 - vh60) * 0.25)) {
-          detailPane.classList.add('expanded-pane');
-        } else {
-          detailPane.classList.remove('expanded-pane');
-        }
-      };
+      }, { passive: false });
 
-      newCloseBtn.addEventListener('pointerup', handlePointerUp);
-      newCloseBtn.addEventListener('pointercancel', handlePointerUp);
+      detailPane.addEventListener('touchend', () => {
+        isTouchOnPane = false;
+      });
+
+      // Keep the drag handle as a tap-to-close fallback
+      const closeBtn = document.getElementById('mobile-detail-close');
+      if (!closeBtn) return;
+      closeBtn.addEventListener('click', () => {
+        this.layout?.classList.remove('has-active-project');
+        this.cards.forEach(c => c.classList.remove('active'));
+        detailPane.classList.remove('expanded-pane');
+      });
     }
   }
 
@@ -755,8 +740,11 @@ let projects: Project[] = projectsData as Project[];
       overscroll-behavior: contain;
     }
 
-    .projects-layout.has-active-project .projects-sidebar {
-      padding-bottom: 65dvh;
+    .projects-layout.has-active-project .projects-list::after {
+      content: '';
+      display: block;
+      height: 62dvh;
+      flex-shrink: 0;
     }
 
     .projects-list {
@@ -794,10 +782,12 @@ let projects: Project[] = projectsData as Project[];
       left: 0;
       width: 100%;
       height: 60dvh;
-      padding: 0 1.5rem 2rem 1.5rem;
+      padding: 0 1.5rem 2rem 1.5rem; /* Removed top padding to let sticky handler sit cleanly */
       background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(15px);
-      /* Removed border-top, border-radius, and box-shadow to prevent duplicate pane visuals */
+      border-top: 1px solid var(--border-strong);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;
@@ -847,7 +837,7 @@ let projects: Project[] = projectsData as Project[];
       height: 3rem;
       align-items: center;
       justify-content: center;
-      background: var(--bg-primary);
+      background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(15px);
       border-radius: 24px 24px 0 0;
       border: none;
