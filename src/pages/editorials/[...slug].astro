@@ -5,6 +5,7 @@
  */
 import EditorialLayout from '../../layouts/EditorialLayout.astro';
 import { loadEditorials } from '../../lib/editorial-loader';
+import { getImage } from 'astro:assets';
 
 export function getStaticPaths() {
   const editorials = loadEditorials();
@@ -15,6 +16,28 @@ export function getStaticPaths() {
 }
 
 const { editorial } = Astro.props;
+
+// Intercept raw HTML and automatically optimize all injected images
+let processedHtml = editorial.html;
+const imgTags = processedHtml.match(/<img\b[^>]*>/gi) || [];
+
+for (const tag of imgTags) {
+  const srcMatch = tag.match(/src="([^"]+)"/i);
+  if (srcMatch) {
+    const src = srcMatch[1];
+    const altMatch = tag.match(/alt="([^"]*)"/i);
+    const alt = altMatch ? altMatch[1] : "";
+    
+    try {
+      // Process through Astro's image build pipeline
+      const optimized = await getImage({ src, width: 800, format: 'webp' });
+      const newTag = `<img src="${optimized.src}" alt="${alt}" loading="lazy" decoding="async" width="${optimized.attributes.width}" height="${optimized.attributes.height}" />`;
+      processedHtml = processedHtml.replace(tag, newTag);
+    } catch (err) {
+      console.warn(`[Editorial Image Optimizer] Failed to optimize: ${src}`);
+    }
+  }
+}
 ---
 
 <EditorialLayout
@@ -24,5 +47,5 @@ const { editorial } = Astro.props;
   abstract={editorial.abstract}
   layout_type={editorial.layout}
 >
-  <Fragment set:html={editorial.html} />
+  <Fragment set:html={processedHtml} />
 </EditorialLayout>

@@ -13,4 +13,7 @@ export default defineConfig({
     assetsInclude: ['**/*.frag', '**/*.vert'],
     plugins: [tailwindcss()],
   },
+  image: {
+    domains: ['images.unsplash.com'],
+  },
 });
