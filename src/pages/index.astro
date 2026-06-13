@@ -428,6 +428,9 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const distance = targetPosition - startPosition;
     let startTime: number | null = null;
 
+    // Lock body to kill native inertial scrolling that fights the JS animation
+    document.body.style.overflow = 'hidden';
+
     function animation(currentTime: number) {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
@@ -439,10 +442,14 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           ? 4 * progress * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-      window.scrollTo(0, startPosition + distance * ease);
+      // Use Math.round to prevent sub-pixel rendering jitter
+      window.scrollTo(0, Math.round(startPosition + distance * ease));
 
       if (timeElapsed < duration) {
         requestAnimationFrame(animation);
+      } else {
+        // Unlock body when animation completes
+        document.body.style.overflow = '';
       }
     }
     requestAnimationFrame(animation);
@@ -467,17 +474,20 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       const scrollingDown = e.deltaY > 0;
 
+      const aboutSection = document.getElementById('about');
+      const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+
       // If at the top and scrolling down
       if (scrollingDown && scrollY < 50) {
         e.preventDefault();
         isAutoScrolling = true;
-        customSmoothScroll(maxScroll, 1000);
+        customSmoothScroll(targetScroll, 1000);
         setTimeout(() => {
           isAutoScrolling = false;
         }, 1200);
       }
       // If at the bottom and scrolling up
-      else if (!scrollingDown && scrollY > maxScroll - 50) {
+      else if (!scrollingDown && scrollY > targetScroll - 50) {
         e.preventDefault();
         isAutoScrolling = true;
         customSmoothScroll(0, 1000);
@@ -507,6 +517,9 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const scrollY = window.scrollY;
     const maxScroll = document.body.scrollHeight - window.innerHeight;
     
+    const aboutSection = document.getElementById('about');
+    const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+    
     // Only trigger cinematic scroll if the swipe is significant enough (e.g. > 30px)
     if (Math.abs(deltaY) < 30) return;
     
@@ -515,9 +528,9 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     if (scrollingDown && scrollY < 50) {
       e.preventDefault();
       isAutoScrolling = true;
-      customSmoothScroll(maxScroll, 1000);
+      customSmoothScroll(targetScroll, 1000);
       setTimeout(() => { isAutoScrolling = false; }, 1200);
-    } else if (!scrollingDown && scrollY > maxScroll - 50) {
+    } else if (!scrollingDown && scrollY > targetScroll - 50) {
       e.preventDefault();
       isAutoScrolling = true;
       customSmoothScroll(0, 1000);
@@ -539,12 +552,12 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
         e.stopPropagation();
         e.stopImmediatePropagation();
 
+        const aboutSection = document.getElementById('about');
+        const targetScroll = aboutSection ? aboutSection.offsetTop : (document.body.scrollHeight - window.innerHeight);
+
         if (isAutoScrolling) return;
         isAutoScrolling = true;
-        customSmoothScroll(
-          document.body.scrollHeight - window.innerHeight,
-          1000,
-        );
+        customSmoothScroll(targetScroll, 1000);
         setTimeout(() => {
           isAutoScrolling = false;
         }, 1200);
@@ -564,9 +577,12 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           const maxScroll = document.body.scrollHeight - window.innerHeight;
           isAutoScrolling = true;
 
+          const aboutSection = document.getElementById('about');
+          const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+
           // If we're at the top, scroll down to About. If we're at the bottom, scroll up to Home.
-          if (window.scrollY < maxScroll / 2) {
-            customSmoothScroll(maxScroll, 1000);
+          if (window.scrollY < targetScroll / 2) {
+            customSmoothScroll(targetScroll, 1000);
           } else {
             customSmoothScroll(0, 1000);
           }
