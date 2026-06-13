@@ -102,16 +102,13 @@
   
   .ieee-mobile-warning {
     display: block;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: #ff00ff;
-    border: 1px solid rgba(255, 0, 255, 0.3);
-    background: rgba(255, 0, 255, 0.05);
-    padding: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--text-muted); /* Light gray */
+    font-style: italic;
+    margin-top: 0.5rem;
     margin-bottom: 2rem;
-    text-align: center;
-    border-radius: 4px;
-    letter-spacing: 0.05em;
+    text-align: left;
   }
 }
 
