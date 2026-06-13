@@ -25,13 +25,13 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
     <Nav active="editorials" showBack={true} backUrl="/editorials" backText="Go Back" hideLinks={true} />
 
     <article class={`editorial-container layout-${layout_type}`}>
-      {layout_type === 'ieee' && (
-        <div class="ieee-mobile-warning">
-          [!] IEEE style document. Rotate device for better view.
-        </div>
-      )}
       <header class="editorial-header">
         <h1>{title}</h1>
+        {layout_type === 'ieee' && (
+          <div class="ieee-mobile-warning">
+            * IEEE style document. Rotate device for better view.
+          </div>
+        )}
         {author && <p class="author">{author}</p>}
         {date && <p class="date">{date}</p>}
       </header>

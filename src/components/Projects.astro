@@ -207,15 +207,15 @@ let projects: Project[] = projectsData as Project[];
             const sidebar = document.querySelector('.projects-sidebar');
             if (sidebar) {
               const cardRect = activeCard.getBoundingClientRect();
-              // Calculate exactly where the card is vs where it should be
-              // We want it centered in the top 40vh safe zone (approx 25vh)
-              const safeZoneCenterY = window.innerHeight * 0.25;
-              const cardCenterY = cardRect.top + (cardRect.height / 2);
-              const distanceToMove = cardCenterY - safeZoneCenterY;
+              const sidebarRect = sidebar.getBoundingClientRect();
               
-              if (Math.abs(distanceToMove) > 10) {
-                sidebar.scrollBy({ top: distanceToMove, behavior: 'smooth' });
-              }
+              // Calculate exact relative offset regardless of CSS positioning
+              const cardRelativeTop = (cardRect.top - sidebarRect.top) + sidebar.scrollTop;
+              
+              // Park the card at 12vh from the top of the sidebar
+              const targetScroll = cardRelativeTop - (window.innerHeight * 0.12);
+              
+              sidebar.scrollTo({ top: targetScroll, behavior: 'smooth' });
             }
           }, 50);
         }
@@ -808,6 +808,7 @@ let projects: Project[] = projectsData as Project[];
       border-radius: 24px 24px 0 0;
       box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
       overflow-y: auto;
+      overflow-x: hidden;
       overscroll-behavior: contain;
       z-index: 250;
       transform: translateY(100%);
