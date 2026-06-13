@@ -176,7 +176,7 @@ a:hover {
   border-radius: 2px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
   .page-frame {
     border-width: 0.5rem; /* Opened up for mobile screens */
   }
@@ -253,7 +253,7 @@ body.no-scroll {
 }
 
 /* Only show the solid navbar lining on editorials, projects, and connect, and ONLY on mobile */
-@media (max-width: 900px) {
+@media (max-width: 900px) and (orientation: portrait) {
   .nav-editorials .nav-left-group::before,
   .nav-projects .nav-left-group::before,
   .nav-connect .nav-left-group::before {
@@ -391,7 +391,7 @@ body.no-scroll {
   opacity: 1;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
   /* On home page, we want the links stacked centrally and scrolling away naturally */
   .fixed-nav.is-home {
     position: absolute;

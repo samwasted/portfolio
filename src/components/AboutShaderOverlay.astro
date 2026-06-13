@@ -35,7 +35,7 @@ const { position = 'bottom-right' } = Astro.props;
     transform: scaleX(-1) scaleY(-1);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (orientation: portrait) {
     #about-shader-overlay {
       display: none;
     }

@@ -58,7 +58,7 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
       scrollbar-width: thin;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 900px) and (orientation: portrait) {
       .editorial-page {
         inset: 0.5rem; /* Match the new 0.5rem mobile border mask */
       }

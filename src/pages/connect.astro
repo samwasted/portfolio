@@ -101,7 +101,7 @@ import bgImage3 from '../../public/residue.png';
   }
 
   /* Rotate the entire animation sequence on mobile screens to fill the vertical space */
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (orientation: portrait) {
     .master-animation-group {
       transform: translate(-50%, -50%) rotate(90deg);
     }

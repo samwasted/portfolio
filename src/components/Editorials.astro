@@ -131,7 +131,7 @@ const editorials = loadEditorials().slice(0, 4);
     font-size: var(--text-sm);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 768px) and (orientation: portrait) {
     .editorials-grid {
       grid-template-columns: 1fr;
     }
