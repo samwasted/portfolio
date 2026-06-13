@@ -204,12 +204,18 @@ let projects: Project[] = projectsData as Project[];
         const activeCard = this.cards[this.previewIndex] as HTMLElement;
         if (activeCard) {
           setTimeout(() => {
-            const cardRect = activeCard.getBoundingClientRect();
-            const bottomThreshold = window.innerHeight * 0.35; 
-            const topThreshold = window.innerHeight * 0.10;
-            
-            if (cardRect.bottom > bottomThreshold || cardRect.top < topThreshold) {
-              activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const sidebar = document.querySelector('.projects-sidebar');
+            if (sidebar) {
+              const cardRect = activeCard.getBoundingClientRect();
+              // Calculate exactly where the card is vs where it should be
+              // We want it centered in the top 40vh safe zone (approx 25vh)
+              const safeZoneCenterY = window.innerHeight * 0.25;
+              const cardCenterY = cardRect.top + (cardRect.height / 2);
+              const distanceToMove = cardCenterY - safeZoneCenterY;
+              
+              if (Math.abs(distanceToMove) > 10) {
+                sidebar.scrollBy({ top: distanceToMove, behavior: 'smooth' });
+              }
             }
           }, 50);
         }
@@ -795,7 +801,7 @@ let projects: Project[] = projectsData as Project[];
       left: 0;
       width: 100%;
       height: 60dvh;
-      padding: 3rem 1.5rem 2rem 1.5rem;
+      padding: 0 1.5rem 2rem 1.5rem; /* Removed top padding to let sticky handler sit cleanly */
       background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(15px);
       border-top: 1px solid var(--border-strong);
@@ -844,8 +850,8 @@ let projects: Project[] = projectsData as Project[];
       left: 0;
       width: calc(100% + 3rem);
       margin-left: -1.5rem;
-      margin-top: -3rem;
-      margin-bottom: 2rem;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
       height: 3rem;
       align-items: center;
       justify-content: center;

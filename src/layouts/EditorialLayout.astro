@@ -25,6 +25,11 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
     <Nav active="editorials" showBack={true} backUrl="/editorials" backText="Go Back" hideLinks={true} />
 
     <article class={`editorial-container layout-${layout_type}`}>
+      {layout_type === 'ieee' && (
+        <div class="ieee-mobile-warning">
+          [!] IEEE style document. Rotate device for better view.
+        </div>
+      )}
       <header class="editorial-header">
         <h1>{title}</h1>
         {author && <p class="author">{author}</p>}
@@ -46,14 +51,17 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
   <style>
     .editorial-page {
       position: fixed;
-      top: 1rem;
-      left: 1rem;
-      width: calc(100% - 2rem);
-      height: calc(100vh - 2rem);
+      inset: 1rem;
       overflow-y: auto;
       z-index: 1;
       padding-top: 4rem; /* Ensure space for the global nav */
       scrollbar-width: thin;
+    }
+
+    @media (max-width: 900px) {
+      .editorial-page {
+        inset: 0.5rem; /* Match the new 0.5rem mobile border mask */
+      }
     }
   </style>
 
