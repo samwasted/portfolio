@@ -3,10 +3,33 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
 import ContactComponent from '../components/Contact.astro';
+
+// Import the new background image
+import bgImage from '../../public/hands.png';
+import bgImage2 from '../../public/handss.png';
 ---
 
 <BaseLayout title="Contact — Samarpan Verma">
   <ShaderBackground />
+  
+  <!-- Base Hands Image -->
+  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-90">
+    <div 
+      class="absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat transition-opacity duration-1000"
+      style={`background-image: url('${bgImage.src}');`}
+    ></div>
+  </div>
+
+  <!-- Glowing Hands Overlay (Animated Pulse) -->
+  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen">
+    <!-- The sweeping wave animation -->
+    <div 
+      id="glow-layer"
+      class="glow-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
+      style={`background-image: url('${bgImage2.src}');`}
+    ></div>
+  </div>
+
   <Nav active="contact" showBack={true} />
   <div class="page-frame" aria-hidden="true"></div>
 
@@ -15,9 +38,61 @@ import ContactComponent from '../components/Contact.astro';
   </main>
 </BaseLayout>
 
+<script>
+  // Ensure animation plays flawlessly after Astro view transitions finish
+  document.addEventListener('astro:page-load', () => {
+    const glowLayer = document.getElementById('glow-layer');
+    if (glowLayer) {
+      // Remove class if it exists to reset state on fast navigations
+      glowLayer.classList.remove('is-animating');
+      
+      // Wait for the View Transition cross-fade to complete (~300ms) 
+      // so the start of the ease-in-out curve isn't hidden
+      setTimeout(() => {
+        glowLayer.classList.add('is-animating');
+      }, 400);
+    }
+  });
+</script>
+
 <style>
   .page-content {
     position: relative;
     z-index: 1;
+  }
+
+  .glow-wave {
+    /* Create a distinct, thick ring mask */
+    -webkit-mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
+    mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
+    
+    -webkit-mask-position: center;
+    mask-position: center;
+    
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0;
+  }
+
+  /* Only play the animation when injected by Javascript */
+  .glow-wave.is-animating {
+    animation: sweepRadial 2.5s ease-in-out forwards;
+  }
+
+  @keyframes sweepRadial {
+    0% {
+      -webkit-mask-size: 0% 0%;
+      mask-size: 0% 0%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      /* Pause the ring's expansion so the glowing ring rests permanently on the outer strands */
+      -webkit-mask-size: 190% 190%;
+      mask-size: 190% 190%;
+      opacity: 1;
+    }
   }
 </style>

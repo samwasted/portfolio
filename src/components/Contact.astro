@@ -48,30 +48,33 @@
   }
 
   .contact-links {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
-    gap: 1.5rem;
-    align-items: center;
+    gap: 2.5rem;
+    align-items: flex-start;
   }
 
   .contact-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    color: var(--text-secondary);
+    gap: 1.25rem;
+    color: #ffffff;
     font-family: var(--font-sans);
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    font-weight: 500;
     text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
   }
 
   .contact-link:hover {
-    color: var(--text-primary);
     opacity: 1;
   }
 
   .contact-icon {
     flex-shrink: 0;
-    opacity: 0.8;
+    width: 28px;
+    height: 28px;
   }
 
   @media (max-width: 768px) {
