@@ -486,8 +486,44 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
         }, 1200);
       }
     },
-    { passive: false },
+    { passive: false }
   );
+
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => {
+    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
+    if (isAutoScrolling) {
+      e.preventDefault();
+      return;
+    }
+    
+    const touchEndY = e.touches[0].clientY;
+    const deltaY = touchStartY - touchEndY;
+    const scrollY = window.scrollY;
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+    
+    // Only trigger cinematic scroll if the swipe is significant enough (e.g. > 30px)
+    if (Math.abs(deltaY) < 30) return;
+    
+    const scrollingDown = deltaY > 0;
+    
+    if (scrollingDown && scrollY < 50) {
+      e.preventDefault();
+      isAutoScrolling = true;
+      customSmoothScroll(maxScroll, 1000);
+      setTimeout(() => { isAutoScrolling = false; }, 1200);
+    } else if (!scrollingDown && scrollY > maxScroll - 50) {
+      e.preventDefault();
+      isAutoScrolling = true;
+      customSmoothScroll(0, 1000);
+      setTimeout(() => { isAutoScrolling = false; }, 1200);
+    }
+  }, { passive: false });
 
   // Use event delegation in the CAPTURE phase so listeners intercept the click
   // BEFORE Astro's ViewTransitions router can see it and trigger a reload.

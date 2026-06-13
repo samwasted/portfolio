@@ -839,17 +839,22 @@ let projects: Project[] = projectsData as Project[];
   @media (max-width: 900px) {
     .mobile-close-btn {
       display: flex;
-      position: absolute;
+      position: sticky;
       top: 0;
       left: 0;
-      width: 100%;
+      width: calc(100% + 3rem);
+      margin-left: -1.5rem;
+      margin-top: -3rem;
       height: 3rem;
       align-items: center;
       justify-content: center;
-      background: transparent;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 24px 24px 0 0;
       border: none;
       cursor: pointer;
-      z-index: 10;
+      z-index: 100;
+      flex-shrink: 0;
       touch-action: none;
     }
     .drag-handle {

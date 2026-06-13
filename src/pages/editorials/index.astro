@@ -57,10 +57,7 @@ const allEditorials = [...editorials, ...dummyEditorials];
 <style>
   .editorials-page {
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    width: calc(100% - 2rem);
-    height: calc(100vh - 2rem);
+    inset: 1rem;
     overflow-y: auto;
     z-index: 1;
     padding: 8rem 4rem 4rem 4rem;
@@ -154,6 +151,7 @@ const allEditorials = [...editorials, ...dummyEditorials];
   /* --- Responsive Design --- */
   @media (max-width: 900px) {
     .editorials-page {
+      inset: 0.5rem; /* Match the new 0.5rem mobile border mask */
       padding: 6rem 2rem 4rem 2rem;
     }
     
