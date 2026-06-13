@@ -8,9 +8,10 @@ export interface Props {
 }
 
 const { active, showBack = false } = Astro.props;
+const isHome = Astro.url.pathname === '/';
 ---
 
-<nav id="main-nav" class="fixed-nav">
+<nav id="main-nav" class={`fixed-nav ${isHome ? 'is-home' : 'is-page'}`}>
   {
     showBack && (
       <a href="/" class="nav-back" aria-label="Go back">

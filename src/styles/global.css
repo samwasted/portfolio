@@ -306,16 +306,45 @@ body.no-scroll {
 }
 
 @media (max-width: 768px) {
-  .fixed-nav {
+  /* On home page, we want the links stacked centrally and scrolling away naturally */
+  .fixed-nav.is-home {
+    position: absolute;
+    top: calc(100vh - 16rem);
+    bottom: auto;
+    right: 50%;
+    transform: translateX(50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+
+  .fixed-nav.is-home .nav-links-desktop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .fixed-nav.is-home .nav-group {
+    align-items: center;
+  }
+
+  .fixed-nav.is-home .mobile-menu-btn {
+    display: none;
+  }
+
+  /* On other pages, we use the hamburger menu */
+  .fixed-nav.is-page {
     top: 1.5rem;
     right: 1.5rem;
   }
 
-  .nav-links-desktop {
+  .fixed-nav.is-page .nav-links-desktop {
     display: none;
   }
 
-  .mobile-menu-btn {
+  .fixed-nav.is-page .mobile-menu-btn {
     display: block;
   }
 
