@@ -43,7 +43,7 @@ const {
       (canvas as HTMLCanvasElement).height = size;
 
       let frame = 0;
-      let animationId: number;
+      let animationId: number = 0;
       const patternRefreshInterval = 2;
 
       const imageData = ctx.createImageData(size, size);

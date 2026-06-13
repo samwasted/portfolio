@@ -122,16 +122,16 @@ let projects: Project[] = projectsData as Project[];
 
 <script>
   class ProjectController {
-    projects: any[];
-    cards: HTMLElement[];
-    panes: HTMLElement[];
-    layout: HTMLElement | null;
-    projectsList: HTMLElement | null;
-    closeBtn: HTMLElement | null;
-    lockedIndex: number;
-    previewIndex: number;
-    hoverTimeout: any;
-    isAnimating: boolean;
+    projects: any[] = [];
+    cards: HTMLElement[] = [];
+    panes: HTMLElement[] = [];
+    layout: HTMLElement | null = null;
+    projectsList: HTMLElement | null = null;
+    closeBtn: HTMLElement | null = null;
+    lockedIndex: number = -1;
+    previewIndex: number = 0;
+    hoverTimeout: any = null;
+    isAnimating: boolean = false;
 
     constructor() {
       this.layout = document.querySelector('.projects-layout') as HTMLElement | null;
@@ -149,11 +149,6 @@ let projects: Project[] = projectsData as Project[];
       this.layout = document.querySelector('.projects-layout') as HTMLElement | null;
       this.projectsList = document.querySelector('.projects-list') as HTMLElement | null;
       this.closeBtn = document.getElementById('mobile-detail-close');
-      
-      this.lockedIndex = -1;
-      this.previewIndex = 0;
-      this.hoverTimeout = null;
-      this.isAnimating = false;
 
       if (this.projects.length === 0) return;
 
