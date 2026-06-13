@@ -23,10 +23,6 @@ let projects: Project[] = projectsData as Project[];
   <div class="projects-layout" data-projects={JSON.stringify(projects)}>
     <!-- Sidebar / Explorer (35%) -->
     <aside class="projects-sidebar">
-      <div class="sidebar-header">
-        <h2 class="sidebar-title">Explorer</h2>
-        <span class="sidebar-badge">{projects.length} PROJECTS</span>
-      </div>
       
       <div class="projects-list" id="projects-list">
         {projects.map((project, i) => (
@@ -450,34 +446,6 @@ let projects: Project[] = projectsData as Project[];
     padding: 6rem 2rem 2rem 4rem; /* Top padding clears Nav */
     background: linear-gradient(to right, rgba(10,10,10,0.8) 0%, rgba(10,10,10,0.4) 100%);
     backdrop-filter: blur(5px);
-  }
-
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    padding-bottom: 2rem;
-    background: linear-gradient(to bottom, rgba(10, 10, 10, 0.95) 60%, transparent 100%);
-  }
-
-  .sidebar-title {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  .sidebar-badge {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    background: var(--surface);
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
   }
 
   .projects-list {

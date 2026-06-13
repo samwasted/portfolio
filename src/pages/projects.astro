@@ -3,11 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
 import ProjectsComponent from '../components/Projects.astro';
+import projectsData from '../data/projects.json';
 ---
 
 <BaseLayout title="Projects - Samarpan Verma">
   <ShaderBackground />
-  <Nav active="projects" showBack={true} />
+  <Nav 
+    active="projects" 
+    showBack={true} 
+    sidebarTitle="Explorer" 
+    sidebarBadge={`${projectsData.length} PROJECTS`} 
+  />
   <div class="page-frame" aria-hidden="true"></div>
 
   <main class="page-content">

@@ -8,21 +8,32 @@ export interface Props {
   backUrl?: string;
   backText?: string;
   hideLinks?: boolean;
+  sidebarTitle?: string;
+  sidebarBadge?: string;
 }
 
-const { active, showBack = false, backUrl = "/", backText, hideLinks = false } = Astro.props;
+const { active, showBack = false, backUrl = "/", backText, hideLinks = false, sidebarTitle, sidebarBadge } = Astro.props;
 const isHome = Astro.url.pathname === '/';
 ---
 
 <nav id="main-nav" class={`fixed-nav ${isHome ? 'is-home' : 'is-page'}`}>
-  {
-    showBack && (
-      <a href={backUrl} class="nav-back" aria-label="Go back">
-        <span class="nav-back-icon">&larr;</span>
-        {backText && <span class="nav-back-text">{backText}</span>}
-      </a>
-    )
-  }
+  <div class="nav-left-group">
+    {
+      showBack && (
+        <a href={backUrl} class="nav-back" aria-label="Go back">
+          <span class="nav-back-icon">&larr;</span>
+          {backText && <span class="nav-back-text">{backText}</span>}
+        </a>
+      )
+    }
+    
+    {sidebarTitle && (
+      <div class="nav-sidebar-header">
+        <h2 class="nav-sidebar-title">{sidebarTitle}</h2>
+        {sidebarBadge && <span class="nav-sidebar-badge">{sidebarBadge}</span>}
+      </div>
+    )}
+  </div>
 
   {!hideLinks && (
     <>
