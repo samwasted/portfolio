@@ -53,6 +53,10 @@ if (fs.existsSync(projectsPath)) {
 
     <!-- Detail Panel (65%) -->
     <article class="projects-detail" id="projects-detail">
+      <button id="mobile-detail-close" class="mobile-close-btn" aria-label="Close details">
+        <div class="drag-handle"></div>
+      </button>
+      
       {projects.length > 0 ? (
         <div class="detail-container" id="detail-container">
           <!-- Top: Title & Summary -->
@@ -72,20 +76,14 @@ if (fs.existsSync(projectsPath)) {
             <div class="detail-text-area">
               <p class="detail-description" id="detail-description">{projects[0].description}</p>
               
-              <div class="read-more-wrapper">
-                <button class="read-more-btn" id="read-more-btn" aria-expanded="false">
-                  Read More <span class="read-more-icon">+</span>
-                </button>
-                <div class="read-more-content" id="read-more-content">
-                  <p id="detail-text">{projects[0].detail}</p>
-                  <div class="features-list" id="detail-features">
-                    <h4 class="section-heading">Key Features</h4>
-                    <ul>
-                      {projects[0].features.map(feature => (
-                        <li>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
+              <div class="detail-extended" id="detail-extended">
+                <div class="features-list" id="detail-features">
+                  <h4 class="section-heading">Key Features</h4>
+                  <ul>
+                    {projects[0].features.map(feature => (
+                      <li>{feature}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
@@ -132,101 +130,290 @@ if (fs.existsSync(projectsPath)) {
     const projects = (window as any).__PROJECTS_DATA__ || [];
     if (projects.length === 0) return;
 
+    let lockedIndex = -1;
+    let previewIndex = 0;
+    const projectsList = document.querySelector('.projects-list');
     const cards = document.querySelectorAll('.project-card');
     const detailContainer = document.getElementById('detail-container');
+    const layout = document.querySelector('.projects-layout');
+    const closeBtn = document.getElementById('mobile-detail-close');
     
     // DOM Elements
     const detailName = document.getElementById('detail-name');
     const detailSummary = document.getElementById('detail-summary');
     const detailDesc = document.getElementById('detail-description');
-    const detailText = document.getElementById('detail-text');
     const detailFeatures = document.getElementById('detail-features');
     const detailTech = document.getElementById('detail-tech');
     const detailGithub = document.getElementById('detail-github') as HTMLAnchorElement;
     const detailGithubText = document.getElementById('detail-github-text');
 
     // Read More Logic
-    const readMoreBtn = document.getElementById('read-more-btn');
-    const readMoreContent = document.getElementById('read-more-content');
+    // Removed read-more logic
     
-    if (readMoreBtn && readMoreContent) {
-      // Remove old listeners to prevent duplicates on astro swap
-      const newBtn = readMoreBtn.cloneNode(true);
-      readMoreBtn.parentNode?.replaceChild(newBtn, readMoreBtn);
-      
-      newBtn.addEventListener('click', function(this: HTMLButtonElement) {
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', (!isExpanded).toString());
-        readMoreContent.classList.toggle('expanded');
-        this.innerHTML = !isExpanded ? 'Show Less <span class="read-more-icon">-</span>' : 'Read More <span class="read-more-icon">+</span>';
-      });
-    }
+    
 
-    function selectProject(index: number) {
+    function selectProject(index: number, isHover = false) {
       const p = projects[index];
       if (!p) return;
 
+      const isMobile = window.innerWidth <= 900;
+      let wasClosed = false;
+
+      if (layout && isMobile) {
+        if (!layout.classList.contains('has-active-project')) {
+          wasClosed = true;
+          layout.classList.add('has-active-project');
+        }
+      }
+
       // Update active state on cards
       cards.forEach((card, i) => {
-        card.classList.toggle('active', i === index);
+        if (isMobile) {
+          card.classList.toggle('active', i === index);
+        } else {
+          card.classList.toggle('active', i === lockedIndex);
+        }
       });
 
-      // Fade out -> update -> fade in transition
-      if (detailContainer) {
-        detailContainer.style.opacity = '0';
-        detailContainer.style.transform = 'translateY(10px)';
+      const updateContent = () => {
+        // Reset scroll position to top for the new project
+        const detailPane = document.getElementById('projects-detail');
+        if (detailPane) {
+          detailPane.scrollTop = 0;
+          detailPane.style.height = ''; // Always default back to CSS 60dvh
+          detailPane.classList.remove('expanded-pane');
+        }
+
+        if (detailName) detailName.textContent = p.name;
+        if (detailSummary) detailSummary.textContent = p.summary;
+        if (detailDesc) detailDesc.textContent = p.description;
         
-        setTimeout(() => {
-          if (detailName) detailName.textContent = p.name;
-          if (detailSummary) detailSummary.textContent = p.summary;
-          if (detailDesc) detailDesc.textContent = p.description;
-          if (detailText) detailText.textContent = p.detail;
-          
-          if (detailFeatures) {
-            detailFeatures.innerHTML = `
-              <h4 class="section-heading">Key Features</h4>
-              <ul>
-                ${p.features.map((f: string) => `<li>${f}</li>`).join('')}
-              </ul>
-            `;
-          }
+        if (detailFeatures) {
+          detailFeatures.innerHTML = `
+            <h4 class="section-heading">Key Features</h4>
+            <ul>
+              ${p.features.map((f: string) => `<li>${f}</li>`).join('')}
+            </ul>
+          `;
+        }
 
-          if (detailTech) {
-            detailTech.innerHTML = `
-              <h4 class="section-heading">Technologies</h4>
-              <div class="tech-tags">
-                ${p.techStack.map((t: string) => `<span class="tech-tag">${t}</span>`).join('')}
-              </div>
-            `;
-          }
+        if (detailTech) {
+          detailTech.innerHTML = `
+            <h4 class="section-heading">Technologies</h4>
+            <div class="tech-tags">
+              ${p.techStack.map((t: string) => `<span class="tech-tag">${t}</span>`).join('')}
+            </div>
+          `;
+        }
 
-          if (detailGithub) detailGithub.href = p.github;
-          if (detailGithubText) detailGithubText.textContent = p.github.replace('https://github.com/', '');
+        if (detailGithub) detailGithub.href = p.github;
+        if (detailGithubText) detailGithubText.textContent = p.github.replace('https://github.com/', '');
 
-          // Reset read more state when changing projects
-          const currentReadMoreBtn = document.getElementById('read-more-btn');
-          const currentReadMoreContent = document.getElementById('read-more-content');
-          if (currentReadMoreBtn && currentReadMoreContent) {
-            currentReadMoreBtn.setAttribute('aria-expanded', 'false');
-            currentReadMoreContent.classList.remove('expanded');
-            currentReadMoreBtn.innerHTML = 'Read More <span class="read-more-icon">+</span>';
-          }
+        // (Read More reset removed)
+      };
 
-          // Fade in
+      if (detailContainer) {
+        if (isMobile && wasClosed) {
+          // Opening from closed on mobile: update instantly so it slides up fully populated
+          detailContainer.style.transition = 'none';
+          updateContent();
           detailContainer.style.opacity = '1';
           detailContainer.style.transform = 'translateY(0)';
-        }, 300); // 300ms matches CSS transition
+          void detailContainer.offsetWidth;
+          detailContainer.style.transition = '';
+        } else if (isHover && !isMobile) {
+          // Fast preview on desktop hover: Instant update
+          detailContainer.style.transition = 'none';
+          updateContent();
+          detailContainer.style.opacity = '1';
+          detailContainer.style.transform = 'translateY(0)';
+          void detailContainer.offsetWidth;
+          detailContainer.style.transition = '';
+        } else {
+          // Desktop click-to-lock or mobile switch: manual CSS fade
+          detailContainer.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+          detailContainer.style.opacity = '0';
+          detailContainer.style.transform = 'translateY(5px)';
+          setTimeout(() => {
+            updateContent();
+            detailContainer.style.opacity = '1';
+            detailContainer.style.transform = 'translateY(0)';
+          }, 200);
+        }
+      }
+
+      if (isMobile) {
+        const activeCard = cards[index] as HTMLElement;
+        if (activeCard) {
+          // Wait 150ms to ensure the layout has fully repainted the instant padding
+          setTimeout(() => {
+            const cardRect = activeCard.getBoundingClientRect();
+            // The top 40dvh is visible. If the bottom of the card is below 35dvh, scroll it up!
+            const bottomThreshold = window.innerHeight * 0.35; 
+            const topThreshold = window.innerHeight * 0.10;
+            
+            if (cardRect.bottom > bottomThreshold || cardRect.top < topThreshold) {
+              // Native robust scroll using CSS scroll-margin-top
+              activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 150);
+        }
       }
     }
 
+    // Initial state setup
+    if (window.innerWidth > 900) {
+      if (cards.length > 0) {
+        lockedIndex = -1;
+        previewIndex = 0;
+        selectProject(0, true); // Initial default render
+      }
+    } else {
+      cards.forEach(c => c.classList.remove('active'));
+      if (layout) layout.classList.remove('has-active-project');
+    }
+
+    if (closeBtn) {
+      const newCloseBtn = closeBtn.cloneNode(true);
+      closeBtn.parentNode?.replaceChild(newCloseBtn, closeBtn);
+
+      // Advanced drag physics for resizing/closing
+      let startY = 0;
+      let currentY = 0;
+      let startHeight = 0;
+      let isDragging = false;
+      const detailPane = document.getElementById('projects-detail');
+
+      newCloseBtn.addEventListener('pointerdown', (e: PointerEvent) => {
+        startY = e.clientY;
+        currentY = startY; // Initialize currentY safely
+        if (!detailPane) return;
+        startHeight = detailPane.offsetHeight;
+        isDragging = true;
+        detailPane.classList.add('is-dragging');
+        newCloseBtn.setPointerCapture(e.pointerId);
+      });
+
+      newCloseBtn.addEventListener('pointermove', (e: PointerEvent) => {
+        if (!isDragging || !detailPane) return;
+        e.preventDefault();
+        currentY = e.clientY;
+        const deltaY = currentY - startY; // positive = dragging down
+        
+        const newHeight = startHeight - deltaY;
+        detailPane.style.height = `${newHeight}px`;
+      });
+
+      const handlePointerUp = (e: PointerEvent) => {
+        if (!isDragging || !detailPane) return;
+        isDragging = false;
+        detailPane.classList.remove('is-dragging');
+        newCloseBtn.releasePointerCapture(e.pointerId);
+        
+        const deltaY = currentY - startY;
+        const finalHeight = startHeight - deltaY;
+        
+        detailPane.style.height = ''; // Let CSS take over
+        
+        const windowHeight = window.innerHeight;
+        const vh60 = windowHeight * 0.6;
+        const vh85 = windowHeight * 0.85;
+        
+        // If it was just a tap (deltaY is tiny), close the pane.
+        if (Math.abs(deltaY) < 5) {
+          if (layout) layout.classList.remove('has-active-project');
+          cards.forEach(c => c.classList.remove('active'));
+          detailPane.classList.remove('expanded-pane');
+          return;
+        }
+        
+        if (finalHeight < vh60 * 0.8) {
+          // Dragged down significantly below 60% -> Close
+          if (layout) layout.classList.remove('has-active-project');
+          cards.forEach(c => c.classList.remove('active'));
+          detailPane.classList.remove('expanded-pane');
+        } else if (finalHeight > (vh60 + (vh85 - vh60) * 0.25)) {
+          // Dragged up towards 85% -> Snap to 85%
+          detailPane.classList.add('expanded-pane');
+        } else {
+          // Snap back to 60%
+          detailPane.classList.remove('expanded-pane');
+        }
+      };
+
+      newCloseBtn.addEventListener('pointerup', handlePointerUp);
+      newCloseBtn.addEventListener('pointercancel', handlePointerUp);
+    }
+
     cards.forEach((card) => {
+      const idx = parseInt((card as HTMLElement).dataset.index || '0');
+
       card.addEventListener('click', () => {
-        const idx = parseInt((card as HTMLElement).dataset.index || '0');
-        // Only trigger if not already active
-        if (!card.classList.contains('active')) {
-          selectProject(idx);
+        const isActive = card.classList.contains('active');
+        
+        if (window.innerWidth <= 900) {
+          if (isActive && layout && layout.classList.contains('has-active-project')) {
+            // Close the pane if clicking the active project again on mobile
+            layout.classList.remove('has-active-project');
+            cards.forEach(c => c.classList.remove('active'));
+          } else {
+            selectProject(idx);
+          }
+        } else {
+          // Desktop behavior
+          if (lockedIndex === idx) {
+            lockedIndex = -1; // Release lock if clicking the locked project
+            cards.forEach(c => c.classList.remove('active'));
+          } else {
+            lockedIndex = idx; // Lock the clicked project
+            cards.forEach((c, i) => c.classList.toggle('active', i === lockedIndex));
+            if (previewIndex !== idx) {
+              previewIndex = idx;
+              selectProject(idx);
+            }
+          }
         }
       });
+
+      card.addEventListener('mouseenter', () => {
+        if (window.innerWidth > 900) {
+          if (lockedIndex !== -1) return; // If something is locked, hover does nothing
+          if (previewIndex !== idx) {
+            previewIndex = idx;
+            selectProject(idx, true); // Preview the hovered project
+          }
+        }
+      });
+    });
+
+    if (projectsList) {
+      projectsList.addEventListener('mouseleave', () => {
+        if (window.innerWidth > 900) {
+          if (lockedIndex === -1 && previewIndex !== 0) {
+            // If unlocked, reverting mouse leaves it to default (0)
+            previewIndex = 0;
+            selectProject(0, true);
+          }
+        }
+      });
+    }
+
+    // Release lock by clicking empty space on the left side (sidebar)
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 900) return;
+      const sidebar = document.querySelector('.projects-sidebar');
+      if (sidebar && sidebar.contains(e.target as Node)) {
+        const isCard = (e.target as Element).closest('.project-card');
+        if (!isCard) {
+          lockedIndex = -1;
+          cards.forEach(c => c.classList.remove('active'));
+          // Mouse is in sidebar empty space, not over a card, so revert to default
+          if (previewIndex !== 0) {
+             previewIndex = 0;
+             selectProject(0, true);
+          }
+        }
+      }
     });
   }
 
@@ -386,7 +573,7 @@ if (fs.existsSync(projectsPath)) {
 
   .detail-container {
     max-width: 800px;
-    height: 100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -481,54 +668,11 @@ if (fs.existsSync(projectsPath)) {
     margin-bottom: 1.5rem;
   }
 
-  /* Read More Section */
-  .read-more-wrapper {
-    margin-bottom: 1.5rem;
-  }
-
-  .read-more-btn {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-  }
-
-  .read-more-btn:hover {
-    opacity: 1;
-  }
-
-  .read-more-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-    opacity: 0;
-    margin-top: 0;
-  }
-
-  .read-more-content.expanded {
-    max-height: 500px;
-    opacity: 1;
+  .detail-extended {
     margin-top: 1.5rem;
   }
 
-  .read-more-content p {
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-heading {
+  :global(.section-heading) {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-primary);
@@ -538,12 +682,12 @@ if (fs.existsSync(projectsPath)) {
     opacity: 0.9;
   }
 
-  .features-list ul {
+  :global(.features-list ul) {
     list-style: none;
     padding: 0;
   }
 
-  .features-list li {
+  :global(.features-list li) {
     font-size: 0.9rem;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
@@ -552,19 +696,19 @@ if (fs.existsSync(projectsPath)) {
     gap: 0.5rem;
   }
 
-  .features-list li::before {
+  :global(.features-list li::before) {
     content: '→';
     color: var(--text-muted);
     font-family: var(--font-mono);
   }
 
-  .tech-tags {
+  :global(.tech-tags) {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
 
-  .tech-tag {
+  :global(.tech-tag) {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-secondary);
@@ -575,7 +719,7 @@ if (fs.existsSync(projectsPath)) {
     transition: all 0.2s ease;
   }
 
-  .tech-tag:hover {
+  :global(.tech-tag:hover) {
     background: var(--surface-hover);
     border-color: var(--border-strong);
     color: var(--text-primary);
@@ -628,48 +772,82 @@ if (fs.existsSync(projectsPath)) {
      ============================================ */
   @media (max-width: 900px) {
     .projects-layout {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
+      display: block;
+      height: 100dvh;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
     }
 
     .projects-sidebar {
-      height: auto;
+      height: 100dvh;
       border-right: none;
-      border-bottom: 1px solid var(--border-strong);
-      padding: 5rem 2rem 1.5rem 2rem;
+      padding: 5rem 1.5rem 2rem 1.5rem;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .projects-layout.has-active-project .projects-sidebar {
+      padding-bottom: 65dvh;
     }
 
     .projects-list {
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: visible;
       padding-right: 0;
       padding-bottom: 0.5rem;
     }
 
     .project-card {
-      min-width: 200px;
+      min-width: unset;
       flex-shrink: 0;
+      scroll-margin-top: 12dvh;
     }
 
     .project-card::before {
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0%;
-      height: 2px;
-      transition: width 0.3s ease;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 0%;
+      transition: height 0.3s ease;
     }
 
     .project-card.active::before {
-      height: 2px;
-      width: 60%;
+      height: 60%;
+      width: 2px;
     }
 
     .projects-detail {
-      padding: 2rem;
-      height: auto;
-      overflow: visible;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60dvh;
+      padding: 3rem 1.5rem 2rem 1.5rem;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid var(--border-strong);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      z-index: 250;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .projects-detail.expanded-pane {
+      height: 85dvh;
+    }
+
+    .projects-detail.is-dragging {
+      transition: none !important;
+    }
+
+    .projects-layout.has-active-project .projects-detail {
+      transform: translateY(0);
     }
 
     .detail-body {
@@ -680,5 +858,37 @@ if (fs.existsSync(projectsPath)) {
     .detail-name {
       font-size: 2.5rem;
     }
+  }
+
+  .mobile-close-btn {
+    display: none;
+  }
+
+  
+
+  @media (max-width: 900px) {
+    .mobile-close-btn {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3rem;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 10;
+      touch-action: none;
+    }
+    .drag-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--text-muted);
+      border-radius: 4px;
+    }
+
+    
   }
 </style>
