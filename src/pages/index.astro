@@ -424,35 +424,12 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
   // Custom smooth scroll function for butter-smooth button click
   function customSmoothScroll(targetPosition: number, duration: number) {
-    const startPosition = window.scrollY;
-    const distance = targetPosition - startPosition;
-    let startTime: number | null = null;
-
-    // Lock body to kill native inertial scrolling that fights the JS animation
-    document.body.style.overflow = 'hidden';
-
-    function animation(currentTime: number) {
-      if (startTime === null) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-
-      // Easing function (easeInOutCubic)
-      const ease =
-        progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-      // Use Math.round to prevent sub-pixel rendering jitter
-      window.scrollTo(0, Math.round(startPosition + distance * ease));
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animation);
-      } else {
-        // Unlock body when animation completes
-        document.body.style.overflow = '';
-      }
-    }
-    requestAnimationFrame(animation);
+    // We delegate the animation entirely to the browser's hardware-accelerated compositor.
+    // This is immune to main-thread jank and provides flawless 120Hz scrolling.
+    window.scrollTo({
+      top: targetPosition,
+      behavior: 'smooth'
+    });
   }
 
   // Auto-scroll logic via wheel event
