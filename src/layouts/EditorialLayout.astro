@@ -71,14 +71,14 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
       }
       
       // Render inline math
-      document.querySelectorAll('.math.inline:not([data-rendered])').forEach(el => {
+      document.querySelectorAll<HTMLElement>('.math.inline:not([data-rendered])').forEach(el => {
         try {
           katex.render(el.textContent || '', el, { throwOnError: false, displayMode: false });
           el.setAttribute('data-rendered', 'true');
         } catch (e) { console.warn('KaTeX inline error:', e); }
       });
       // Render display math
-      document.querySelectorAll('.math.display:not([data-rendered])').forEach(el => {
+      document.querySelectorAll<HTMLElement>('.math.display:not([data-rendered])').forEach(el => {
         try {
           katex.render(el.textContent || '', el, { throwOnError: false, displayMode: true });
           el.setAttribute('data-rendered', 'true');
@@ -86,7 +86,7 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
       });
 
       // --- Setup Copy Buttons ---
-      document.querySelectorAll('.editorial-body pre:not([data-copy-added])').forEach(pre => {
+      document.querySelectorAll<HTMLElement>('.editorial-body pre:not([data-copy-added])').forEach(pre => {
         pre.setAttribute('data-copy-added', 'true');
         const btn = document.createElement('button');
         btn.className = 'copy-btn';
