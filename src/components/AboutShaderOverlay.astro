@@ -19,6 +19,12 @@
     pointer-events: none;
     transform: scaleX(-1); /* Flip horizontally */
   }
+
+  @media (max-width: 768px) {
+    #about-shader-overlay {
+      display: none;
+    }
+  }
 </style>
 
 <script>
@@ -27,8 +33,14 @@
   import fragSrc from '../shaders/about.frag?raw';
 
   function initAboutShader() {
+    // Paranoia check: absolutely do not load WebGL on mobile screens
+    if (window.innerWidth <= 768) return;
+
     const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
     if (!canvas) return;
+    
+    // Don't run WebGL on mobile since it's hidden
+    if (window.getComputedStyle(canvas).display === 'none') return;
 
     // Prevent double-init
     if ((canvas as any).__about_init) return;

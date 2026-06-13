@@ -3,7 +3,7 @@
  * Nav — Fixed navigation across all pages.
  */
 export interface Props {
-  active?: 'about' | 'projects' | 'editorials' | 'contact';
+  active?: "about" | "projects" | "editorials" | "contact";
   showBack?: boolean;
 }
 
@@ -11,19 +11,55 @@ const { active, showBack = false } = Astro.props;
 ---
 
 <nav id="main-nav" class="fixed-nav">
-  {showBack && (
-    <a href="/" class="nav-back" aria-label="Go back">&larr;</a>
-  )}
-  <div class="nav-group">
-    <a href={Astro.url.pathname === '/' ? '#' : '/'} id="nav-about-link" class="nav-link nav-link-sm">About me</a>
+  {
+    showBack && (
+      <a href="/" class="nav-back" aria-label="Go back">
+        &larr;
+      </a>
+    )
+  }
+
+  <!-- Desktop Nav Links -->
+  <div class="nav-links-desktop">
+    <div class="nav-group">
+      <a href="/projects" class="nav-link">Projects</a>
+      <span class="nav-amp">&amp;</span>
+      <a href="/editorials" class="nav-link">Editorials</a>
+    </div>
+    <div class="nav-group">
+      <a href="/contact" class="nav-link nav-link-sm">Contact</a>
+    </div>
   </div>
-  <div class="nav-group">
+
+  <!-- Mobile Hamburger Button -->
+  <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+  </button>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu">
     <a href="/projects" class="nav-link">Projects</a>
-    <span class="nav-amp">&amp;</span>
     <a href="/editorials" class="nav-link">Editorials</a>
-  </div>
-  <div class="nav-group">
-    <a href="/contact" class="nav-link nav-link-sm">Contact</a>
+    <a href="/contact" class="nav-link">Contact</a>
   </div>
 </nav>
 
+<script>
+  function initNav() {
+    const btn = document.getElementById("mobile-menu-btn");
+    const menu = document.getElementById("mobile-menu");
+    if (btn && menu) {
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode?.replaceChild(newBtn, btn);
+
+      newBtn.addEventListener("click", () => {
+        menu.classList.toggle("open");
+      });
+    }
+  }
+
+  initNav();
+  document.addEventListener("astro:after-swap", initNav);
+</script>
