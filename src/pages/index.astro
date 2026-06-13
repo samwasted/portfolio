@@ -454,6 +454,10 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   window.addEventListener(
     "wheel",
     (e) => {
+      // ONLY run this cinematic scroll on the home page!
+      // Otherwise it hijacks scrolling on all other pages during View Transitions.
+      if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
+
       if (isAutoScrolling) {
         e.preventDefault();
         return;
