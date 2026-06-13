@@ -4,5 +4,6 @@
   "date": "2026-06-01",
   "abstract": "This report provides a concise overview of gradient descent optimization, covering the fundamental algorithm, its variants (SGD, Adam), convergence properties, and practical considerations for training deep neural networks.",
   "tags": ["machine-learning", "optimization", "deep-learning"],
+  "layout": "ieee",
   "draft": false
 }

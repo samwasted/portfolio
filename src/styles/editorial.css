@@ -1,98 +1,92 @@
 /* ============================================
-   EDITORIAL LAYOUT — IEEE Two-Column Style
+   EDITORIAL LAYOUT — Cinematic Dark Theme
    ============================================ */
 
 .editorial-page {
-  background: #fafaf8;
-  color: #1a1a1a;
+  background: transparent;
+  color: var(--text-primary);
   min-height: 100vh;
   padding: var(--space-xl) var(--space-lg);
 }
 
 .editorial-container {
-  max-width: 900px;
+  max-width: 715px;
   margin: 0 auto;
-  background: #ffffff;
-  padding: 3rem 2.5rem;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e8e8e8;
-  overflow: hidden;
+  background: transparent;
+  padding: 2rem 0;
 }
 
-/* --- Title Section (spans full width) --- */
+/* --- Title Section --- */
 .editorial-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #ddd;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-strong);
 }
 
 .editorial-header h1 {
-  font-family: 'Libre Baskerville', 'Georgia', serif;
+  font-family: var(--font-sans);
   font-size: 1.65rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.3;
-  color: #111;
-  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
-.editorial-header .author {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 0.25rem;
-}
-
+.editorial-header .author,
 .editorial-header .date {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
-  color: #888;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  display: inline-block;
+  margin-right: 1rem;
 }
 
-/* --- Abstract (spans full width) --- */
+/* --- Abstract --- */
 .editorial-abstract {
-  font-family: 'Libre Baskerville', 'Georgia', serif;
-  font-size: 0.85rem;
-  font-style: italic;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
   line-height: 1.6;
-  color: #333;
-  padding: 1rem 1.5rem;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
-  border-left: 3px solid #333;
-  background: #f5f5f3;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .editorial-abstract strong {
-  font-style: normal;
-  font-weight: 700;
+  display: none; /* Hide the "Abstract -" prefix to match the cleaner reference image */
 }
 
 /* --- Body Base --- */
 .editorial-body {
-  font-family: 'Libre Baskerville', 'Georgia', serif;
-  font-size: 9.5pt;
-  line-height: 1.55;
-  text-align: justify;
-  hyphens: auto;
-  -webkit-hyphens: auto;
-  color: #222;
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  text-align: left;
 }
 
-/* --- IEEE Two-Column Body --- */
-.layout-ieee .editorial-body {
-  column-count: 2;
-  column-gap: 2rem;
-  column-rule: 1px solid #e0e0e0;
-}
-
-/* --- Single Column Body --- */
+/* Single Column Body Constraint */
 .layout-single .editorial-body {
   column-count: auto;
-  max-width: 750px;
   margin: 0 auto;
-  font-size: 10.5pt;
-  /* slightly larger for readability on single column */
-  line-height: 1.7;
+}
+
+/* IEEE Two Column Body Constraint */
+.layout-ieee.editorial-container {
+  max-width: 990px;
+}
+.layout-ieee .editorial-body {
+  column-count: 2;
+  column-gap: 2.5rem;
+  column-rule: 1px solid var(--border-strong);
+  text-align: justify;
+  font-size: 1rem; /* slightly smaller for two columns */
+}
+.layout-ieee .editorial-abstract,
+.layout-ieee .editorial-references {
+  column-span: all;
 }
 
 /* Prevent orphaned headings */
@@ -100,220 +94,185 @@
 .editorial-body h3,
 .editorial-body h4 {
   break-after: avoid;
-  column-span: none;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .editorial-body h2 {
-  font-family: 'Libre Baskerville', 'Georgia', serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  margin-top: 1.4rem;
-  margin-bottom: 0.5rem;
-  color: #111;
+  font-size: 1.2rem;
 }
 
 .editorial-body h3 {
-  font-family: 'Libre Baskerville', 'Georgia', serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  font-style: italic;
-  margin-top: 1rem;
-  margin-bottom: 0.4rem;
-  color: #222;
+  font-size: 1.1rem;
 }
 
 .editorial-body h4 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-top: 0.8rem;
-  margin-bottom: 0.3rem;
+  font-size: 1.05rem;
 }
 
 .editorial-body p {
-  margin-bottom: 0.6rem;
-  text-indent: 1.2em;
-}
-
-.editorial-body p:first-child,
-.editorial-body h2+p,
-.editorial-body h3+p,
-.editorial-body h4+p {
-  text-indent: 0;
+  margin-bottom: 1.5rem;
 }
 
 /* --- Figures --- */
 .editorial-body figure {
-  break-inside: auto;
-  margin: 2rem 0;
-  text-align: center;
+  margin: 2.5rem 0;
+  text-align: left;
   width: 100%;
-  max-width: 100%;
 }
 
-.editorial-body figure img {
+.editorial-body figure img,
+.editorial-body img {
   max-width: 100%;
-  width: 100%;
   height: auto;
   display: block;
   border-radius: 4px;
-  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); /* subtle inner shadow scaled */
+  filter: grayscale(10%) contrast(1.05);
+  margin: 1.5rem auto;
 }
 
 .editorial-body figcaption {
-  font-size: 0.8rem;
-  color: #555;
-  margin-top: 0.4rem;
-  font-style: italic;
-}
-
-/* Full-width figures */
-.editorial-body .figure-full {
-  column-span: all;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* --- Tables --- */
 .editorial-body table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1rem 0;
-  font-size: 0.85rem;
-  break-inside: avoid;
+  margin: 2rem 0;
+  font-size: 0.95rem;
+  font-family: var(--font-mono);
 }
 
 .editorial-body th,
 .editorial-body td {
-  border: 1px solid #ccc;
-  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
   text-align: left;
 }
 
 .editorial-body th {
-  background: #f0f0ee;
-  font-weight: 700;
-}
-
-.editorial-body caption {
-  font-size: 0.8rem;
-  font-style: italic;
-  margin-bottom: 0.3rem;
-  color: #555;
+  color: var(--text-primary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-strong);
 }
 
 /* --- Lists --- */
 .editorial-body ul,
 .editorial-body ol {
-  margin: 0.5rem 0 0.5rem 1.5rem;
+  margin: 0 0 1.5rem 1.5rem;
+  color: var(--text-secondary);
 }
 
 .editorial-body li {
-  margin-bottom: 0.25rem;
-  text-indent: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
 
 /* --- Code --- */
 .editorial-body code {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.82rem;
-  background: #f0f0ee;
-  padding: 0.1em 0.3em;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2em 0.4em;
   border-radius: 2px;
+  color: var(--accent);
 }
 
 .editorial-body pre {
-  break-inside: avoid;
-  background: #f5f5f3;
-  padding: 0.8rem 1rem;
-  border-radius: 3px;
-  overflow-x: auto;
-  margin: 1rem 0;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  border: 1px solid #e0e0e0;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5) !important;
+  padding: 1.5rem !important;
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
 }
 
 .editorial-body pre code {
-  background: none;
+  background: transparent;
   padding: 0;
+  color: inherit;
 }
 
 /* --- Links --- */
 .editorial-body a {
-  color: #1a5276;
-  text-decoration: underline;
-  text-decoration-color: rgba(26, 82, 118, 0.3);
-  text-underline-offset: 2px;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-strong);
+  transition: border-color 0.2s ease;
 }
 
 .editorial-body a:hover {
-  text-decoration-color: rgba(26, 82, 118, 0.8);
-  opacity: 1;
+  border-color: var(--text-primary);
 }
 
 /* --- Blockquotes --- */
 .editorial-body blockquote {
-  border-left: 3px solid #ccc;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #555;
+  border-left: 1px solid var(--text-primary);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  color: var(--text-primary);
   font-style: italic;
+}
+
+/* --- Section Dividers --- */
+.editorial-body hr {
+  border: none;
+  border-top: 1px solid var(--border-strong);
+  margin: 2.5rem 0;
 }
 
 /* --- References --- */
 .editorial-references {
-  column-span: all;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #ddd;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-strong);
 }
 
 .editorial-references h2 {
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .editorial-references ol {
-  font-size: 0.8rem;
-  line-height: 1.5;
-  padding-left: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
-.editorial-references li {
-  margin-bottom: 0.3rem;
-}
-
-/* --- Responsive: single column on mobile --- */
+/* --- Responsive --- */
 @media (max-width: 768px) {
   .editorial-container {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0;
   }
-
-  .editorial-body {
-    column-count: 1;
-    font-size: 10pt;
-  }
-
-  .editorial-header h1 {
-    font-size: 1.3rem;
-  }
-}
-
-/* --- Tags on listing --- */
-.editorial-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-}
-
-.editorial-tag {
-  font-size: 0.7rem;
-  padding: 0.15rem 0.5rem;
-  border: 1px solid var(--border-strong);
-  border-radius: 2px;
-  color: var(--text-secondary);
-  font-family: var(--font-sans);
 }

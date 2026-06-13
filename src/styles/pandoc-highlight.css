@@ -4,13 +4,11 @@
    ============================================ */
 
 pre.sourceCode {
-  background-color: #121212;
+  background-color: transparent;
   padding: 1.25rem;
-  border-radius: 8px;
   overflow-x: auto;
-  border: 1px solid var(--border-strong);
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   line-height: 1.5;
   margin: 1.5rem 0;
 }

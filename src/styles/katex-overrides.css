@@ -36,7 +36,7 @@
   max-width: 100%;
 }
 
-/* Fix KaTeX color for paper background */
+/* Fix KaTeX color for dark background */
 .editorial-body .katex {
-  color: #1a1a1a;
+  color: var(--text-primary);
 }

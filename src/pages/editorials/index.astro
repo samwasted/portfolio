@@ -23,7 +23,7 @@ const editorials = loadEditorials();
       {editorials.length > 0 ? (
         <div class="editorials-list">
           {editorials.map(editorial => (
-            <a href={`/editorials/${editorial.slug}`} class="editorial-list-item">
+            <a href={`/editorials/${editorial.slug}`} class="editorial-list-item" data-astro-prefetch="hover">
               <div class="editorial-list-meta">
                 <time>{editorial.date}</time>
                 {editorial.tags.length > 0 && (
