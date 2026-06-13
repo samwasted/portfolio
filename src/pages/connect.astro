@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShaderBackground from '../components/ShaderBackground.astro';
+import Nav from '../components/Nav.astro';
+import ContactComponent from '../components/Contact.astro';
+
+// Import the new background image
+import bgImage from '../../public/hands.png';
+import bgImage2 from '../../public/handss.png';
+import bgImage3 from '../../public/residue.png';
+---
+
+<BaseLayout title="Connect — Samarpan Verma">
+  <ShaderBackground />
+  
+  <!-- Base Hands Image -->
+  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-90">
+    <img 
+      src={bgImage.src}
+      alt=""
+      class="absolute inset-0 w-full h-full object-contain object-center"
+      fetchpriority="high"
+      loading="eager"
+      decoding="sync"
+    />
+  </div>
+
+  <!-- Expanding Residue Overlay -->
+  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-90">
+    <div 
+      id="residue-layer"
+      class="residue-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
+      style={`background-image: url('${bgImage3.src}');`}
+    ></div>
+  </div>
+
+  <!-- Sweeping Glow Ring -->
+  <div class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none mix-blend-screen opacity-60">
+    <!-- The sweeping wave animation -->
+    <div 
+      id="glow-layer"
+      class="glow-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
+      style={`background-image: url('${bgImage2.src}');`}
+    ></div>
+  </div>
+
+  <!-- Cinematic Film Grain Overlay -->
+  <div class="fixed inset-0 w-full h-full pointer-events-none" style="z-index: 0; mix-blend-mode: soft-light; opacity: 0.15;">
+    <svg width="100%" height="100%">
+      <filter id="film-noise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+        <feColorMatrix type="matrix" values="1 0 0 0 0, 1 0 0 0 0, 1 0 0 0 0, 0 0 0 1 0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#film-noise)"></rect>
+    </svg>
+  </div>
+
+  <Nav active="connect" showBack={true} />
+  <div class="page-frame" aria-hidden="true"></div>
+
+  <main class="page-content">
+    <ContactComponent />
+  </main>
+</BaseLayout>
+
+<script>
+  // Ensure animation plays flawlessly after Astro view transitions finish
+  document.addEventListener('astro:page-load', () => {
+    const glowLayer = document.getElementById('glow-layer');
+    const residueLayer = document.getElementById('residue-layer');
+    
+    if (glowLayer && residueLayer) {
+      // Synchronously reset and trigger animations to avoid async setTimeout glitches
+      glowLayer.classList.remove('is-animating');
+      residueLayer.classList.remove('is-animating');
+      
+      // Force browser reflow
+      void glowLayer.offsetWidth;
+      
+      glowLayer.classList.add('is-animating');
+      residueLayer.classList.add('is-animating');
+    }
+  });
+</script>
+
+<style>
+  .page-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .glow-wave {
+    /* Create a distinct, thick ring mask */
+    -webkit-mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
+    mask-image: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.8) 40%, black 50%, rgba(0,0,0,0.8) 60%, transparent 70%);
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0;
+  }
+
+  .residue-wave {
+    /* Create a solid expanding circle mask */
+    -webkit-mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
+    mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    opacity: 0;
+
+    /* 
+      Base state: Slight 1px thickness boost, with a subtle 50% ambient glow.
+    */
+    filter: 
+      drop-shadow(0 0 1px rgba(255, 255, 255, 0.4))
+      drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))
+      drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))
+      brightness(1.1);
+
+    /* Smoothly transition the filter properties */
+    transition: filter 0.8s ease-in-out;
+  }
+
+  /* Only play the animation when injected by Javascript */
+  .glow-wave.is-animating {
+    animation: sweepRadial 2.5s ease-in-out forwards;
+  }
+  
+  .residue-wave.is-animating {
+    animation: sweepResidue 2.5s ease-in-out forwards;
+  }
+
+  @keyframes sweepRadial {
+    0% {
+      -webkit-mask-size: 0% 0%;
+      mask-size: 0% 0%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      /* Pause the ring's expansion so the glowing ring rests perfectly on the outer strands, and fully fade it out */
+      -webkit-mask-size: 190% 190%;
+      mask-size: 190% 190%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes sweepResidue {
+    0% {
+      -webkit-mask-size: 0% 0%;
+      mask-size: 0% 0%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      /* Solid circle fully covers the screen and remains permanently */
+      -webkit-mask-size: 350% 350%;
+      mask-size: 350% 350%;
+      opacity: 1;
+    }
+  }
+
+  /* Smoothly transition the filter UP when hovering */
+  :global(body:has(.contact-link:hover)) .residue-wave {
+    filter: 
+      drop-shadow(0 0 1px rgba(255, 255, 255, 0.4))
+      drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))
+      drop-shadow(0 0 15px rgba(255, 255, 255, 0.4))
+      brightness(1.3);
+  }
+</style>

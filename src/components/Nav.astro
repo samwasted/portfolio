@@ -3,7 +3,7 @@
  * Nav — Fixed navigation across all pages.
  */
 export interface Props {
-  active?: "about" | "projects" | "editorials" | "contact";
+  active?: "about" | "projects" | "editorials" | "connect";
   showBack?: boolean;
 }
 
@@ -28,7 +28,7 @@ const isHome = Astro.url.pathname === '/';
       <a href="/editorials" class="nav-link">Editorials</a>
     </div>
     <div class="nav-group">
-      <a href="/contact" class="nav-link nav-link-sm">Contact</a>
+      <a href="/connect" class="nav-link nav-link-sm">Connect</a>
     </div>
   </div>
 
@@ -43,7 +43,7 @@ const isHome = Astro.url.pathname === '/';
   <div id="mobile-menu" class="mobile-menu">
     <a href="/projects" class="nav-link">Projects</a>
     <a href="/editorials" class="nav-link">Editorials</a>
-    <a href="/contact" class="nav-link">Contact</a>
+    <a href="/connect" class="nav-link">Connect</a>
   </div>
 </nav>
 
