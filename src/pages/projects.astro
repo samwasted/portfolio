@@ -3,10 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
 import Nav from '../components/Nav.astro';
 import ProjectsComponent from '../components/Projects.astro';
+import AboutShaderOverlay from '../components/AboutShaderOverlay.astro';
 ---
 
 <BaseLayout title="Projects — Samarpan Verma">
   <ShaderBackground />
+  <AboutShaderOverlay />
   <Nav active="projects" showBack={true} />
   <div class="page-frame" aria-hidden="true"></div>
 

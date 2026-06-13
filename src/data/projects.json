@@ -1,34 +1,77 @@
 [
   {
-    "name": "2d-metaverse",
-    "category": "webdev",
-    "description": "The about/description of project, extracted from github",
-    "detail": "How and what the project is, and what it implements vaguely. For eg. I used Websockets for live connection, and shift to HTTP when user is not in close proximity to visit the screen. When the user is very close, it connects them to WebRTC video call",
-    "techStack": ["Typescript", "Websockets", "NextJS", "WebRTC", "TailwindCSS", "ExpressJS", "Docker", "PostGRE-SQL"],
-    "github": "https://www.github.com/samwasted/2d-metaverse"
+    "name": "myshell",
+    "category": "Systems",
+    "summary": "Custom Unix shell with AST-based parsing and job control.",
+    "description": "A fully functional Unix shell implemented in C++. It features a custom Abstract Syntax Tree (AST) parser for handling complex command lines, robust job control (foreground, background, stopped jobs), and built-in process substitution.",
+    "detail": "Built from scratch to understand the intricacies of process management, file descriptors, and signal handling in POSIX systems. Implements advanced features like pipes, I/O redirection, and a custom readline-like interface.",
+    "techStack": ["C++", "Unix", "POSIX", "AST", "Job Control"],
+    "features": [
+      "Custom Recursive Descent Parser",
+      "Process Group Management",
+      "Pipes and I/O Redirection",
+      "Signal Handling (SIGINT, SIGTSTP, SIGCHLD)"
+    ],
+    "github": "https://github.com/samwasted/myshell"
   },
   {
-    "name": "Music recommendation system",
-    "category": "machine learning",
-    "description": "ML-based music recommendation engine",
-    "detail": "A collaborative filtering system that analyzes listening patterns to suggest new music. Built with Python and scikit-learn.",
-    "techStack": ["Python", "scikit-learn", "Pandas", "Flask"],
-    "github": "https://www.github.com/samwasted/music-recommendation"
-  },
-  {
-    "name": "C Http server",
-    "category": "systems",
-    "description": "HTTP/1.1 server written from scratch in C",
-    "detail": "A minimal HTTP server implementation supporting GET/POST, static file serving, and basic routing. Written in pure C with POSIX sockets.",
-    "techStack": ["C", "POSIX", "Sockets", "Makefile"],
-    "github": "https://www.github.com/samwasted/c-http-server"
+    "name": "PDF → Mock Test Generator",
+    "category": "Machine Learning",
+    "summary": "Automated generation of MCQ tests from PDF materials.",
+    "description": "An NLP-powered pipeline that ingests educational PDF documents and automatically generates high-quality Multiple Choice Questions (MCQs) to simulate mock tests. It uses advanced text extraction and contextual question generation.",
+    "detail": "Utilizes transformer-based language models to understand the core concepts in the text and generate plausible distractors. The system is containerized and exposed via a REST API for easy integration with frontend platforms.",
+    "techStack": ["Python", "NLP", "Transformers", "PyTorch", "FastAPI"],
+    "features": [
+      "PDF Text Extraction Pipeline",
+      "Context-Aware Question Generation",
+      "Plausible Distractor Generation",
+      "RESTful API Interface"
+    ],
+    "github": "https://github.com/samwasted/pdf-mock-test"
   },
   {
     "name": "OS in Rust",
-    "category": "systems",
-    "description": "A minimal operating system kernel written in Rust",
-    "detail": "Bare-metal kernel targeting x86_64 with VGA text output, interrupt handling, and basic memory management.",
-    "techStack": ["Rust", "x86_64", "QEMU", "Assembly"],
-    "github": "https://www.github.com/samwasted/rust-os"
+    "category": "Systems",
+    "summary": "Minimal x86_64 operating system kernel in Rust.",
+    "description": "A bare-metal operating system kernel targeting the x86_64 architecture, written entirely in Rust. Designed to explore safe systems programming and modern OS architecture.",
+    "detail": "Features include a custom VGA text mode driver, a fully functional Interrupt Descriptor Table (IDT), hardware interrupts (timer, keyboard), and a bump allocator for dynamic memory management. Runs on QEMU and real hardware.",
+    "techStack": ["Rust", "x86_64", "Assembly", "QEMU", "Bootloader"],
+    "features": [
+      "VGA Text Mode Output",
+      "Interrupt Handling (IDT)",
+      "Hardware Timer & Keyboard Support",
+      "Basic Memory Management"
+    ],
+    "github": "https://github.com/samwasted/rust-os"
+  },
+  {
+    "name": "HTTP Server in C",
+    "category": "Systems",
+    "summary": "High-performance HTTP/1.1 server from scratch.",
+    "description": "A minimal, highly concurrent HTTP server implementation written in pure C. It supports GET and POST requests, static file serving, and basic routing mechanisms.",
+    "detail": "Built directly on top of POSIX sockets. Uses an event-driven architecture with epoll (on Linux) to handle thousands of concurrent connections efficiently. Strict memory management ensures no leaks under heavy load.",
+    "techStack": ["C", "POSIX", "Sockets", "epoll", "HTTP/1.1"],
+    "features": [
+      "Event-Driven Architecture",
+      "Static File Serving",
+      "MIME Type Detection",
+      "Zero-Dependency Implementation"
+    ],
+    "github": "https://github.com/samwasted/c-http-server"
+  },
+  {
+    "name": "Research Projects",
+    "category": "Research",
+    "summary": "Collection of academic and independent research papers.",
+    "description": "Various research projects spanning Machine Learning, Computer Vision, and Systems architecture. Focuses on novel optimization techniques and performance analysis.",
+    "detail": "Includes investigations into gradient descent optimization topologies, low-latency data structures for high-frequency trading platforms, and custom allocators for embedded systems.",
+    "techStack": ["Python", "C++", "LaTeX", "CUDA", "NumPy"],
+    "features": [
+      "Empirical Performance Analysis",
+      "Algorithm Optimization",
+      "Peer-Reviewed Methodologies",
+      "Open Source Implementations"
+    ],
+    "github": "https://github.com/samwasted/research"
   }
 ]

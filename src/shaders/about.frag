@@ -62,35 +62,33 @@ void main() {
     
     // animation times
     float t = iTime * 0.8; 
-    float t_sun     = clamp((t - 0.5) / 1.5, 0.0, 1.0); 
-    float t_branch  = clamp((t - 1.5) / 2.0, 0.0, 1.0); 
-    float t_flowers = clamp((t - 3.5) / 2.5, 0.0, 1.0); 
-    float swayStrength = 0.02 * (1.0 - smoothstep(3.5, 5.5, t));
+    // float t_sun     = clamp((t - 0.5) / 1.5, 0.0, 1.0); 
+    float t_branch  = clamp((t - 0.0) / 2.0, 0.0, 1.0); 
+    float t_flowers = clamp((t - 2.0) / 2.5, 0.0, 1.0); 
+    float swayStrength = 0.02 * (1.0 - smoothstep(2.0, 4.0, t));
     
     vec3 rgb = vec3(0.0);
     float alpha = 0.0;
     float wetEdgeJitter = fbm(uv * 40.0) * 0.08;
 
     // 2. THE RED SUN 
-    vec2 sunUV = uv - vec2(0.6, 0.3); 
-    float sunRadius = 0.18; // slightly larger
-    float sunDist = length(sunUV) - sunRadius + fbm(uv * 10.0) * 0.04; // softer, less intense noise displacement
-    float sunShape = smoothstep(0.05, -0.05, sunDist); // much softer edges
-    float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
-    
-    // less internal contrast, looks more like a flat watercolor wash
-    sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
-    float a_sun = clamp(sunShape * 0.6, 0.0, 1.0); // lower opacity overall
-    rgb = mix(rgb, vec3(0.9, 0.15, 0.15), a_sun); // slightly softer red
-    alpha = max(alpha, a_sun);
+    // vec2 sunUV = uv - vec2(0.6, 0.3); 
+    // float sunRadius = 0.18; // slightly larger
+    // float sunDist = length(sunUV) - sunRadius + fbm(uv * 10.0) * 0.04; // softer, less intense noise displacement
+    // float sunShape = smoothstep(0.05, -0.05, sunDist); // much softer edges
+    // float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
+    // 
+    // // less internal contrast, looks more like a flat watercolor wash
+    // sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
+    // float a_sun = clamp(sunShape * 0.6, 0.0, 1.0); // lower opacity overall
+    // rgb = mix(rgb, vec3(0.9, 0.15, 0.15), a_sun); // slightly softer red
+    // alpha = max(alpha, a_sun);
 
     // 3. MOUNTAIN (Skipped)
     float a_mnt = 0.0; 
 
     // 4. BRANCHES
     vec2 branchUV = uv;
-    branchUV.x += sin(iTime * 1.5 + uv.y * 3.0) * swayStrength;
-    branchUV.y += cos(iTime * 1.2 + uv.x * 2.0) * swayStrength;
 
     vec2 n0 = vec2(-1.0, -0.2);
     vec2 n1 = vec2(-0.6,  0.0);

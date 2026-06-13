@@ -1,6 +1,6 @@
 ---
 /**
- * Projects — Sidebar list + detail panel.
+ * Projects — Cinematic IDE-like Sidebar list + detail panel.
  * Reads from src/data/projects.json config file.
  */
 import fs from 'node:fs';
@@ -9,11 +9,12 @@ import path from 'node:path';
 interface Project {
   name: string;
   category: string;
+  summary: string;
   description: string;
   detail: string;
   techStack: string[];
+  features: string[];
   github: string;
-  image?: string;
 }
 
 let projects: Project[] = [];
@@ -25,57 +26,99 @@ if (fs.existsSync(projectsPath)) {
 
 <section id="projects" class="section projects-section">
   <div class="projects-layout">
-    <!-- Sidebar -->
-    <div class="projects-sidebar">
-      <button class="scroll-arrow up" id="projects-up" aria-label="Scroll up">&#8963;</button>
+    <!-- Sidebar / Explorer (35%) -->
+    <aside class="projects-sidebar">
+      <div class="sidebar-header">
+        <h2 class="sidebar-title">Explorer</h2>
+        <span class="sidebar-badge">{projects.length} PROJECTS</span>
+      </div>
+      
       <div class="projects-list" id="projects-list">
         {projects.map((project, i) => (
           <button
-            class:list={['project-item', { active: i === 0 }]}
+            class:list={['project-card', { active: i === 0 }]}
             data-index={i}
           >
-            <span class="project-item-name">{project.name}</span>
-            <span class="project-item-category">{project.category}</span>
+            <div class="card-content">
+              <span class="card-name">{project.name}</span>
+              <span class="card-category">{project.category}</span>
+            </div>
           </button>
         ))}
         {projects.length === 0 && (
           <p class="projects-empty">Projects coming soon...</p>
         )}
       </div>
-      <button class="scroll-arrow down" id="projects-down" aria-label="Scroll down">&#8964;</button>
-    </div>
+    </aside>
 
-    <!-- Detail Panel -->
-    <div class="projects-detail" id="projects-detail">
+    <!-- Detail Panel (65%) -->
+    <article class="projects-detail" id="projects-detail">
       {projects.length > 0 ? (
-        <div class="detail-content" id="detail-content">
-          <h3 class="detail-name" id="detail-name">{projects[0].name}</h3>
-          <p class="detail-description" id="detail-description">{projects[0].description}</p>
-          <div class="detail-text" id="detail-text">
-            <p>{projects[0].detail}</p>
+        <div class="detail-container" id="detail-container">
+          <!-- Top: Title & Summary -->
+          <header class="detail-header">
+            <h1 class="detail-name" id="detail-name">{projects[0].name}</h1>
+            <hr class="detail-divider" />
+            <p class="detail-summary" id="detail-summary">{projects[0].summary}</p>
+          </header>
+
+          <!-- Center: Visual Area -->
+          <div class="detail-visual">
+            <div class="visual-pattern"></div>
           </div>
-          <div class="detail-tech" id="detail-tech">
-            <h4>Tech stack</h4>
-            <div class="tech-tags">
-              {projects[0].techStack.map(tech => (
-                <span class="tech-tag">•{tech}</span>
-              ))}
+
+          <!-- Bottom: Description & Tech -->
+          <div class="detail-body">
+            <div class="detail-text-area">
+              <p class="detail-description" id="detail-description">{projects[0].description}</p>
+              
+              <div class="read-more-wrapper">
+                <button class="read-more-btn" id="read-more-btn" aria-expanded="false">
+                  Read More <span class="read-more-icon">+</span>
+                </button>
+                <div class="read-more-content" id="read-more-content">
+                  <p id="detail-text">{projects[0].detail}</p>
+                  <div class="features-list" id="detail-features">
+                    <h4 class="section-heading">Key Features</h4>
+                    <ul>
+                      {projects[0].features.map(feature => (
+                        <li>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-meta">
+              <div class="detail-tech" id="detail-tech">
+                <h4 class="section-heading">Technologies</h4>
+                <div class="tech-tags">
+                  {projects[0].techStack.map(tech => (
+                    <span class="tech-tag">{tech}</span>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <a class="detail-github" id="detail-github" href={projects[0].github} target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-            </svg>
-            <span id="detail-github-text">{projects[0].github.replace('https://', '')}</span>
-            <span class="external-arrow">↗</span>
-          </a>
+
+          <!-- Footer: Links -->
+          <footer class="detail-footer">
+            <a class="github-link" id="detail-github" href={projects[0].github} target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              <span id="detail-github-text" class="github-text">{projects[0].github.replace('https://github.com/', '')}</span>
+              <span class="external-arrow">↗</span>
+            </a>
+          </footer>
         </div>
       ) : (
-        <div class="detail-content">
+        <div class="detail-container">
           <p class="projects-empty">Select a project to view details</p>
         </div>
       )}
-    </div>
+    </article>
   </div>
 </section>
 
@@ -89,54 +132,101 @@ if (fs.existsSync(projectsPath)) {
     const projects = (window as any).__PROJECTS_DATA__ || [];
     if (projects.length === 0) return;
 
-    const items = document.querySelectorAll('.project-item');
+    const cards = document.querySelectorAll('.project-card');
+    const detailContainer = document.getElementById('detail-container');
+    
+    // DOM Elements
     const detailName = document.getElementById('detail-name');
+    const detailSummary = document.getElementById('detail-summary');
     const detailDesc = document.getElementById('detail-description');
     const detailText = document.getElementById('detail-text');
+    const detailFeatures = document.getElementById('detail-features');
     const detailTech = document.getElementById('detail-tech');
     const detailGithub = document.getElementById('detail-github') as HTMLAnchorElement;
     const detailGithubText = document.getElementById('detail-github-text');
+
+    // Read More Logic
+    const readMoreBtn = document.getElementById('read-more-btn');
+    const readMoreContent = document.getElementById('read-more-content');
+    
+    if (readMoreBtn && readMoreContent) {
+      // Remove old listeners to prevent duplicates on astro swap
+      const newBtn = readMoreBtn.cloneNode(true);
+      readMoreBtn.parentNode?.replaceChild(newBtn, readMoreBtn);
+      
+      newBtn.addEventListener('click', function(this: HTMLButtonElement) {
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', (!isExpanded).toString());
+        readMoreContent.classList.toggle('expanded');
+        this.innerHTML = !isExpanded ? 'Show Less <span class="read-more-icon">-</span>' : 'Read More <span class="read-more-icon">+</span>';
+      });
+    }
 
     function selectProject(index: number) {
       const p = projects[index];
       if (!p) return;
 
-      items.forEach((item, i) => {
-        item.classList.toggle('active', i === index);
+      // Update active state on cards
+      cards.forEach((card, i) => {
+        card.classList.toggle('active', i === index);
       });
 
-      if (detailName) detailName.textContent = p.name;
-      if (detailDesc) detailDesc.textContent = p.description;
-      if (detailText) detailText.innerHTML = `<p>${p.detail}</p>`;
-      if (detailTech) {
-        detailTech.innerHTML = `
-          <h4>Tech stack</h4>
-          <div class="tech-tags">
-            ${p.techStack.map((t: string) => `<span class="tech-tag">•${t}</span>`).join('')}
-          </div>
-        `;
+      // Fade out -> update -> fade in transition
+      if (detailContainer) {
+        detailContainer.style.opacity = '0';
+        detailContainer.style.transform = 'translateY(10px)';
+        
+        setTimeout(() => {
+          if (detailName) detailName.textContent = p.name;
+          if (detailSummary) detailSummary.textContent = p.summary;
+          if (detailDesc) detailDesc.textContent = p.description;
+          if (detailText) detailText.textContent = p.detail;
+          
+          if (detailFeatures) {
+            detailFeatures.innerHTML = `
+              <h4 class="section-heading">Key Features</h4>
+              <ul>
+                ${p.features.map((f: string) => `<li>${f}</li>`).join('')}
+              </ul>
+            `;
+          }
+
+          if (detailTech) {
+            detailTech.innerHTML = `
+              <h4 class="section-heading">Technologies</h4>
+              <div class="tech-tags">
+                ${p.techStack.map((t: string) => `<span class="tech-tag">${t}</span>`).join('')}
+              </div>
+            `;
+          }
+
+          if (detailGithub) detailGithub.href = p.github;
+          if (detailGithubText) detailGithubText.textContent = p.github.replace('https://github.com/', '');
+
+          // Reset read more state when changing projects
+          const currentReadMoreBtn = document.getElementById('read-more-btn');
+          const currentReadMoreContent = document.getElementById('read-more-content');
+          if (currentReadMoreBtn && currentReadMoreContent) {
+            currentReadMoreBtn.setAttribute('aria-expanded', 'false');
+            currentReadMoreContent.classList.remove('expanded');
+            currentReadMoreBtn.innerHTML = 'Read More <span class="read-more-icon">+</span>';
+          }
+
+          // Fade in
+          detailContainer.style.opacity = '1';
+          detailContainer.style.transform = 'translateY(0)';
+        }, 300); // 300ms matches CSS transition
       }
-      if (detailGithub) detailGithub.href = p.github;
-      if (detailGithubText) detailGithubText.textContent = p.github.replace('https://', '');
     }
 
-    items.forEach((item) => {
-      item.addEventListener('click', () => {
-        const idx = parseInt((item as HTMLElement).dataset.index || '0');
-        selectProject(idx);
+    cards.forEach((card) => {
+      card.addEventListener('click', () => {
+        const idx = parseInt((card as HTMLElement).dataset.index || '0');
+        // Only trigger if not already active
+        if (!card.classList.contains('active')) {
+          selectProject(idx);
+        }
       });
-    });
-
-    // Scroll arrows
-    const list = document.getElementById('projects-list');
-    const upBtn = document.getElementById('projects-up');
-    const downBtn = document.getElementById('projects-down');
-
-    upBtn?.addEventListener('click', () => {
-      list?.scrollBy({ top: -80, behavior: 'smooth' });
-    });
-    downBtn?.addEventListener('click', () => {
-      list?.scrollBy({ top: 80, behavior: 'smooth' });
     });
   }
 
@@ -147,142 +237,325 @@ if (fs.existsSync(projectsPath)) {
 <style>
   .projects-section {
     min-height: 100vh;
-    padding: 4rem var(--page-padding);
+    padding: 0;
     display: flex;
     align-items: center;
+    background-color: transparent; /* Rely on body background/shader */
   }
 
   .projects-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 3rem;
+    grid-template-columns: 35% 65%;
     width: 100%;
-    max-width: var(--page-max-width);
-    margin: 0 auto;
-    min-height: 60vh;
+    height: 100vh;
+    max-width: 100%;
   }
 
-  /* Sidebar */
+  /* ============================================
+     LEFT COLUMN: EXPLORER
+     ============================================ */
   .projects-sidebar {
+    height: 100vh;
+    border-right: 1px solid var(--border-strong);
     display: flex;
     flex-direction: column;
+    padding: 6rem 2rem 2rem 4rem; /* Top padding clears Nav */
+    background: linear-gradient(to right, rgba(10,10,10,0.8) 0%, rgba(10,10,10,0.4) 100%);
+    backdrop-filter: blur(5px);
+  }
+
+  .sidebar-header {
+    margin-bottom: 2rem;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
   }
 
-  .scroll-arrow {
-    background: none;
-    border: none;
+  .sidebar-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0.25rem;
-    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
 
-  .scroll-arrow:hover {
-    color: var(--text-primary);
+  .sidebar-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
   }
 
   .projects-list {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
-    max-height: 400px;
+    gap: 0.5rem;
     overflow-y: auto;
+    padding-right: 1rem;
+    /* Hide scrollbar but keep functionality */
     scrollbar-width: none;
   }
-
   .projects-list::-webkit-scrollbar {
     display: none;
   }
 
-  .project-item {
+  .project-card {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.75rem 1rem;
+    align-items: center;
+    padding: 1.25rem;
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     text-align: left;
-    color: var(--text-secondary);
-    font-family: var(--font-sans);
-    width: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
   }
 
-  .project-item:hover {
-    background: var(--surface);
-    border-color: var(--border);
+  .project-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 0%;
+    width: 2px;
+    background-color: var(--text-primary);
+    transition: height 0.3s ease;
   }
 
-  .project-item.active {
+  .project-card:hover {
     background: var(--surface-hover);
-    border-color: var(--border-strong);
-    color: var(--text-primary);
   }
 
-  .project-item-name {
-    font-size: 0.95rem;
+  .project-card.active {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-strong);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .project-card.active::before {
+    height: 60%;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .card-name {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
     font-weight: 500;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
   }
 
-  .project-item-category {
-    font-size: 0.72rem;
+  .project-card.active .card-name {
+    color: var(--text-primary);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+
+  .card-category {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     color: var(--text-muted);
-    margin-top: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .projects-empty {
     color: var(--text-muted);
     font-size: 0.9rem;
-    padding: 1rem;
+    font-family: var(--font-mono);
   }
 
-  /* Detail panel */
+  /* ============================================
+     RIGHT COLUMN: DETAIL PANEL
+     ============================================ */
   .projects-detail {
+    height: 100vh;
+    padding: 6rem 4rem 2rem 4rem;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .detail-container {
+    max-width: 800px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 2rem 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
-  .detail-content {
-    max-width: 550px;
+  .detail-header {
+    margin-bottom: 2rem;
   }
 
   .detail-name {
-    font-size: var(--text-2xl);
-    font-weight: 400;
+    font-family: var(--font-serif);
+    font-size: 3.5rem;
     color: var(--text-primary);
-    margin-bottom: var(--space-md);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .detail-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-strong) 0%, transparent 100%);
+    margin-bottom: 1rem;
+  }
+
+  .detail-summary {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  /* Cinematic Center Visual Area */
+  .detail-visual {
+    width: 100%;
+    height: 250px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Subtle monochromatic abstract pattern */
+  .visual-pattern {
+    position: absolute;
+    inset: -20%;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center center;
+    opacity: 0.6;
+    transition: transform 0.5s ease-out;
+  }
+
+  /* Slight parallax on hover over the visual area */
+  .detail-visual:hover .visual-pattern {
+    transform: scale(1.05) translate(1%, 1%);
+  }
+
+  /* Overlay vignette for the cinematic feel */
+  .detail-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+  }
+
+  .detail-body {
+    display: flex;
+    gap: 3rem;
+    flex: 1;
+    margin-bottom: 2rem;
+  }
+
+  .detail-text-area {
+    flex: 2;
+  }
+
+  .detail-meta {
+    flex: 1;
   }
 
   .detail-description {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    margin-bottom: var(--space-lg);
-    line-height: 1.6;
-  }
-
-  .detail-text {
-    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
     color: var(--text-secondary);
     line-height: 1.7;
-    margin-bottom: var(--space-lg);
+    margin-bottom: 1.5rem;
   }
 
-  .detail-tech {
-    margin-bottom: var(--space-lg);
+  /* Read More Section */
+  .read-more-wrapper {
+    margin-bottom: 1.5rem;
   }
 
-  .detail-tech h4 {
-    font-size: var(--text-sm);
-    font-weight: 500;
+  .read-more-btn {
+    background: none;
+    border: none;
     color: var(--text-primary);
-    margin-bottom: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .read-more-btn:hover {
+    opacity: 1;
+  }
+
+  .read-more-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  .read-more-content.expanded {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 1.5rem;
+  }
+
+  .read-more-content p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+  }
+
+  .features-list ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .features-list li {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .features-list li::before {
+    content: '→';
+    color: var(--text-muted);
+    font-family: var(--font-mono);
   }
 
   .tech-tags {
@@ -292,44 +565,120 @@ if (fs.existsSync(projectsPath)) {
   }
 
   .tech-tag {
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-secondary);
-    font-family: var(--font-sans);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
 
-  .detail-github {
+  .tech-tag:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  /* Footer */
+  .detail-footer {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .github-link {
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
     color: var(--text-secondary);
-    font-size: var(--text-sm);
-    padding: 0.75rem 0;
-    border-top: 1px solid var(--border);
     text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
   }
 
-  .detail-github svg {
-    flex-shrink: 0;
-  }
-
-  .detail-github:hover {
+  .github-link:hover {
     color: var(--text-primary);
-    opacity: 1;
+  }
+
+  .github-text {
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .github-link:hover .github-text {
+    border-color: var(--text-primary);
   }
 
   .external-arrow {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    opacity: 0.5;
+    transition: transform 0.2s ease, opacity 0.2s ease;
   }
 
-  /* Mobile */
-  @media (max-width: 768px) {
+  .github-link:hover .external-arrow {
+    transform: translate(2px, -2px);
+    opacity: 1;
+  }
+
+  /* ============================================
+     RESPONSIVE (MOBILE)
+     ============================================ */
+  @media (max-width: 900px) {
     .projects-layout {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      grid-template-rows: auto 1fr;
     }
 
     .projects-sidebar {
-      max-height: 250px;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border-strong);
+      padding: 5rem 2rem 1.5rem 2rem;
+    }
+
+    .projects-list {
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-right: 0;
+      padding-bottom: 0.5rem;
+    }
+
+    .project-card {
+      min-width: 200px;
+      flex-shrink: 0;
+    }
+
+    .project-card::before {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0%;
+      height: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .project-card.active::before {
+      height: 2px;
+      width: 60%;
+    }
+
+    .projects-detail {
+      padding: 2rem;
+      height: auto;
+      overflow: visible;
+    }
+
+    .detail-body {
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .detail-name {
+      font-size: 2.5rem;
     }
   }
 </style>
