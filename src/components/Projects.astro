@@ -206,9 +206,9 @@ let projects: Project[] = projectsData as Project[];
           setTimeout(() => {
             const cardRect = activeCard.getBoundingClientRect();
             // Trigger native scroll if the card is under the navbar or behind the 60vh detail pane
-            if (cardRect.bottom > window.innerHeight * 0.38 || cardRect.top < window.innerHeight * 0.12) {
-              // 'nearest' combined with CSS scroll-margin perfectly forces the card into the visible gap
-              activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (cardRect.bottom > window.innerHeight * 0.38 || cardRect.top < window.innerHeight * 0.15) {
+              // Align to the top of the safe zone to prioritize reading the heading
+              activeCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
           }, 50);
         }
@@ -267,11 +267,8 @@ let projects: Project[] = projectsData as Project[];
         this.projectsList.addEventListener('mouseleave', () => {
           if (!this.isMobile) {
             clearTimeout(this.hoverTimeout);
-            if (this.lockedIndex === -1 && this.previewIndex !== 0) {
-              this.hoverTimeout = setTimeout(() => {
-                this.transitionTo(0);
-              }, 50);
-            }
+            // Deliberately DO NOT transitionTo(0).
+            // This leaves the UI parked on the last hovered project.
           }
         });
       }
@@ -469,8 +466,10 @@ let projects: Project[] = projectsData as Project[];
     transition: height 0.3s ease;
   }
 
-  .project-card:hover {
-    background: var(--surface-hover);
+  @media (hover: hover) {
+    .project-card:hover {
+      background: var(--surface-hover);
+    }
   }
 
   .project-card.active {
@@ -771,8 +770,8 @@ let projects: Project[] = projectsData as Project[];
     .project-card {
       min-width: unset;
       flex-shrink: 0;
-      scroll-margin-top: 12dvh;
-      scroll-margin-bottom: 62dvh; /* Forces scrollIntoView to push the card above the 60dvh pane */
+      scroll-margin-top: 15dvh;
+      scroll-margin-bottom: 65dvh; 
     }
 
     .project-card::before {

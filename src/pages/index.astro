@@ -452,7 +452,9 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       const scrollingDown = e.deltaY > 0;
 
       const aboutSection = document.getElementById('about');
-      const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+      // Only apply the offsetTop rule on mobile devices; desktop should always go to the extreme bottom
+      const isMobile = window.innerWidth <= 900;
+      const targetScroll = isMobile && aboutSection ? aboutSection.offsetTop : maxScroll;
 
       // If at the top and scrolling down
       if (scrollingDown && scrollY < 50) {
@@ -495,7 +497,8 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const maxScroll = document.body.scrollHeight - window.innerHeight;
     
     const aboutSection = document.getElementById('about');
-    const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+    const isMobile = window.innerWidth <= 900;
+    const targetScroll = isMobile && aboutSection ? aboutSection.offsetTop : maxScroll;
     
     // Only trigger cinematic scroll if the swipe is significant enough (e.g. > 30px)
     if (Math.abs(deltaY) < 30) return;
