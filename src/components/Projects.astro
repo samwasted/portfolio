@@ -204,18 +204,11 @@ let projects: Project[] = projectsData as Project[];
         const activeCard = this.cards[this.previewIndex] as HTMLElement;
         if (activeCard) {
           setTimeout(() => {
-            const sidebar = document.querySelector('.projects-sidebar');
-            if (sidebar) {
-              const cardRect = activeCard.getBoundingClientRect();
-              const sidebarRect = sidebar.getBoundingClientRect();
-              
-              // Calculate exact relative offset regardless of CSS positioning
-              const cardRelativeTop = (cardRect.top - sidebarRect.top) + sidebar.scrollTop;
-              
-              // Park the card at 12vh from the top of the sidebar
-              const targetScroll = cardRelativeTop - (window.innerHeight * 0.12);
-              
-              sidebar.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            const cardRect = activeCard.getBoundingClientRect();
+            // Trigger native scroll if the card is under the navbar or behind the 60vh detail pane
+            if (cardRect.bottom > window.innerHeight * 0.38 || cardRect.top < window.innerHeight * 0.12) {
+              // 'nearest' combined with CSS scroll-margin perfectly forces the card into the visible gap
+              activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
           }, 50);
         }
@@ -779,6 +772,7 @@ let projects: Project[] = projectsData as Project[];
       min-width: unset;
       flex-shrink: 0;
       scroll-margin-top: 12dvh;
+      scroll-margin-bottom: 62dvh; /* Forces scrollIntoView to push the card above the 60dvh pane */
     }
 
     .project-card::before {
