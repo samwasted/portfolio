@@ -230,6 +230,8 @@ let projects: Project[] = projectsData as Project[];
               // Close
               this.layout?.classList.remove('has-active-project');
               this.cards.forEach(c => c.classList.remove('active'));
+              const sidebar = document.querySelector('.projects-sidebar');
+              if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
               const wasOpen = hasPane;
               
@@ -326,13 +328,14 @@ let projects: Project[] = projectsData as Project[];
         const deltaY = e.touches[0].clientY - touchStartY;
         const atTop = detailPane.scrollTop === 0;
 
-        // Require a firm 60px pull down to close, so it's not overly sensitive
         if (atTop && deltaY > 60) {
           e.preventDefault();
           this.layout?.classList.remove('has-active-project');
           this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
           isTouchOnPane = false;
+          const sidebar = document.querySelector('.projects-sidebar');
+          if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }, { passive: false });
 
@@ -386,6 +389,8 @@ let projects: Project[] = projectsData as Project[];
           this.layout?.classList.remove('has-active-project');
           this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
+          const sidebar = document.querySelector('.projects-sidebar');
+          if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         
@@ -394,6 +399,8 @@ let projects: Project[] = projectsData as Project[];
           this.layout?.classList.remove('has-active-project');
           this.cards.forEach(c => c.classList.remove('active'));
           detailPane.classList.remove('expanded-pane');
+          const sidebar = document.querySelector('.projects-sidebar');
+          if (sidebar) sidebar.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (finalHeight > (vh60 + (vh85 - vh60) * 0.25)) {
           detailPane.classList.add('expanded-pane');
         } else {
@@ -807,9 +814,20 @@ let projects: Project[] = projectsData as Project[];
     .projects-sidebar {
       height: 100dvh;
       border-right: none;
-      padding: 5.1rem 1.5rem 2rem 1.5rem;
+      padding: 5rem 1.5rem 2rem 1.5rem;
       overflow-y: auto;
       overscroll-behavior: contain;
+      position: relative;
+    }
+
+    .sidebar-header {
+      position: sticky;
+      top: -0.5rem;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      padding: 0.5rem 0 1.5rem 0;
+      margin-top: -0.5rem;
     }
 
     .projects-layout.has-active-project .projects-list::after {
