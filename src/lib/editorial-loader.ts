@@ -59,7 +59,7 @@ export function loadEditorials(): Editorial[] {
         abstract: meta.abstract || '',
         tags: meta.tags || [],
         draft: meta.draft || false,
-        layout: meta.layout || 'ieee',
+        layout: meta.layout || 'single',
         html,
       });
     } catch (err) {
@@ -96,7 +96,7 @@ export function loadEditorial(slug: string): Editorial | null {
       abstract: meta.abstract || '',
       tags: meta.tags || [],
       draft: meta.draft || false,
-      layout: meta.layout || 'ieee',
+      layout: meta.layout || 'single',
       html,
     };
   } catch {

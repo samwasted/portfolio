@@ -55,7 +55,6 @@ convert_editorial() {
     --to html5 \
     --katex \
     --section-divs \
-    --no-highlight \
     --mathml \
     --wrap=none \
     -o "$dest/content.html" 2>&1 || {

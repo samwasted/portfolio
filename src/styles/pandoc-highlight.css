@@ -1,0 +1,56 @@
+/* ============================================
+   Pandoc Syntax Highlighting (Dark Theme)
+   Maps to standard Pandoc span classes
+   ============================================ */
+
+pre.sourceCode {
+  background-color: #121212;
+  padding: 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 1.5rem 0;
+}
+
+code.sourceCode {
+  color: #d4d4d4;
+  white-space: pre;
+}
+
+code.sourceCode span {
+  display: inline-block;
+}
+
+/* --- Token Colors (Inspired by VSCode Dark+ / Breezedark) --- */
+span.kw { color: #569cd6; font-weight: bold; }      /* Keyword */
+span.dt { color: #4ec9b0; }                         /* DataType */
+span.dv { color: #b5cea8; }                         /* DecVal */
+span.bn { color: #b5cea8; }                         /* BaseN */
+span.fl { color: #b5cea8; }                         /* Float */
+span.ch { color: #ce9178; }                         /* Char */
+span.st { color: #ce9178; }                         /* String */
+span.co { color: #6a9955; font-style: italic; }     /* Comment */
+span.ot { color: #dcdcaa; }                         /* Other */
+span.al { color: #f44747; font-weight: bold; }      /* Alert */
+span.fu { color: #dcdcaa; }                         /* Function */
+span.er { color: #f44747; font-weight: bold; }      /* Error */
+span.wa { color: #6a9955; font-style: italic; }     /* Warning */
+span.cn { color: #569cd6; }                         /* Constant */
+span.sc { color: #dcdcaa; }                         /* SpecialChar */
+span.vs { color: #ce9178; }                         /* VerbatimString */
+span.ss { color: #ce9178; }                         /* SpecialString */
+span.im { color: #dcdcaa; }                         /* Import */
+span.va { color: #9cdcfe; }                         /* Variable */
+span.cf { color: #c586c0; font-weight: bold; }      /* ControlFlow */
+span.op { color: #d4d4d4; }                         /* Operator */
+span.bu { color: #4ec9b0; }                         /* BuiltIn */
+span.ex { color: #dcdcaa; }                         /* Extension */
+span.pp { color: #c586c0; font-weight: bold; }      /* Preprocessor */
+span.at { color: #9cdcfe; }                         /* Attribute */
+span.do { color: #6a9955; font-style: italic; }     /* Documentation */
+span.an { color: #6a9955; font-weight: bold; }      /* Annotation */
+span.cv { color: #6a9955; font-weight: bold; }      /* CommentVar */
+span.in { color: #6a9955; font-weight: bold; }      /* Information */

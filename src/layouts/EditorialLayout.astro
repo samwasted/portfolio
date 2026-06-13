@@ -8,7 +8,7 @@ export interface Props {
   layout_type?: string;
 }
 
-const { title, author, date, abstract, layout_type = 'ieee' } = Astro.props;
+const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
 ---
 
 <!doctype html>
@@ -39,6 +39,7 @@ const { title, author, date, abstract, layout_type = 'ieee' } = Astro.props;
       @import '../styles/global.css';
       @import '../styles/editorial.css';
       @import '../styles/katex-overrides.css';
+      @import '../styles/pandoc-highlight.css';
     </style>
   </head>
   <body>
