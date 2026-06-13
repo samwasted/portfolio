@@ -17,7 +17,7 @@ const { title, author, date, abstract, layout_type = 'ieee' } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={abstract || `Editorial: ${title}`} />
-    <title>{title} — Samarpan Verma</title>
+    <title>{title} - Samarpan Verma</title>
     <ClientRouter />
 
     <!-- Fonts -->
@@ -57,7 +57,7 @@ const { title, author, date, abstract, layout_type = 'ieee' } = Astro.props;
 
         {abstract && (
           <div class="editorial-abstract">
-            <strong>Abstract — </strong>{abstract}
+            <strong>Abstract - </strong>{abstract}
           </div>
         )}
 

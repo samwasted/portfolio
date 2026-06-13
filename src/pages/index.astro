@@ -9,7 +9,7 @@ import Nav from "../components/Nav.astro";
 import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 ---
 
-<BaseLayout title="Samarpan Verma — Portfolio">
+<BaseLayout title="Samarpan Verma - Portfolio">
   <ShaderBackground />
   <FujiShaderOverlay />
   <div class="page-frame" aria-hidden="true"></div>
@@ -344,73 +344,81 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 </BaseLayout>
 
 <script>
-  // Fade out Fuji shader, blur background, and hide scroll arrow based on scroll
-  const fuji = document.getElementById("fuji-shader-overlay");
-  const bg = document.getElementById("image-bg");
-  const indicator = document.getElementById("scroll-indicator-container");
-
-  // Hero text elements
-  const greeting = document.getElementById("hero-greeting");
-  const label = document.getElementById("hero-label");
-  const tags = document.getElementById("hero-tags");
-  const stickyGroup = document.getElementById("hero-sticky-group");
-
   let isTicking = false;
+
+  function updateScrollState() {
+    const scrollY = window.scrollY;
+    const height = window.innerHeight;
+
+    // Fetch elements dynamically so they are always accurate after Astro ViewTransitions
+    const fuji = document.getElementById("fuji-shader-overlay");
+    const bg = document.getElementById("image-bg");
+    const indicator = document.getElementById("scroll-indicator-container");
+    const greeting = document.getElementById("hero-greeting");
+    const label = document.getElementById("hero-label");
+    const tags = document.getElementById("hero-tags");
+    const stickyGroup = document.getElementById("hero-sticky-group");
+
+    // 1. Hide scroll indicator
+    if (indicator) {
+      indicator.style.opacity = scrollY > 50 ? "0" : "1";
+      indicator.style.pointerEvents = scrollY > 50 ? "none" : "auto";
+    }
+
+    // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
+    const fadeOpacity = Math.max(0, 1 - scrollY / 200).toString();
+    if (greeting) greeting.style.opacity = fadeOpacity;
+    if (label) label.style.opacity = fadeOpacity;
+    if (tags) tags.style.opacity = fadeOpacity;
+
+    // 3. Keep the Name and "3rd year" text completely fixed
+    const scrollThreshold = height * 0.4;
+    if (stickyGroup) {
+      if (scrollY > scrollThreshold) {
+        const pushUpAmount = scrollY - scrollThreshold;
+        if (stickyGroup.parentElement) {
+          const heroRect = stickyGroup.parentElement.getBoundingClientRect();
+          const initialTop = height * 0.35 - heroRect.height / 2;
+          const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
+          const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
+
+          if (window.innerWidth > 768) {
+            stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
+          } else {
+            stickyGroup.style.transform = `translateY(0px)`;
+          }
+          stickyGroup.style.opacity = "1";
+        }
+      } else {
+        stickyGroup.style.transform = `translateY(0px)`;
+        stickyGroup.style.opacity = "1";
+      }
+    }
+
+    // Shader and Background fades
+    if (fuji) {
+      const opacity = Math.max(0.3, 1 - scrollY / (height * 0.6));
+      fuji.style.opacity = opacity.toString();
+    }
+    if (bg) {
+      bg.style.filter = `brightness(${Math.max(0.2, 1 - scrollY / 800)})`;
+    }
+  }
+
   window.addEventListener("scroll", () => {
     if (!isTicking) {
       window.requestAnimationFrame(() => {
-        const scrollY = window.scrollY;
-        const height = window.innerHeight;
-
-        // 1. Hide scroll indicator
-        if (indicator) {
-          indicator.style.opacity = scrollY > 50 ? "0" : "1";
-          indicator.style.pointerEvents = scrollY > 50 ? "none" : "auto";
-        }
-
-        // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
-        const fadeOpacity = Math.max(0, 1 - scrollY / 200).toString();
-        if (greeting) greeting.style.opacity = fadeOpacity;
-        if (label) label.style.opacity = fadeOpacity;
-        if (tags) tags.style.opacity = fadeOpacity;
-
-        // 3. Keep the Name and "3rd year" text completely fixed
-        const scrollThreshold = height * 0.4;
-        if (stickyGroup) {
-          if (scrollY > scrollThreshold) {
-            const pushUpAmount = scrollY - scrollThreshold;
-            if (stickyGroup.parentElement) {
-              const heroRect =
-                stickyGroup.parentElement.getBoundingClientRect();
-              const initialTop = height * 0.35 - heroRect.height / 2;
-              const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
-              const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
-
-              if (window.innerWidth > 768) {
-                stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
-              } else {
-                stickyGroup.style.transform = `translateY(0px)`;
-              }
-              stickyGroup.style.opacity = "1";
-            }
-          } else {
-            stickyGroup.style.transform = `translateY(0px)`;
-            stickyGroup.style.opacity = "1";
-          }
-        }
-
-        // Shader and Background fades
-        if (fuji) {
-          const opacity = Math.max(0.3, 1 - scrollY / (height * 0.6));
-          fuji.style.opacity = opacity.toString();
-        }
-        if (bg) {
-          bg.style.filter = `brightness(${Math.max(0.2, 1 - scrollY / 800)})`;
-        }
-
+        updateScrollState();
         isTicking = false;
       });
       isTicking = true;
+    }
+  });
+
+  // Instantly sync state when returning to the page via Astro ViewTransitions
+  document.addEventListener('astro:page-load', () => {
+    if (window.location.pathname === '/') {
+      updateScrollState();
     }
   });
 
