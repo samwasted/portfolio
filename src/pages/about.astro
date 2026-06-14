@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ShaderBackground from '../components/ShaderBackground.astro';
 import AboutShaderOverlay from '../components/AboutShaderOverlay.astro';
 import Nav from '../components/Nav.astro';
+import EventLedger from '../components/EventLedger.astro';
 ---
 
 <BaseLayout title="About - Samarpan Verma">
@@ -11,7 +12,9 @@ import Nav from '../components/Nav.astro';
   <Nav active="about" showBack={true} />
 
   <main class="page-content">
-    <!-- About me content can go here later, for now it's just the shader -->
+    <div class="ledger-container">
+      <EventLedger />
+    </div>
   </main>
 </BaseLayout>
 
@@ -19,5 +22,16 @@ import Nav from '../components/Nav.astro';
   .page-content {
     position: relative;
     z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem 2rem 2rem; /* Clear nav bar */
+  }
+
+  .ledger-container {
+    width: 100%;
+    max-width: 800px;
+    z-index: 10; /* Above the shader */
   }
 </style>

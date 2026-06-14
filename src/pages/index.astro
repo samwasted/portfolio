@@ -33,7 +33,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
         class="transition-transform duration-[0ms] ease-linear"
       >
         <h2 class="hero-name">Samarpan Verma</h2>
-        <p class="hero-subtitle">
+        <p id="hero-subtitle" class="hero-subtitle transition-opacity duration-300">
           3rd year <span class="highlight">Mathematics &amp; Computing</span> student
           at <span class="highlight">IIT (BHU) Varanasi</span>
         </p>
@@ -91,7 +91,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       >
         <!-- PANE 1: Chronological Event Ledger (Left Side, Centered) -->
         <div
-          class="lg:col-span-6 flex flex-col justify-center space-y-8 text-lg"
+          class="lg:col-span-6 flex flex-col justify-center space-y-8 text-lg mt-16"
         >
           <div
             class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4"
@@ -99,54 +99,119 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
             System Log // Event Ledger
           </div>
 
-          <div class="font-mono text-base space-y-5 text-white/60">
-            <div class="flex gap-4 group">
-              <div
-                class="text-[#D4C594] whitespace-nowrap min-w-[110px] opacity-80 group-hover:opacity-100 transition-opacity"
-              >
-                [RANK] 2026-04
+          <div class="font-mono text-base flex flex-col gap-5 text-white/60 relative">
+            <!-- Vertical line behind nodes -->
+            <div class="absolute left-[176px] top-2 bottom-2 w-px bg-white/10 z-0 hidden md:block"></div>
+
+            <!-- [BASE] Standard -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
+                [BASE] 2024-07
               </div>
-              <div class="text-white/20 select-none">|</div>
-              <div class="text-white/90 leading-relaxed">
-                Codeforces Expert Rank profile validation.
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
+              </div>
+              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
+                System initialization: Admitted to Indian Institute of Technology (IIT) BHU, Varanasi. Enrolled in Mathematics and Computing (IDD).
               </div>
             </div>
 
-            <div class="flex gap-4 group">
-              <div
-                class="text-[#D4C594] whitespace-nowrap min-w-[110px] opacity-80 group-hover:opacity-100 transition-opacity"
-              >
-                [AWARD] 2026-03
+            <!-- [DEPLOY] Standard -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
+                [DEPLOY] 2025-01
               </div>
-              <div class="text-white/20 select-none">|</div>
-              <div class="text-white/90 leading-relaxed">
-                Bronze Medal at Inter IIT Tech Meet 14.0 (Quant Problem
-                Statement).
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
               </div>
-            </div>
-
-            <div class="flex gap-4 group">
-              <div
-                class="text-[#FFF3C7] whitespace-nowrap min-w-[110px] opacity-80 group-hover:opacity-100 transition-opacity"
-              >
-                [LAUNCH] 2026-03
-              </div>
-              <div class="text-white/20 select-none">|</div>
-              <div class="text-white/90 leading-relaxed">
-                "Rent-a-Romeo" Matchmaking Engine deployment trace.
+              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
+                Java/Spring Boot streaming architecture deployment trace (HLS dynamic streaming, FFmpeg, React).
               </div>
             </div>
 
-            <div class="flex gap-4 group">
-              <div
-                class="text-[#FFF3C7] whitespace-nowrap min-w-[110px] opacity-80 group-hover:opacity-100 transition-opacity"
-              >
-                [LAUNCH] 2026-01
+            <!-- [INDUCT] Standard -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
+                [INDUCT] 2025-06
               </div>
-              <div class="text-white/20 select-none">|</div>
-              <div class="text-white/90 leading-relaxed">
-                "jailsh" Unix Sandbox Runtime kernel implementation logs
-                (seccomp-BPF, namespaces).
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
+              </div>
+              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
+                Club of Programmers (COPS) induction following full-stack Next.js, Redis, and WebSocket application deployments.
+              </div>
+            </div>
+
+            <!-- [SELECT] Standard -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
+                [SELECT] 2025-10
+              </div>
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
+              </div>
+              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
+                High-prep Problem Statement selection for Inter IIT Tech Meet 14.0 (Quantitative Finance pivot).
+              </div>
+            </div>
+
+            <!-- [AWARD] Highlight -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
+                [AWARD] 2025-12
+              </div>
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
+              </div>
+              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
+                Bronze Medal at Inter IIT Tech Meet 14.0 (Quant Problem Statement). Market models and backtesting pipeline architecture.
+              </div>
+            </div>
+
+            <!-- [INDUCT] Standard -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
+                [INDUCT] 2026-01
+              </div>
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
+              </div>
+              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
+                Algorithmic Trading vertical induction at Quant Club, IIT BHU.
+              </div>
+            </div>
+
+            <!-- [RANK] Highlight -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
+                [RANK] 2026-02
+              </div>
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
+              </div>
+              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
+                Codeforces Expert Rank profile validation via advanced data structures and algorithmic execution.
+              </div>
+            </div>
+
+            <!-- [LAUNCH] Highlight -->
+            <div class="flex gap-4 group items-start relative z-10">
+              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
+                [LAUNCH] 2026-04
+              </div>
+              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
+                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
+              </div>
+              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
+                "jailsh" Unix Sandbox Runtime kernel implementation logs (seccomp-BPF, namespaces).
               </div>
             </div>
           </div>
@@ -357,6 +422,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const greeting = document.getElementById("hero-greeting");
     const label = document.getElementById("hero-label");
     const tags = document.getElementById("hero-tags");
+    const subtitle = document.getElementById("hero-subtitle");
     const stickyGroup = document.getElementById("hero-sticky-group");
 
     // 1. Hide scroll indicator
@@ -365,11 +431,26 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       indicator.style.pointerEvents = scrollY > 50 ? "none" : "auto";
     }
 
-    // 2. Fade out secondary text (greeting, label, tags) in the first 200px of scrolling
+    // 2. Fade out secondary text in the first 200px of scrolling
     const fadeOpacity = Math.max(0, 1 - scrollY / 200).toString();
-    if (greeting) greeting.style.opacity = fadeOpacity;
-    if (label) label.style.opacity = fadeOpacity;
-    if (tags) tags.style.opacity = fadeOpacity;
+    const pointerEvents = scrollY > 150 ? "none" : "auto";
+    
+    if (greeting) {
+      greeting.style.opacity = fadeOpacity;
+      greeting.style.pointerEvents = pointerEvents;
+    }
+    if (label) {
+      label.style.opacity = fadeOpacity;
+      label.style.pointerEvents = pointerEvents;
+    }
+    if (tags) {
+      tags.style.opacity = fadeOpacity;
+      tags.style.pointerEvents = pointerEvents;
+    }
+    if (subtitle) {
+      subtitle.style.opacity = fadeOpacity;
+      subtitle.style.pointerEvents = pointerEvents;
+    }
 
     // 3. Keep the Name and "3rd year" text completely fixed
     const scrollThreshold = height * 0.4;
@@ -405,10 +486,32 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     }
   }
 
+  let lastScrollY = window.scrollY;
+
   window.addEventListener("scroll", () => {
     if (!isTicking) {
       window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
         updateScrollState();
+        
+        // Momentum Scroll Snapping Logic
+        if (!isAutoScrolling) {
+          const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
+          const aboutSection = document.getElementById('about');
+          const targetScroll = aboutSection ? aboutSection.offsetTop : (document.body.scrollHeight - window.innerHeight);
+          const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
+          
+          const scrollingUp = currentScrollY < lastScrollY;
+          
+          // If scrolling up natively and we cross the threshold into the home screen, snap to top
+          if (scrollingUp && currentScrollY <= snapThreshold && currentScrollY > 50) {
+            isAutoScrolling = true;
+            customSmoothScroll(0, 1000);
+            setTimeout(() => { isAutoScrolling = false; }, 1200);
+          }
+        }
+        
+        lastScrollY = currentScrollY;
         isTicking = false;
       });
       isTicking = true;
@@ -472,7 +575,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
 
       const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
-      const snapThreshold = isMobile ? targetScroll - 10 : targetScroll + 100;
+      const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
 
       // If at the top and scrolling down
       if (scrollingDown && scrollY < 50) {
@@ -523,7 +626,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const scrollingDown = deltaY > 0;
     
     const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
-    const snapThreshold = isMobile ? targetScroll - 10 : targetScroll + 100;
+    const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
 
     if (scrollingDown && scrollY < 50) {
       e.preventDefault();
@@ -610,7 +713,8 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     pointer-events: none;
   }
 
-  .home-viewport > * {
+  /* Only allow pointer events on the actual content, not their transparent wrappers */
+  .hero-greeting, .hero-label, .hero-name, .hero-subtitle, .hero-tags, .scroll-indicator {
     pointer-events: auto;
   }
 
@@ -759,6 +863,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       height: 100vh;
       min-height: 100vh;
       z-index: 10;
+      pointer-events: auto !important;
     }
 
     /* Hide the scroll spacer on mobile since the viewport is in-flow */
@@ -813,6 +918,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       height: 100vh;
       min-height: 100vh;
       z-index: 10;
+      pointer-events: auto !important;
     }
 
     div.h-\[100vh\] {
