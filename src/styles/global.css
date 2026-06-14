@@ -278,6 +278,16 @@ body.no-scroll {
   gap: 1.5rem;
 }
 
+@media (min-width: 769px), (orientation: landscape) {
+  .nav-sidebar-header {
+    position: fixed;
+    top: 4rem;
+    left: 4rem;
+    width: calc(35vw - 8rem);
+    justify-content: space-between;
+  }
+}
+
 .nav-sidebar-title {
   font-family: var(--font-mono);
   font-size: 0.85rem;

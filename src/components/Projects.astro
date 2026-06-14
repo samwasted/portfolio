@@ -449,22 +449,17 @@ let projects: Project[] = projectsData as Project[];
     position: relative;
   }
 
-  /* Desktop white line separator for Explorer header */
+  /* Removed desktop white line separator as requested */
   .projects-sidebar::before {
-    content: '';
-    position: absolute;
-    top: 4.5rem;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.15);
-    z-index: 10;
+    display: none;
   }
 
   .projects-list {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     /* Hide scrollbar but keep functionality */
     scrollbar-width: none;
@@ -482,6 +477,7 @@ let projects: Project[] = projectsData as Project[];
     border-radius: 8px;
     cursor: pointer;
     text-align: left;
+    flex-shrink: 0; /* Prevent cards from squishing vertically! */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
@@ -553,7 +549,7 @@ let projects: Project[] = projectsData as Project[];
      ============================================ */
   .projects-detail {
     height: 100vh;
-    padding: 6rem 4rem 2rem 4rem;
+    padding: 6rem 12rem 2rem 4rem;
     overflow-y: auto;
     position: relative;
     z-index: 1;

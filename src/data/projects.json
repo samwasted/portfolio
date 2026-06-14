@@ -73,5 +73,105 @@
       "Open Source Implementations"
     ],
     "github": "https://github.com/samwasted/research"
+  },
+  {
+    "name": "Dummy Project Alpha",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-alpha"
+  },
+  {
+    "name": "Dummy Project Beta",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "Another dummy project to increase the length of the sidebar list.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-beta"
+  },
+  {
+    "name": "Dummy Project Gamma",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-gamma"
+  },
+  {
+    "name": "Dummy Project Delta",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-delta"
+  },
+  {
+    "name": "Dummy Project Epsilon",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "The final dummy project to ensure the list is overwhelmingly long for mobile and desktop screens.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-epsilon"
+  },
+  {
+    "name": "Dummy Project Zeta",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "More dummy content to guarantee scroll overflow.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-zeta"
+  },
+  {
+    "name": "Dummy Project Eta",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "More dummy content to guarantee scroll overflow.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-eta"
+  },
+  {
+    "name": "Dummy Project Theta",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "More dummy content to guarantee scroll overflow.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-theta"
+  },
+  {
+    "name": "Dummy Project Iota",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "More dummy content to guarantee scroll overflow.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-iota"
+  },
+  {
+    "name": "Dummy Project Kappa",
+    "category": "Testing",
+    "summary": "Placeholder project for UI scroll testing.",
+    "description": "The absolute final dummy content to guarantee scroll overflow on 4K screens.",
+    "detail": "Scrollability testing project.",
+    "techStack": ["CSS", "HTML", "UI/UX"],
+    "features": ["Overflow testing", "Flexbox validation"],
+    "github": "https://github.com/samwasted/dummy-kappa"
   }
 ]
