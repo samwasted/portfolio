@@ -7,7 +7,7 @@ interface Event {
   tag: string;
   date: string;
   description: string;
-  highlight: boolean;
+  highlight: boolean | "medium";
 }
 
 const events: Event[] = [
@@ -17,24 +17,14 @@ const events: Event[] = [
     description: "System initialization: Admitted to Indian Institute of Technology (IIT) BHU, Varanasi. Enrolled in Mathematics and Computing (IDD).", 
     highlight: false 
   },
-  { 
-    tag: "DEPLOY", 
-    date: "2025-01", 
-    description: "Java/Spring Boot streaming architecture deployment trace (HLS dynamic streaming, FFmpeg, React).", 
-    highlight: false 
-  },
+
   { 
     tag: "INDUCT", 
     date: "2025-06", 
-    description: "Club of Programmers (COPS) induction following full-stack Next.js, Redis, and WebSocket application deployments.", 
+    description: "Club of Programmers (COPS) selection following full-stack Next.js, Redis, and WebSocket application deployments.", 
     highlight: false 
   },
-  { 
-    tag: "SELECT", 
-    date: "2025-10", 
-    description: "High-prep Problem Statement selection for Inter IIT Tech Meet 14.0 (Quantitative Finance pivot).", 
-    highlight: false 
-  },
+
   { 
     tag: "AWARD", 
     date: "2025-12", 
@@ -44,19 +34,19 @@ const events: Event[] = [
   { 
     tag: "INDUCT", 
     date: "2026-01", 
-    description: "Algorithmic Trading vertical induction at Quant Club, IIT BHU.", 
+    description: "Algorithmic Trading vertical selection at The Quant Club (TQC), IIT BHU.", 
     highlight: false 
   },
   { 
     tag: "RANK", 
     date: "2026-02", 
     description: "Codeforces Expert Rank profile validation via advanced data structures and algorithmic execution.", 
-    highlight: true 
+    highlight: "medium"
   },
   { 
-    tag: "LAUNCH", 
+    tag: "CORE", 
     date: "2026-04", 
-    description: "\"jailsh\" Unix Sandbox Runtime kernel implementation logs (seccomp-BPF, namespaces).", 
+    description: "\"jailsh\" C++17 interactive execution sandbox and container runtime. Engineered a strict double-fork PID 1 init model, IPC handshakes, and cgroups v2 boundaries.", 
     highlight: true 
   }
 ];
@@ -67,7 +57,7 @@ const events: Event[] = [
   
   <div class="ledger-events">
     {events.map(event => (
-      <div class={`ledger-event ${event.highlight ? 'is-highlight' : 'is-standard'}`}>
+      <div class={`ledger-event ${event.highlight === true ? 'is-highlight' : event.highlight === 'medium' ? 'is-medium' : 'is-standard'}`}>
         <div class="ledger-node"></div>
         <div class="ledger-content">
           <span class="ledger-meta">
@@ -132,6 +122,11 @@ const events: Event[] = [
     background: #333;
     border: 1px solid #444;
   }
+  
+  .is-medium .ledger-node {
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+  }
 
   .is-highlight .ledger-node {
     background: #fff;
@@ -161,6 +156,10 @@ const events: Event[] = [
   .is-standard .ledger-meta {
     color: rgba(255, 255, 255, 0.4);
   }
+  
+  .is-medium .ledger-meta {
+    color: rgba(255, 255, 255, 0.7);
+  }
 
   .is-highlight .ledger-meta {
     color: rgba(255, 255, 255, 0.9);
@@ -178,6 +177,10 @@ const events: Event[] = [
   /* Description styling */
   .is-standard .ledger-desc {
     color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .is-medium .ledger-desc {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .is-highlight .ledger-desc {

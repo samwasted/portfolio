@@ -81,7 +81,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   <!-- About Section (Scrolls up) -->
   <section
     id="about"
-    class="min-h-screen w-full relative z-30 flex items-center bg-gradient-to-b from-transparent via-[#0a0a0a]/60 to-[#0a0a0a]/85"
+    class="min-h-screen w-full relative z-30 flex items-center bg-gradient-to-b from-transparent via-[#0a0a0a] to-[#0a0a0a]"
     style="padding: 15vh 12vw 15vh 8vw;"
   >
     <div class="w-full h-full">
@@ -94,7 +94,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           class="lg:col-span-6 flex flex-col justify-center space-y-8 text-lg mt-16"
         >
           <div
-            class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4"
+            class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4 "
           >
             System Log // Event Ledger
           </div>
@@ -117,19 +117,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               </div>
             </div>
 
-            <!-- [DEPLOY] Standard -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [DEPLOY] 2025-01
-              </div>
-              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
-                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
-              </div>
-              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                Java/Spring Boot streaming architecture deployment trace (HLS dynamic streaming, FFmpeg, React).
-              </div>
-            </div>
+
 
             <!-- [INDUCT] Standard -->
             <div class="flex gap-4 group items-start relative z-10">
@@ -141,23 +129,11 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               </div>
               <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
               <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                Club of Programmers (COPS) induction following full-stack Next.js, Redis, and WebSocket application deployments.
+                Club of Programmers (COPS) selection following full-stack Next.js, Redis, and WebSocket application deployments.
               </div>
             </div>
 
-            <!-- [SELECT] Standard -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [SELECT] 2025-10
-              </div>
-              <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
-                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
-              </div>
-              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                High-prep Problem Statement selection for Inter IIT Tech Meet 14.0 (Quantitative Finance pivot).
-              </div>
-            </div>
+
 
             <!-- [AWARD] Highlight -->
             <div class="flex gap-4 group items-start relative z-10">
@@ -183,35 +159,35 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               </div>
               <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
               <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                Algorithmic Trading vertical induction at Quant Club, IIT BHU.
+                Algorithmic Trading vertical selection at The Quant Club (TQC), IIT BHU.
               </div>
             </div>
 
-            <!-- [RANK] Highlight -->
+            <!-- [RANK] Medium -->
             <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
+              <div class="text-[#FFF3C7]/80 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
                 [RANK] 2026-02
               </div>
               <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
-                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
+                <div class="w-2 h-2 rounded-full bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.3)] transition-colors"></div>
               </div>
-              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
+              <div class="text-white/40 select-none md:hidden flex-shrink-0">|</div>
+              <div class="text-white/80 leading-relaxed group-hover:text-white transition-colors flex-1">
                 Codeforces Expert Rank profile validation via advanced data structures and algorithmic execution.
               </div>
             </div>
 
-            <!-- [LAUNCH] Highlight -->
+            <!-- [CORE] Highlight -->
             <div class="flex gap-4 group items-start relative z-10">
               <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
-                [LAUNCH] 2026-04
+                [CORE] 2026-04
               </div>
               <div class="flex-col items-center justify-start pt-2 w-[10px] flex-shrink-0 hidden md:flex">
                 <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
               </div>
               <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
               <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
-                "jailsh" Unix Sandbox Runtime kernel implementation logs (seccomp-BPF, namespaces).
+                "jailsh" C++17 interactive execution sandbox and container runtime. Engineered a strict double-fork PID 1 init model, IPC handshakes, and cgroups v2 boundaries.
               </div>
             </div>
           </div>
@@ -460,14 +436,12 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
         if (stickyGroup.parentElement) {
           const heroRect = stickyGroup.parentElement.getBoundingClientRect();
           const initialTop = height * 0.35 - heroRect.height / 2;
-          const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
+          
+          // Pull the name higher up, but keep it on screen
+          const maxPushUp = initialTop + 10; 
           const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
 
-          if (window.innerWidth > 768 && window.innerHeight > 650) {
-            stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
-          } else {
-            stickyGroup.style.transform = `translateY(0px)`;
-          }
+          stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
           stickyGroup.style.opacity = "1";
         }
       } else {
