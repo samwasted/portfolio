@@ -382,7 +382,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           const maxPushUp = Math.max(0, initialTop - 32); // 32px padding from top
           const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
 
-          if (window.innerWidth > 768) {
+          if (window.innerWidth > 768 && window.innerHeight > 650) {
             stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
           } else {
             stickyGroup.style.transform = `translateY(0px)`;
@@ -469,9 +469,10 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       const scrollingDown = e.deltaY > 0;
 
       const aboutSection = document.getElementById('about');
-      // Only apply the offsetTop rule on mobile devices; desktop should always go to the extreme bottom
-      const isMobile = window.innerWidth <= 900;
-      const targetScroll = isMobile && aboutSection ? aboutSection.offsetTop : maxScroll;
+      const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
+
+      const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
+      const snapThreshold = isMobile ? targetScroll - 10 : targetScroll + 100;
 
       // If at the top and scrolling down
       if (scrollingDown && scrollY < 50) {
@@ -482,8 +483,8 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           isAutoScrolling = false;
         }, 1200);
       }
-      // If at the bottom and scrolling up
-      else if (!scrollingDown && scrollY > targetScroll - 50) {
+      // If pulled past the top of the About section and scrolling up
+      else if (!scrollingDown && scrollY <= snapThreshold && scrollY > 50) {
         e.preventDefault();
         isAutoScrolling = true;
         customSmoothScroll(0, 1000);
@@ -514,20 +515,22 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     const maxScroll = document.body.scrollHeight - window.innerHeight;
     
     const aboutSection = document.getElementById('about');
-    const isMobile = window.innerWidth <= 900;
-    const targetScroll = isMobile && aboutSection ? aboutSection.offsetTop : maxScroll;
+    const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
     
-    // Only trigger cinematic scroll if the swipe is significant enough (e.g. > 30px)
-    if (Math.abs(deltaY) < 30) return;
+    // Only trigger cinematic scroll if the swipe is significant enough
+    if (Math.abs(deltaY) < 40) return;
     
     const scrollingDown = deltaY > 0;
     
+    const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
+    const snapThreshold = isMobile ? targetScroll - 10 : targetScroll + 100;
+
     if (scrollingDown && scrollY < 50) {
       e.preventDefault();
       isAutoScrolling = true;
       customSmoothScroll(targetScroll, 1000);
       setTimeout(() => { isAutoScrolling = false; }, 1200);
-    } else if (!scrollingDown && scrollY > targetScroll - 50) {
+    } else if (!scrollingDown && scrollY <= snapThreshold && scrollY > 50) {
       e.preventDefault();
       isAutoScrolling = true;
       customSmoothScroll(0, 1000);
@@ -800,6 +803,37 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
     .hero-tags {
       margin-top: 1.5rem;
+    }
+  }
+
+  /* --- Landscape Mobile & Short Screens --- */
+  @media (max-height: 650px) {
+    .home-viewport {
+      position: relative;
+      height: 100vh;
+      min-height: 100vh;
+      z-index: 10;
+    }
+
+    div.h-\[100vh\] {
+      display: none !important;
+    }
+
+    #about {
+      min-height: auto;
+      padding: 6rem 16rem 6rem 6vw !important;
+    }
+
+    /* Force vertical stack for the About section panes on short screens */
+    #about .grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4rem !important;
+    }
+    
+    /* Compress the large 8rem desktop gap between Pane 2 and Pane 3 */
+    #about .lg\:mt-\[8rem\] {
+      margin-top: 4rem !important;
     }
   }
 
