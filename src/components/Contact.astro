@@ -64,11 +64,12 @@
     font-weight: 500;
     text-decoration: none;
     opacity: 0.8;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease; /* Transition opacity and drop-shadow */
   }
 
   .contact-link:hover {
     opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(212, 197, 148, 0.35)) drop-shadow(0 0 20px rgba(212, 197, 148, 0.18));
   }
 
   .contact-icon {
