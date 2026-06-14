@@ -15,5 +15,6 @@ export default defineConfig({
   },
   image: {
     domains: ['images.unsplash.com'],
+    remotePatterns: [{ protocol: 'https' }],
   },
 });

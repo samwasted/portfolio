@@ -30,7 +30,8 @@ for (const tag of imgTags) {
     
     try {
       // Process through Astro's image build pipeline
-      const optimized = await getImage({ src, width: 800, format: 'webp' });
+      const isRemote = src.startsWith('http://') || src.startsWith('https://');
+      const optimized = await getImage({ src, width: 800, format: 'webp', inferSize: isRemote });
       const newTag = `<img src="${optimized.src}" alt="${alt}" loading="lazy" decoding="async" width="${optimized.attributes.width}" height="${optimized.attributes.height}" />`;
       processedHtml = processedHtml.replace(tag, newTag);
     } catch (err) {

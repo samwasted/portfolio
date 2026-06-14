@@ -37,7 +37,8 @@ const { position = 'bottom-right' } = Astro.props;
 
   @media (max-width: 768px) and (orientation: portrait) {
     #about-shader-overlay {
-      display: none;
+      width: 100%;
+      display: block;
     }
   }
 </style>
@@ -48,9 +49,6 @@ const { position = 'bottom-right' } = Astro.props;
   import fragSrc from '../shaders/about.frag?raw';
 
   function initAboutShader() {
-    // Paranoia check: absolutely do not load WebGL on mobile screens
-    if (window.innerWidth <= 768) return;
-
     const canvas = document.getElementById('about-shader-overlay') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -73,8 +71,9 @@ const { position = 'bottom-right' } = Astro.props;
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    // Downscale to save memory
-    const DOWNSCALE_FACTOR = 2;
+    // Downscale aggressively on mobile to save GPU cycles
+    const isMobile = window.innerWidth <= 768;
+    const DOWNSCALE_FACTOR = isMobile ? 4 : 2;
     const dpr = window.devicePixelRatio / DOWNSCALE_FACTOR;
 
     let startTime = performance.now();

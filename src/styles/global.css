@@ -248,13 +248,13 @@ body.no-scroll {
   height: 32px;
   display: flex;
   align-items: center;
-  gap: 2.5rem;
+  gap: 2.25rem;
   z-index: 100;
   pointer-events: auto;
 }
 
 /* Only show the solid navbar lining on editorials, projects, and connect, and ONLY on mobile */
-@media (max-width: 900px) and (orientation: portrait) {
+@media (max-width: 768px) and (orientation: portrait) {
   .nav-editorials .nav-left-group::before,
   .nav-projects .nav-left-group::before,
   .nav-connect .nav-left-group::before {
