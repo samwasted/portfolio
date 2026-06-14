@@ -837,6 +837,14 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     }
   }
 
+  /* --- Extremely Short Screens (Prevent Navigation Overlap) --- */
+  @media (max-height: 550px) {
+    .hero-greeting, 
+    .hero-label {
+      display: none !important;
+    }
+  }
+
   /* --- Flower Petal Unfurling Effect --- */
   .flower-petal {
     stroke-dasharray: 100;
