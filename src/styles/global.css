@@ -185,7 +185,7 @@ a:hover {
 /* --- No-scroll utility (single-viewport pages) --- */
 body.no-scroll {
   overflow: hidden;
-  height: 100vh;
+  height: 100dvh;
 }
 
 /* ============================================
@@ -245,6 +245,7 @@ body.no-scroll {
   position: fixed;
   top: 1.5rem;
   left: 1.5rem;
+  height: 32px;
   display: flex;
   align-items: center;
   gap: 2.5rem;
