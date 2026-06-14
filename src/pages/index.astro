@@ -198,7 +198,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           class="lg:col-span-4 lg:col-start-9 flex flex-col h-full mt-24 lg:mt-0"
         >
           <!-- PANE 2: Environment Dependencies & Registries (Top Right) -->
-          <div class="space-y-6 pt-4 lg:pt-0">
+          <div class="flex flex-col gap-6 pt-4 lg:pt-0">
             <div
               class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4"
             >
@@ -208,7 +208,6 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
             <div
               class="font-mono text-base text-white/30 leading-loose flex flex-col"
             >
-              <div class="space-y-4">.</div>
               <div>├── <span class="text-[#D4C594]/80">bin/</span></div>
 
               <div>
@@ -239,52 +238,10 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
               <div class="inline-flex items-center link-group group w-fit">
                 &nbsp;&nbsp;&nbsp;├── <a
-                  href="https://codeforces.com/profile/amwasted"
+                  href="https://codeforces.com/profile/aceclofenac"
                   target="_blank"
-                  class="text-white magenta-hover transition-colors underline decoration-white/20 underline-offset-4 ml-1"
-                  >cf/amwasted</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
-              </div>
-
-              <div class="inline-flex items-center link-group group w-fit">
-                &nbsp;&nbsp;&nbsp;├── <a
-                  href="https://leetcode.com/"
-                  target="_blank"
-                  class="text-white magenta-hover transition-colors underline decoration-white/20 underline-offset-4 ml-1"
-                  >leetcode</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
-              </div>
-
-              <div class="inline-flex items-center link-group group w-fit">
-                &nbsp;&nbsp;&nbsp;├── <a
-                  href="https://github.com/samwasted"
-                  target="_blank"
-                  class="text-white magenta-hover transition-colors underline decoration-white/20 underline-offset-4 ml-1"
-                  >gh/samwasted</a
+                  class="cyan-text magenta-hover transition-colors underline underline-offset-4 ml-1"
+                  >codeforces</a
                 ><svg
                   class="w-4 h-4 ml-2 text-[#FF00FF]"
                   viewBox="0 0 24 24"
@@ -302,9 +259,10 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
               <div class="inline-flex items-center link-group group w-fit">
                 &nbsp;&nbsp;&nbsp;└── <a
-                  href="#"
-                  class="text-white/50 magenta-hover transition-colors italic ml-1"
-                  >arxiv_index</a
+                  href="https://github.com/samwasted"
+                  target="_blank"
+                  class="cyan-text magenta-hover transition-colors underline decoration-cyan-400/20 underline-offset-4 ml-1"
+                  >github</a
                 ><svg
                   class="w-4 h-4 ml-2 text-[#FF00FF]"
                   viewBox="0 0 24 24"
@@ -939,5 +897,8 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   /* Force magenta hover color, bypassing Tailwind arbitrary values */
   .link-group:hover .magenta-hover {
     color: #ff00ff !important;
+  }
+  .cyan-text { /** fix for the cyan color in hyperlinks btw */
+    color: #b9dce0 !important;
   }
 </style>
