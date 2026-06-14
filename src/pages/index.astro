@@ -87,7 +87,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     <div class="w-full h-full">
       <!-- Full Width Grid Layout -->
       <div
-        class="w-full h-full grid grid-cols-1 lg:grid-cols-12 gap-x-12 text-white"
+        class="w-full h-full grid grid-cols-1 lg:grid-cols-12 gap-x-12 text-white flex flex-col gap-5"
       >
         <!-- PANE 1: Chronological Event Ledger (Left Side, Centered) -->
         <div
@@ -195,7 +195,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
         <!-- Right Panes 2 & 3 (Top Right & Bottom Right) -->
         <div
-          class="lg:col-span-4 lg:col-start-9 flex flex-col h-full mt-24 lg:mt-0"
+          class="lg:col-span-4 lg:col-start-9 flex flex-col h-full mt-24 lg:mt-0 gap-5"
         >
           <!-- PANE 2: Environment Dependencies & Registries (Top Right) -->
           <div class="flex flex-col gap-6 pt-4 lg:pt-0">
@@ -208,7 +208,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
             <div
               class="font-mono text-base text-white/30 leading-loose flex flex-col"
             >
-              <div>├── <span class="text-[#D4C594]/80">bin/</span></div>
+              <div>├── <span class="text-[#D4C594]/80">stack/</span></div>
 
               <div>
                 │&nbsp;&nbsp;├── <span class="text-white">cpp17</span>
@@ -218,18 +218,23 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               <div>
                 │&nbsp;&nbsp;├── <span class="text-white">python3</span>
               </div>
-              <div>│&nbsp;&nbsp;└── <span class="text-white">glsl</span></div>
-
-              <div>├── <span class="text-[#D4C594]/80">sys/</span></div>
+              <div>├── <span class="text-[#D4C594]/80">domains/</span></div>
 
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white">seccomp-bpf</span>
+                │&nbsp;&nbsp;├── <span class="text-white">competitive_programming</span>
               </div>
               <div>
                 │&nbsp;&nbsp;└── <span class="text-white"
-                  >linux_namespaces</span>
+                  >process_isolation</span>
               </div>
-
+              <div>
+                │&nbsp;&nbsp;└── <span class="text-white"
+                  >low_latency</span>
+              </div>
+              <div>
+                │&nbsp;&nbsp;└── <span class="text-white"
+                  >quantitative_finance</span>
+              </div>  
               <div>
                 └── <span class="text-[#D4C594]/80">remote/</span>
                 <span class="text-[#D4C594]/50 text-sm ml-2"
@@ -281,7 +286,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           </div>
 
           <!-- PANE 3: System Egress Protocols (Bottom Right) -->
-          <div class="space-y-6 pb-4 mt-8 lg:mt-[8rem]">
+          <div class="flex flex-col gap-6 pb-4 mt-8 lg:mt-[8rem]">
             <div
               class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4"
             >
@@ -290,24 +295,24 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
             <div class="font-mono text-base space-y-6">
               <!-- Contact -->
-              <a
-                href="mailto:samarpan.verma.mat24@itbhu.ac.in"
-                class="block group cursor-pointer"
+              <div
+                id="copy-mail-btn"
+                class="block group cursor-pointer select-none"
               >
                 <span
                   class="text-[#D4C594] group-hover:text-white transition-colors"
-                  >> [ initiate_remote_protocol<span
+                  >> [ <span id="mail-btn-text">initiate_remote_protocol</span><span
                     class="opacity-0 group-hover:opacity-100 text-white inline-block w-2 ml-1"
                     >_</span
                   > ]</span
                 >
-                <span class="text-[#D4C594]/50 text-sm ml-2"># mail me</span>
+                <span id="mail-btn-comment" class="text-[#D4C594]/50 text-sm ml-2"># copy my mail</span>
                 <div
                   class="pl-4 text-white/40 text-sm mt-2 border-l border-white/10 ml-2"
                 >
                   <span class="opacity-50">email:</span> samarpan.verma.mat24@itbhu.ac.in
                 </div>
-              </a>
+              </div>
 
               <!-- Resume -->
               <a
@@ -317,7 +322,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               >
                 <span
                   class="text-[#D4C594] group-hover:text-white transition-colors"
-                  >> [ download_legacy_resume.pdf<span
+                  >> [ download_resume.pdf<span
                     class="opacity-0 group-hover:opacity-100 text-white inline-block w-2 ml-1"
                     >_</span
                   > ]</span
@@ -580,6 +585,29 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
     (e) => {
       const target = e.target as Element;
       if (!target || typeof target.closest !== "function") return;
+
+      // Copy Mail Protocol
+      if (target.closest("#copy-mail-btn")) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        navigator.clipboard.writeText("samarpan.verma.mat24@itbhu.ac.in").catch(() => {});
+        
+        const btnText = document.getElementById("mail-btn-text");
+        const btnComment = document.getElementById("mail-btn-comment");
+        
+        if (btnText && btnComment) {
+          btnText.textContent = "text_copied_to_clipboard";
+          btnComment.textContent = "ACK";
+          
+          setTimeout(() => {
+            btnText.textContent = "initiate_remote_protocol";
+            btnComment.textContent = "# copy my mail";
+          }, 1500);
+        }
+        return;
+      }
 
       // Smooth scroll for the down arrow
       if (target.closest("#scroll-down-btn")) {
