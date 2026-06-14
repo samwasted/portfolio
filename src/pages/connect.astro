@@ -19,7 +19,7 @@ import bgImage3 from '../../public/residue.png';
   <!-- Master Animation Group (Isolates the dimming effect so it doesn't darken the page background) -->
   <div class="master-animation-group fixed z-0 pointer-events-none mix-blend-screen isolate">
     <!-- Base Hands Image -->
-    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-90">
+    <div class="absolute inset-0 w-full h-full overflow-hidden opacity-90">
       <Image 
         id="base-hands-layer"
         src={bgImage}
@@ -27,27 +27,33 @@ import bgImage3 from '../../public/residue.png';
         class="base-wave absolute inset-0 w-full h-full object-contain object-center"
         fetchpriority="high"
         loading="eager"
-        decoding="sync"
+        decoding="async"
       />
     </div>
 
     <!-- Expanding Residue Overlay -->
-    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-90">
-      <div 
+    <div class="absolute inset-0 w-full h-full overflow-hidden opacity-90">
+      <Image 
         id="residue-layer"
-        class="residue-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
-        style={`background-image: url('${bgImage3.src}');`}
-      ></div>
+        src={bgImage3}
+        alt=""
+        class="residue-wave absolute inset-0 w-full h-full object-contain object-center"
+        decoding="async"
+        loading="lazy"
+      />
     </div>
 
     <!-- Sweeping Glow Ring -->
-    <div class="absolute inset-0 w-full h-full overflow-hidden mix-blend-screen opacity-60">
+    <div class="absolute inset-0 w-full h-full overflow-hidden opacity-60">
       <!-- The sweeping wave animation -->
-      <div 
+      <Image 
         id="glow-layer"
-        class="glow-wave absolute inset-0 w-full h-full bg-contain bg-center bg-no-repeat"
-        style={`background-image: url('${bgImage2.src}');`}
-      ></div>
+        src={bgImage2}
+        alt=""
+        class="glow-wave absolute inset-0 w-full h-full object-contain object-center"
+        decoding="async"
+        loading="lazy"
+      />
     </div>
 
     <!-- Center Readability Dimmer -->
@@ -119,13 +125,6 @@ import bgImage3 from '../../public/residue.png';
   }
 
   .base-wave {
-    /* Create a solid expanding circle mask identical to the residue wave */
-    -webkit-mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
-    mask-image: radial-gradient(circle, black 0%, black 50%, transparent 60%);
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
     opacity: 0;
   }
 
@@ -139,22 +138,13 @@ import bgImage3 from '../../public/residue.png';
     mask-repeat: no-repeat;
     opacity: 0;
 
-    /* 
-      Base state: Slight 1px thickness boost, with a subtle 50% ambient glow.
-    */
-    filter: 
-      drop-shadow(0 0 1px rgba(255, 255, 255, 0.4))
-      drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))
-      drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))
-      brightness(1.1);
-
-    /* Smoothly transition the filter properties */
-    transition: filter 0.8s ease-in-out;
+    /* Simplified: Single soft glow, much faster to composite */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3)) brightness(1.1);
   }
 
   /* Only play the animation when injected by Javascript */
   .base-wave.is-animating {
-    animation: sweepResidue 2.5s ease-in-out forwards;
+    animation: fadeBase 2.5s ease-in-out forwards;
   }
 
   .glow-wave.is-animating {
@@ -171,6 +161,12 @@ import bgImage3 from '../../public/residue.png';
     /* Focuses the dimming squarely on the center connection point to protect the text links */
     background: radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.65) 12%, transparent 35%);
     opacity: 1;
+  }
+
+  @keyframes fadeBase {
+    0% { opacity: 0; }
+    15% { opacity: 0; } /* Wait for the sweep to start before fading in */
+    100% { opacity: 1; }
   }
 
   @keyframes sweepRadial {
@@ -207,12 +203,8 @@ import bgImage3 from '../../public/residue.png';
     }
   }
 
-  /* Smoothly transition the filter UP when hovering */
+  /* Hover states */
   :global(body:has(.contact-link:hover)) .residue-wave {
-    filter: 
-      drop-shadow(0 0 1px rgba(255, 255, 255, 0.4))
-      drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))
-      drop-shadow(0 0 15px rgba(255, 255, 255, 0.4))
-      brightness(1.3);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)) brightness(1.2);
   }
 </style>
