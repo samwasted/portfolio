@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
+import { remarkMermaid } from './src/lib/remark-mermaid.mjs';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
@@ -16,5 +18,8 @@ export default defineConfig({
   image: {
     domains: ['images.unsplash.com'],
     remotePatterns: [{ protocol: 'https' }],
+  },
+  markdown: {
+    remarkPlugins: [remarkMermaid],
   },
 });

@@ -65,6 +65,25 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
     }
   </style>
 
+  <style is:global>
+    /* Cinematic Fade-in to completely eliminate layout shift/flinching */
+    .editorial-body {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .editorial-body.content-ready {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Hide raw mermaid code before rendering */
+    .mermaid:not([data-processed="true"]) {
+      visibility: hidden;
+      height: 0;
+      margin: 0;
+    }
+  </style>
+
   <script>
     function setupCopyButtons() {
       document.querySelectorAll<HTMLElement>('.editorial-body pre:not([data-copy-added])').forEach(pre => {
@@ -95,5 +114,38 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
     }
     
     document.addEventListener('astro:after-swap', setupCopyButtons);
+  </script>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+    
+    async function renderMermaid() {
+      const body = document.querySelector('.editorial-body');
+      const nodes = document.querySelectorAll('.mermaid');
+      
+      if (nodes.length > 0) {
+        try {
+          await mermaid.run({ nodes });
+        } catch (err) {
+          console.warn('[Mermaid Error]', err);
+        }
+      }
+      
+      // Reveal the content gracefully after DOM has settled
+      if (body) {
+        requestAnimationFrame(() => {
+          body.classList.add('content-ready');
+        });
+      }
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderMermaid);
+    } else {
+      renderMermaid();
+    }
+    
+    document.addEventListener('astro:after-swap', renderMermaid);
   </script>
 </BaseLayout>

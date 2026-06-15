@@ -1,52 +1,92 @@
 ---
 /**
- * Dynamic editorial page — renders pre-converted HTML from .tex files.
+ * Dynamic editorial page — renders pre-converted HTML from .tex files OR native .md files.
  * Uses [...slug].astro catch-all for /editorials/<slug> routes.
  */
 import EditorialLayout from '../../layouts/EditorialLayout.astro';
 import { loadEditorials } from '../../lib/editorial-loader';
 import { getImage } from 'astro:assets';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
   const editorials = loadEditorials();
-  return editorials.map(e => ({
+  
+  const mdModules = import.meta.glob('../../data/editorials/**/*.md', { eager: true });
+  
+  const mdPaths = Object.entries(mdModules).map(([path, mod]: [string, any]) => {
+    const parts = path.split('/');
+    let slug = parts[parts.length - 2];
+    if (parts[parts.length - 1] !== 'index.md' && parts[parts.length - 1] !== 'main.md') {
+      slug = parts[parts.length - 1].replace('.md', '');
+    }
+    
+    return {
+      params: { slug },
+      props: { type: 'md', editorial: mod },
+    };
+  });
+
+  const htmlPaths = editorials.map(e => ({
     params: { slug: e.slug },
-    props: { editorial: e },
+    props: { type: 'html', editorial: e },
   }));
+  
+  return [...htmlPaths, ...mdPaths];
 }
 
-const { editorial } = Astro.props;
+const { type, editorial } = Astro.props;
 
-// Intercept raw HTML and automatically optimize all injected images
-let processedHtml = editorial.html;
-const imgTags = processedHtml.match(/<img\b[^>]*>/gi) || [];
+let processedHtml = "";
+let title, author, date, abstract, layout_type;
+let Content = null;
 
-for (const tag of imgTags) {
-  const srcMatch = tag.match(/src="([^"]+)"/i);
-  if (srcMatch) {
-    const src = srcMatch[1];
-    const altMatch = tag.match(/alt="([^"]*)"/i);
-    const alt = altMatch ? altMatch[1] : "";
-    
-    try {
-      // Process through Astro's image build pipeline
-      const isRemote = src.startsWith('http://') || src.startsWith('https://');
-      const optimized = await getImage({ src, width: 800, format: 'webp', inferSize: isRemote });
-      const newTag = `<img src="${optimized.src}" alt="${alt}" loading="lazy" decoding="async" width="${optimized.attributes.width}" height="${optimized.attributes.height}" />`;
-      processedHtml = processedHtml.replace(tag, newTag);
-    } catch (err) {
-      console.warn(`[Editorial Image Optimizer] Failed to optimize: ${src}`);
+if (type === 'html') {
+  processedHtml = editorial.html;
+  title = editorial.title;
+  author = editorial.author;
+  date = editorial.date;
+  abstract = editorial.abstract;
+  layout_type = editorial.layout || 'single';
+  
+  // Intercept raw HTML and automatically optimize all injected images
+  const imgTags = processedHtml.match(/<img\b[^>]*>/gi) || [];
+  for (const tag of imgTags) {
+    const srcMatch = tag.match(/src="([^"]+)"/i);
+    if (srcMatch) {
+      const src = srcMatch[1];
+      const altMatch = tag.match(/alt="([^"]*)"/i);
+      const alt = altMatch ? altMatch[1] : "";
+      
+      try {
+        const isRemote = src.startsWith('http://') || src.startsWith('https://');
+        const optimized = await getImage({ src, width: 800, format: 'webp', inferSize: isRemote });
+        const newTag = `<img src="${optimized.src}" alt="${alt}" loading="lazy" decoding="async" width="${optimized.attributes.width}" height="${optimized.attributes.height}" />`;
+        processedHtml = processedHtml.replace(tag, newTag);
+      } catch (err) {
+        console.warn(`[Editorial Image Optimizer] Failed to optimize: ${src}`);
+      }
     }
   }
+} else if (type === 'md') {
+  Content = editorial.default;
+  const fm = editorial.frontmatter || {};
+  title = fm.title || Astro.params.slug;
+  author = fm.author;
+  date = fm.date;
+  abstract = fm.abstract;
+  layout_type = fm.layout || 'single';
 }
 ---
 
 <EditorialLayout
-  title={editorial.title}
-  author={editorial.author}
-  date={editorial.date}
-  abstract={editorial.abstract}
-  layout_type={editorial.layout}
+  title={title}
+  author={author}
+  date={date}
+  abstract={abstract}
+  layout_type={layout_type}
 >
-  <Fragment set:html={processedHtml} />
+  {type === 'html' ? (
+    <Fragment set:html={processedHtml} />
+  ) : (
+    <Content />
+  )}
 </EditorialLayout>
