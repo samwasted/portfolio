@@ -76,6 +76,16 @@ const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
       opacity: 1;
       transform: translateY(0);
     }
+    
+    /* Center Mermaid diagrams once they render */
+    .mermaid[data-processed="true"] {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 2rem auto;
+      width: 100%;
+    }
+    
     /* Hide raw mermaid code before rendering */
     .mermaid:not([data-processed="true"]) {
       visibility: hidden;
