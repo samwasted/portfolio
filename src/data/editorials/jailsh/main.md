@@ -347,12 +347,12 @@ sequenceDiagram
     
     Parent->>Child: fork()
     Child->>Child: unshare(CLONE_NEWUSER)
-    Child->>Parent: Write "A" (Sync byte via pipe)
+    Child->>Parent: Write A (Sync byte via pipe)
     Child->>Child: Block on read() waiting for Parent
-    Parent->>Parent: Read "A" (Child is ready)
-    Parent->>Child: Write "0 <uid> 1" to /proc/[pid]/uid_map
-    Parent->>Child: Write "0 <gid> 1" to /proc/[pid]/gid_map
-    Parent->>Child: Write "A" (Wake up byte)
+    Parent->>Parent: Read A (Child is ready)
+    Parent->>Child: Write 0 [uid] 1 to /proc/[pid]/uid_map
+    Parent->>Child: Write 0 [gid] 1 to /proc/[pid]/gid_map
+    Parent->>Child: Write A (Wake up byte)
     Child->>Child: Unblock, resume as mapped Root
 ```
 
