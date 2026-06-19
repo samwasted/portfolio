@@ -1,177 +1,74 @@
 [
   {
-    "name": "myshell",
+    "name": "jailsh",
     "category": "Systems",
-    "summary": "Custom Unix shell with AST-based parsing and job control.",
-    "description": "A fully functional Unix shell implemented in C++. It features a custom Abstract Syntax Tree (AST) parser for handling complex command lines, robust job control (foreground, background, stopped jobs), and built-in process substitution.",
-    "detail": "Built from scratch to understand the intricacies of process management, file descriptors, and signal handling in POSIX systems. Implements advanced features like pipes, I/O redirection, and a custom readline-like interface.",
-    "techStack": ["C++", "Unix", "POSIX", "AST", "Job Control"],
+    "subtitle": "A Unix shell that runs untrusted binaries — no Docker required.",
+    "description": "A C++17 shell with an AST-based execution engine and a built-in kernel-enforced sandbox. Prefix any command with jail to isolate it using Linux namespaces, seccomp-BPF, and cgroups v2 — the same primitives containers use, implemented from scratch.",
     "features": [
-      "Custom Recursive Descent Parser",
-      "Process Group Management",
-      "Pipes and I/O Redirection",
-      "Signal Handling (SIGINT, SIGTSTP, SIGCHLD)"
+      "jail sandbox: namespaces + seccomp-BPF + cgroups v2 + capability stripping",
+      "Double-fork midwife pattern for correct PID namespace isolation",
+      "IPC handshake to resolve CLONE_NEWUSER UID mapping deadlock",
+      "Solved fork/SIGCHLD race conditions that caused ghost background jobs"
     ],
-    "github": "https://github.com/samwasted/myshell"
+    "techStack": ["C++17", "seccomp-BPF", "cgroups v2", "Linux Namespaces", "libseccomp", "libreadline"],
+    "github": "https://github.com/samwasted/jailsh"
   },
   {
-    "name": "PDF → Mock Test Generator",
-    "category": "Machine Learning",
-    "summary": "Automated generation of MCQ tests from PDF materials.",
-    "description": "An NLP-powered pipeline that ingests educational PDF documents and automatically generates high-quality Multiple Choice Questions (MCQs) to simulate mock tests. It uses advanced text extraction and contextual question generation.",
-    "detail": "Utilizes transformer-based language models to understand the core concepts in the text and generate plausible distractors. The system is containerized and exposed via a REST API for easy integration with frontend platforms.",
-    "techStack": ["Python", "NLP", "Transformers", "PyTorch", "FastAPI"],
+    "name": "Black Swan",
+    "category": "Quant Finance",
+    "subtitle": "Most backtests tell you why a strategy works. Black Swan tries to prove it doesn't.",
+    "description": "A headless A2A agent for adversarial robustness testing of algorithmic strategies. Runs Walk-Forward Optimization across rolling train/test windows, then attacks the out-of-sample equity curve with four Monte Carlo stress regimes. If your strategy survives, it's worth considering.",
     "features": [
-      "PDF Text Extraction Pipeline",
-      "Context-Aware Question Generation",
-      "Plausible Distractor Generation",
-      "RESTful API Interface"
+      "Walk-Forward Optimization with Optuna — 150 trials per 6-month window",
+      "4 adversarial Monte Carlo regimes: connectivity, sequence, temporal, GBM",
+      "Strict t+1 execution lag — eliminates lookahead bias by design",
+      "Tax engine for US / UK / India capital gains with slippage and fee modeling"
     ],
-    "github": "https://github.com/samwasted/pdf-mock-test"
+    "techStack": ["Python", "Optuna", "pandas-ta", "Monte Carlo", "yFinance", "Finnhub API", "A2A JSON-RPC", "OpenAI API"],
+    "github": "https://github.com/samwasted/black-swan-agent"
   },
   {
-    "name": "OS in Rust",
-    "category": "Systems",
-    "summary": "Minimal x86_64 operating system kernel in Rust.",
-    "description": "A bare-metal operating system kernel targeting the x86_64 architecture, written entirely in Rust. Designed to explore safe systems programming and modern OS architecture.",
-    "detail": "Features include a custom VGA text mode driver, a fully functional Interrupt Descriptor Table (IDT), hardware interrupts (timer, keyboard), and a bump allocator for dynamic memory management. Runs on QEMU and real hardware.",
-    "techStack": ["Rust", "x86_64", "Assembly", "QEMU", "Bootloader"],
+    "name": "SemanticPDF",
+    "category": "Production SaaS",
+    "subtitle": "Production SaaS for conversational document search with auth, payments, and RAG.",
+    "description": "A production web app built around the full SaaS stack: OAuth via Kinde, tiered subscriptions via Razorpay, and end-to-end type safety with tRPC from the PostgreSQL schema to the React UI. The AI part is a RAG pipeline — PDF chunks embedded via OpenAI, stored in Pinecone, retrieved on query, streamed back through GPT.",
     "features": [
-      "VGA Text Mode Output",
-      "Interrupt Handling (IDT)",
-      "Hardware Timer & Keyboard Support",
-      "Basic Memory Management"
+      "tRPC end-to-end type safety from database schema to React components",
+      "RAG pipeline: chunking → OpenAI embeddings → Pinecone → streaming GPT response",
+      "Razorpay subscription tiers with cryptographic webhook verification",
+      "Usage tracking, rate limiting, and self-service billing dashboard"
     ],
-    "github": "https://github.com/samwasted/rust-os"
+    "techStack": ["Next.js 15", "tRPC", "TypeScript", "OpenAI API", "Pinecone", "Supabase", "Razorpay", "Kinde Auth", "shadcn/ui"],
+    "github": "https://github.com/samwasted/semanticpdf",
+    "live": "https://semanticpdf.vercel.app"
   },
   {
-    "name": "HTTP Server in C",
-    "category": "Systems",
-    "summary": "High-performance HTTP/1.1 server from scratch.",
-    "description": "A minimal, highly concurrent HTTP server implementation written in pure C. It supports GET and POST requests, static file serving, and basic routing mechanisms.",
-    "detail": "Built directly on top of POSIX sockets. Uses an event-driven architecture with epoll (on Linux) to handle thousands of concurrent connections efficiently. Strict memory management ensures no leaks under heavy load.",
-    "techStack": ["C", "POSIX", "Sockets", "epoll", "HTTP/1.1"],
+    "name": "Snippets",
+    "category": "Full Stack",
+    "subtitle": "A collaborative code workspace with real-time editing, drag-and-drop organization, and role-based permissions.",
+    "description": "Organize and share code snippets on a free-form interactive canvas. Teams can edit in real-time via WebSocket connections, with per-space role-based access (Admin / Editor / Viewer). Automatic language detection drives syntax highlighting across 50+ languages.",
     "features": [
-      "Event-Driven Architecture",
-      "Static File Serving",
-      "MIME Type Detection",
-      "Zero-Dependency Implementation"
+      "Real-time WebSocket collaboration with 30s heartbeat and stale-connection cleanup",
+      "Turbo monorepo — shared Prisma types across HTTP API and WebSocket servers",
+      "dnd-kit canvas with Framer Motion animations and CodeMirror syntax highlighting",
+      "RBAC per space: owner controls, collaborator roles, and a global admin dashboard"
     ],
-    "github": "https://github.com/samwasted/c-http-server"
+    "techStack": ["React", "TypeScript", "Express.js", "WebSocket", "Prisma", "PostgreSQL", "dnd-kit", "CodeMirror", "Turbo", "JWT"],
+    "github": "https://github.com/samwasted/snippets-list",
+    "live": "https://snippets-list.vercel.app"
   },
   {
-    "name": "Research Projects",
-    "category": "Research",
-    "summary": "Collection of academic and independent research papers.",
-    "description": "Various research projects spanning Machine Learning, Computer Vision, and Systems architecture. Focuses on novel optimization techniques and performance analysis.",
-    "detail": "Includes investigations into gradient descent optimization topologies, low-latency data structures for high-frequency trading platforms, and custom allocators for embedded systems.",
-    "techStack": ["Python", "C++", "LaTeX", "CUDA", "NumPy"],
+    "name": "StreamVault",
+    "category": "Full Stack",
+    "subtitle": "Self-hosted video streaming with adaptive HLS quality and FFmpeg transcoding.",
+    "description": "A full-stack streaming platform where uploaded videos are transcoded server-side by FFmpeg into multi-quality HLS segments. The React frontend uses HLS.js for adaptive bitrate playback with in-player quality switching. JWT auth gates uploads and playlist management; admins can moderate any content.",
     "features": [
-      "Empirical Performance Analysis",
-      "Algorithm Optimization",
-      "Peer-Reviewed Methodologies",
-      "Open Source Implementations"
+      "Server-side FFmpeg transcoding to multi-quality HLS manifests on upload",
+      "HLS.js adaptive bitrate playback with live quality switching in the player",
+      "JWT auth with role-based access: users manage their own content, admins control all",
+      "Public streaming without login — auth only required to upload or create playlists"
     ],
-    "github": "https://github.com/samwasted/research"
-  },
-  {
-    "name": "Dummy Project Alpha",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-alpha"
-  },
-  {
-    "name": "Dummy Project Beta",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "Another dummy project to increase the length of the sidebar list.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-beta"
-  },
-  {
-    "name": "Dummy Project Gamma",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-gamma"
-  },
-  {
-    "name": "Dummy Project Delta",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "This is a dummy project explicitly added to verify that the projects sidebar successfully overflows and scrolls when the number of items exceeds the vertical height of the viewport.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-delta"
-  },
-  {
-    "name": "Dummy Project Epsilon",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "The final dummy project to ensure the list is overwhelmingly long for mobile and desktop screens.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-epsilon"
-  },
-  {
-    "name": "Dummy Project Zeta",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "More dummy content to guarantee scroll overflow.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-zeta"
-  },
-  {
-    "name": "Dummy Project Eta",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "More dummy content to guarantee scroll overflow.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-eta"
-  },
-  {
-    "name": "Dummy Project Theta",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "More dummy content to guarantee scroll overflow.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-theta"
-  },
-  {
-    "name": "Dummy Project Iota",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "More dummy content to guarantee scroll overflow.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-iota"
-  },
-  {
-    "name": "Dummy Project Kappa",
-    "category": "Testing",
-    "summary": "Placeholder project for UI scroll testing.",
-    "description": "The absolute final dummy content to guarantee scroll overflow on 4K screens.",
-    "detail": "Scrollability testing project.",
-    "techStack": ["CSS", "HTML", "UI/UX"],
-    "features": ["Overflow testing", "Flexbox validation"],
-    "github": "https://github.com/samwasted/dummy-kappa"
+    "techStack": ["Spring Boot", "Java", "FFmpeg", "HLS.js", "React", "Vite", "MySQL", "JWT", "Tailwind CSS"],
+    "github": "https://github.com/samwasted/streamvault"
   }
 ]
