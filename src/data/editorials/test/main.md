@@ -4,6 +4,7 @@ author: "Antigravity"
 date: "2026-06-15"
 abstract: "Testing native Markdown and Mermaid integration"
 layout_type: "single"
+draft: true
 ---
 
 # Hello World

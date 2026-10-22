@@ -7,6 +7,20 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ShaderBackground from "../components/ShaderBackground.astro";
 import Nav from "../components/Nav.astro";
 import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
+import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+
+// Real metadata for the resume listing; the entry is hidden until public/resume.pdf exists
+const resumePath = "public/resume.pdf";
+const resume = existsSync(resumePath)
+  ? (() => {
+      const buf = readFileSync(resumePath);
+      return {
+        size: `${Math.round(buf.length / 1024)} KB`,
+        md5: createHash("md5").update(buf).digest("hex").slice(0, 16),
+      };
+    })()
+  : null;
 ---
 
 <BaseLayout title="Samarpan Verma - Portfolio">
@@ -81,8 +95,8 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
   <!-- About Section (Scrolls up) -->
   <section
     id="about"
-    class="min-h-screen w-full relative z-30 flex items-center bg-gradient-to-b from-transparent via-[#0a0a0a] to-[#0a0a0a]"
-    style="padding: 15vh 12vw 15vh 8vw;"
+    class="min-h-screen w-full relative z-30 flex items-start bg-gradient-to-b from-transparent via-[#0a0a0a] to-[#0a0a0a]"
+    style="padding: max(15vh, 7rem) 12vw 10vh 8vw;"
   >
     <div class="w-full h-full">
       <!-- Full Width Grid Layout -->
@@ -91,7 +105,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
       >
         <!-- PANE 1: Chronological Event Ledger (Left Side, Centered) -->
         <div
-          class="lg:col-span-6 flex flex-col justify-center gap-6 text-lg mt-16"
+          class="lg:col-span-6 flex flex-col justify-start gap-6 text-lg mt-16"
         >
           <div
             class="text-[#D4C594] font-mono text-sm tracking-widest uppercase border-b border-white/10 pb-4"
@@ -195,7 +209,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
 
         <!-- Right Panes 2 & 3 (Top Right & Bottom Right) -->
         <div
-          class="lg:col-span-4 lg:col-start-9 flex flex-col h-full mt-24 lg:mt-0 gap-5"
+          class="lg:col-span-4 lg:col-start-9 flex flex-col h-full mt-24 lg:mt-16 gap-5"
         >
           <!-- PANE 2: Environment Dependencies & Registries (Top Right) -->
           <div class="flex flex-col gap-6 pt-4 lg:pt-0">
@@ -216,7 +230,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
                   >#define int ll</span>
               </div>
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white">python3</span>
+                │&nbsp;&nbsp;└── <span class="text-white">python3</span>
               </div>
               <div>├── <span class="text-[#D4C594]/80">domains/</span></div>
 
@@ -224,11 +238,11 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
                 │&nbsp;&nbsp;├── <span class="text-white">competitive_programming</span>
               </div>
               <div>
-                │&nbsp;&nbsp;└── <span class="text-white"
+                │&nbsp;&nbsp;├── <span class="text-white"
                   >process_isolation</span>
               </div>
               <div>
-                │&nbsp;&nbsp;└── <span class="text-white"
+                │&nbsp;&nbsp;├── <span class="text-white"
                   >low_latency</span>
               </div>
               <div>
@@ -315,6 +329,7 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
               </div>
 
               <!-- Resume -->
+              {resume && (
               <a
                 href="/resume.pdf"
                 target="_blank"
@@ -330,15 +345,16 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
                 <div
                   class="pl-4 text-white/40 text-sm mt-2 border-l border-white/10 ml-2 flex flex-col space-y-1"
                 >
-                  <div><span class="opacity-50">size:</span> 142 KB</div>
+                  <div><span class="opacity-50">size:</span> {resume.size}</div>
                   <div>
                     <span class="opacity-50">type:</span> application/pdf
                   </div>
                   <div>
-                    <span class="opacity-50">md5:&nbsp;</span> 8f4e2c9b1a0d3e5f
+                    <span class="opacity-50">md5:&nbsp;</span> {resume.md5}
                   </div>
                 </div>
               </a>
+              )}
             </div>
           </div>
         </div>
@@ -405,7 +421,10 @@ import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
           const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
 
           stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
-          stickyGroup.style.opacity = "1";
+
+          const about = document.getElementById("about");
+          const overscroll = about ? scrollY - about.offsetTop : 0;
+          stickyGroup.style.opacity = Math.max(0, Math.min(1, 1 - overscroll / 120)).toString();
         }
       } else {
         stickyGroup.style.transform = `translateY(0px)`;

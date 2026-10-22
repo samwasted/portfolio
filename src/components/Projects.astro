@@ -8,12 +8,12 @@ import projectsData from '../data/projects.json';
 interface Project {
   name: string;
   category: string;
-  summary: string;
+  subtitle: string;
   description: string;
-  detail: string;
   techStack: string[];
   features: string[];
   github: string;
+  live?: string;
 }
 
 let projects: Project[] = projectsData as Project[];
@@ -62,8 +62,14 @@ let projects: Project[] = projectsData as Project[];
                 <span class="github-text">{p.github.replace('https://github.com/', '')}</span>
                 <span class="external-arrow">↗</span>
               </a>
+              {p.live && (
+                <a class="github-link mobile-header-link" href={p.live} target="_blank" rel="noopener">
+                  <span class="github-text">{p.live.replace(/^https?:\/\//, '')}</span>
+                  <span class="external-arrow">↗</span>
+                </a>
+              )}
               <hr class="detail-divider" />
-              <p class="detail-summary">{p.summary}</p>
+              <p class="detail-summary">{p.subtitle}</p>
             </header>
 
             <!-- Center: Visual Area -->
@@ -109,6 +115,12 @@ let projects: Project[] = projectsData as Project[];
                 <span class="github-text">{p.github.replace('https://github.com/', '')}</span>
                 <span class="external-arrow">↗</span>
               </a>
+              {p.live && (
+                <a class="github-link" href={p.live} target="_blank" rel="noopener">
+                  <span class="github-text">{p.live.replace(/^https?:\/\//, '')}</span>
+                  <span class="external-arrow">↗</span>
+                </a>
+              )}
             </footer>
           </div>
         )) : (
@@ -653,10 +665,6 @@ let projects: Project[] = projectsData as Project[];
     flex: 2;
   }
 
-  .detail-footer {
-    display: block;
-  }
-
   .mobile-header-link {
     display: none !important;
   }
@@ -732,6 +740,9 @@ let projects: Project[] = projectsData as Project[];
 
   /* Footer */
   .detail-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
     margin-top: auto;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
@@ -878,6 +889,7 @@ let projects: Project[] = projectsData as Project[];
       display: inline-flex !important;
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
+      margin-right: 1.5rem;
     }
 
     .detail-footer {

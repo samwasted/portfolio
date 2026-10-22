@@ -11,19 +11,22 @@
    GLOBAL STYLES — Portfolio
    ============================================ */
 
-/* --- Reset --- */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* --- Reset ---
+   Layered so Tailwind's margin/padding utilities can override it;
+   an unlayered reset beats every @layer utilities rule. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-weight: 300;
-  font-variant-numeric: tabular-nums; /* Enable tabular figures globally for UI */
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
