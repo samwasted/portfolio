@@ -1,0 +1,431 @@
+---
+/**
+ * SemanticPdfRag — the RAG pipeline from the SemanticPDF README, ending in
+ * the real product:
+ *   ingest: PDF → chunks → embeddings → Pinecone
+ *   query:  question → embedding → nearest chunks → GPT → streamed answer
+ *
+ * The vector space is seeded, so it illustrates the idea rather than real
+ * embeddings. The answer frame is an actual screenshot of the live app.
+ * Plays when its pane becomes active; context then keeps flowing to GPT.
+ */
+
+// --- Vector space (Pinecone) ---
+const BOX = { x: 220, y: 30, w: 250, h: 300 };
+const QUERY = { x: 352, y: 214 };
+const K = 3;
+
+function rng(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+const r = rng(7);
+const dots: { x: number; y: number }[] = [];
+while (dots.length < 42) {
+  const x = BOX.x + 18 + r() * (BOX.w - 36);
+  const y = BOX.y + 40 + r() * (BOX.h - 58);
+  // Keep a little room around the query so its neighbours read clearly
+  if (Math.hypot(x - QUERY.x, y - QUERY.y) < 16) continue;
+  dots.push({ x, y });
+}
+
+const nearest = new Set(
+  dots
+    .map((d, i) => ({ i, dist: Math.hypot(d.x - QUERY.x, d.y - QUERY.y) }))
+    .sort((a, b) => a.dist - b.dist)
+    .slice(0, K)
+    .map((d) => d.i),
+);
+
+// --- GPT and the answer ---
+const GPT = { x: 488, y: 196, w: 60, h: 38 };
+const SHOT = { x: 600, y: 151, w: 176, h: 128 };
+
+// Retrieved chunks carry their context to GPT
+const contextPaths = [...nearest].map((i) => {
+  const d = dots[i];
+  const ex = GPT.x;
+  const ey = GPT.y + GPT.h / 2;
+  return `M${d.x.toFixed(1)} ${d.y.toFixed(1)} C${(d.x + 60).toFixed(1)} ${d.y.toFixed(1)} ${ex - 40} ${ey} ${ex} ${ey}`;
+});
+
+const chunks = Array.from({ length: 6 }, (_, i) => ({
+  x: 110 + (i % 2) * 30,
+  y: 48 + Math.floor(i / 2) * 24,
+}));
+---
+
+<svg
+  class="sp"
+  viewBox="0 0 800 360"
+  role="img"
+  aria-label="A PDF is split into chunks and embedded into a Pinecone vector space. A question is embedded too, its nearest chunks are retrieved and sent with it to GPT, and the answer streams into the SemanticPDF chat, shown as a screenshot of the live app."
+>
+  <defs>
+    <clipPath id="sp-shot-clip">
+      <rect x={SHOT.x} y={SHOT.y} width={SHOT.w} height={SHOT.h} rx="6" />
+    </clipPath>
+  </defs>
+
+  <!-- Ingest: the document becomes chunks -->
+  <g class="sp-pdf">
+    <rect x="24" y="40" width="60" height="80" rx="3" />
+    {[0, 1, 2, 3, 4, 5].map((i) => (
+      <line x1="34" y1={56 + i * 10} x2={i % 3 === 2 ? 60 : 74} y2={56 + i * 10} />
+    ))}
+    <text x="24" y="138">pdf</text>
+  </g>
+
+  <path class="sp-arrow" d="M88 80 H104" pathLength="1" />
+
+  <g class="sp-chunks">
+    {chunks.map((c, i) => (
+      <rect x={c.x} y={c.y} width="24" height="18" rx="2" style={`--i: ${i}`} />
+    ))}
+    <text x="110" y="138">chunks</text>
+  </g>
+
+  <path class="sp-arrow sp-ingest" d="M170 80 H216" pathLength="1" />
+  <text class="sp-step sp-step-ingest" x="176" y="72">embed</text>
+
+  <!-- The vector space -->
+  <g class="sp-space">
+    <rect class="sp-box" x={BOX.x} y={BOX.y} width={BOX.w} height={BOX.h} rx="10" />
+    <text class="sp-label" x={BOX.x + 14} y={BOX.y + 22}>Pinecone<tspan class="sp-dim" dx="10">chunk vectors</tspan></text>
+    {dots.map((d, i) => (
+      <circle
+        class={`sp-dot${nearest.has(i) ? " is-near" : ""}`}
+        cx={d.x.toFixed(1)}
+        cy={d.y.toFixed(1)}
+        r={nearest.has(i) ? 4 : 2.6}
+        style={`--i: ${i}`}
+      />
+    ))}
+  </g>
+
+  <!-- Query: embedded into the same space -->
+  <text class="sp-query" x="24" y="292">"explain the first page"</text>
+  <path class="sp-arrow sp-query-arrow" d={`M150 280 C200 280 ${QUERY.x - 60} ${QUERY.y} ${QUERY.x - 9} ${QUERY.y}`} pathLength="1" />
+  <text class="sp-step sp-step-query" x="176" y="268">embed</text>
+
+  <g class="sp-search">
+    {[...nearest].map((i) => (
+      <line x1={QUERY.x} y1={QUERY.y} x2={dots[i].x.toFixed(1)} y2={dots[i].y.toFixed(1)} />
+    ))}
+  </g>
+  <rect class="sp-diamond" x={QUERY.x - 6} y={QUERY.y - 6} width="12" height="12" transform={`rotate(45 ${QUERY.x} ${QUERY.y})`} />
+  <text class="sp-step sp-topk" x={QUERY.x - 2} y={QUERY.y + 28} text-anchor="middle">top-{K}</text>
+
+  <!-- Context + question to GPT, answer streams out -->
+  <g class="sp-context">
+    {contextPaths.map((d) => (
+      <g>
+        <path class="sp-wire" d={d} pathLength="1" />
+        <path class="sp-packet" d={d} pathLength="1" />
+      </g>
+    ))}
+  </g>
+
+  <g class="sp-gpt">
+    <rect x={GPT.x} y={GPT.y} width={GPT.w} height={GPT.h} rx="6" />
+    <text x={GPT.x + GPT.w / 2} y={GPT.y + 24} text-anchor="middle">GPT</text>
+  </g>
+
+  <path class="sp-arrow sp-stream" d={`M${GPT.x + GPT.w + 4} 215 H${SHOT.x - 6}`} pathLength="1" />
+  <path class="sp-packet sp-stream-packet" d={`M${GPT.x + GPT.w + 4} 215 H${SHOT.x - 6}`} pathLength="1" />
+  <text class="sp-step sp-step-stream" x={GPT.x + GPT.w + 5} y="207">stream</text>
+
+  <g class="sp-answer">
+    <image
+      class="sp-shot"
+      href="/projects/semanticpdf/chat.webp"
+      x={SHOT.x}
+      y={SHOT.y}
+      width={SHOT.w}
+      height={SHOT.h}
+      preserveAspectRatio="xMidYMin slice"
+      clip-path="url(#sp-shot-clip)"
+    />
+    <rect class="sp-frame" x={SHOT.x} y={SHOT.y} width={SHOT.w} height={SHOT.h} rx="6" />
+    <text class="sp-step" x={SHOT.x} y={SHOT.y + SHOT.h + 18}>semanticpdf.vercel.app</text>
+  </g>
+</svg>
+
+<style>
+  .sp {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0, "liga" 0;
+  }
+
+  .sp text {
+    font-size: 12px;
+    fill: #d4c594;
+  }
+
+  .sp .sp-step {
+    font-size: 11px;
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .sp .sp-dim {
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .sp .sp-query {
+    fill: #fff3c7;
+  }
+
+  .sp-pdf rect {
+    fill: rgba(255, 243, 199, 0.06);
+    stroke: rgba(212, 197, 148, 0.6);
+  }
+
+  .sp-pdf line {
+    stroke: rgba(212, 197, 148, 0.45);
+  }
+
+  .sp-chunks rect {
+    fill: rgba(212, 197, 148, 0.12);
+    stroke: rgba(212, 197, 148, 0.55);
+  }
+
+  .sp-arrow {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.5);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .sp-box {
+    fill: rgba(212, 197, 148, 0.025);
+    stroke: rgba(212, 197, 148, 0.3);
+    stroke-dasharray: 3 4;
+  }
+
+  .sp-dot {
+    fill: rgba(212, 197, 148, 0.45);
+  }
+
+  .sp-dot.is-near {
+    fill: #fff3c7;
+    filter: drop-shadow(0 0 4px rgba(255, 243, 199, 0.7));
+  }
+
+  .sp-search line {
+    stroke: rgba(255, 243, 199, 0.55);
+    stroke-width: 1;
+    stroke-dasharray: 2 3;
+  }
+
+  .sp-diamond {
+    fill: #fff3c7;
+  }
+
+  .sp-wire {
+    fill: none;
+    stroke: rgba(255, 243, 199, 0.35);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  /* A short dash that travels along its wire: context on its way to GPT */
+  .sp-packet {
+    fill: none;
+    stroke: #fff3c7;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 0.06 1;
+    stroke-dashoffset: 0.06;
+    opacity: 0;
+  }
+
+  .sp-gpt rect {
+    fill: rgba(255, 243, 199, 0.08);
+    stroke: #fff3c7;
+  }
+
+  .sp .sp-gpt text {
+    fill: #fff3c7;
+  }
+
+  /* The real app, pulled into the amber palette until hovered */
+  .sp-shot {
+    filter: grayscale(0.85) sepia(0.3) brightness(0.75) contrast(1.1);
+    transition: filter 0.6s ease;
+  }
+
+  :global(.detail-visual:hover) .sp-shot {
+    filter: none;
+  }
+
+  .sp-frame {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.6);
+  }
+
+  /* --- Sequence, only while this project is on screen --- */
+  :global(.active-pane) .sp-pdf {
+    animation: sp-fade 0.4s ease 0.1s backwards;
+  }
+
+  :global(.active-pane) .sp-arrow {
+    animation: sp-draw 0.35s ease 0.5s backwards;
+  }
+
+  :global(.active-pane) .sp-chunks rect {
+    animation: sp-fade 0.25s ease calc(0.6s + var(--i) * 0.07s) backwards;
+  }
+
+  :global(.active-pane) .sp-ingest {
+    animation-delay: 1s;
+  }
+
+  :global(.active-pane) .sp-space .sp-box,
+  :global(.active-pane) .sp-space .sp-label {
+    animation: sp-fade 0.4s ease 1s backwards;
+  }
+
+  :global(.active-pane) .sp-dot {
+    animation: sp-pop 0.3s ease calc(1.1s + var(--i) * 0.02s) backwards;
+  }
+
+  :global(.active-pane) .sp-query {
+    clip-path: inset(0 100% 0 0);
+    animation: sp-type 0.7s steps(24) 2.1s forwards;
+  }
+
+  :global(.active-pane) .sp-query-arrow {
+    animation: sp-draw 0.5s ease 2.8s backwards;
+  }
+
+  :global(.active-pane) .sp-diamond {
+    animation: sp-fade 0.3s ease 3.2s backwards;
+  }
+
+  :global(.active-pane) .sp-search,
+  :global(.active-pane) .sp-topk {
+    animation: sp-fade 0.4s ease 3.4s backwards;
+  }
+
+  :global(.active-pane) .sp-dot.is-near {
+    animation: sp-near 0.5s ease 3.4s backwards;
+  }
+
+  :global(.active-pane) .sp-wire {
+    animation: sp-draw 0.6s ease 3.8s backwards;
+  }
+
+  /* Step labels arrive with their arrows */
+  :global(.active-pane) .sp-step-ingest {
+    animation: sp-fade 0.3s ease 1s backwards;
+  }
+
+  :global(.active-pane) .sp-step-query {
+    animation: sp-fade 0.3s ease 2.8s backwards;
+  }
+
+  :global(.active-pane) .sp-step-stream {
+    animation: sp-fade 0.3s ease 4.5s backwards;
+  }
+
+  :global(.active-pane) .sp-gpt {
+    animation: sp-fade 0.4s ease 4.1s backwards;
+  }
+
+  :global(.active-pane) .sp-stream {
+    animation: sp-draw 0.3s ease 4.5s backwards;
+  }
+
+  /* The answer arrives top to bottom, like a streamed response */
+  :global(.active-pane) .sp-answer {
+    animation: sp-reveal 1.1s steps(12) 4.7s backwards;
+  }
+
+  :global(.active-pane) .sp-packet {
+    animation: sp-flow 2.4s linear 6s infinite;
+  }
+
+  :global(.active-pane) .sp-stream-packet {
+    animation-delay: 6.9s;
+  }
+
+  @keyframes sp-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes sp-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes sp-pop {
+    from {
+      opacity: 0;
+      r: 0;
+    }
+  }
+
+  @keyframes sp-near {
+    from {
+      fill: rgba(212, 197, 148, 0.45);
+      filter: none;
+    }
+  }
+
+  @keyframes sp-type {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes sp-reveal {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes sp-flow {
+    0% {
+      stroke-dashoffset: 0.06;
+      opacity: 1;
+    }
+    40% {
+      stroke-dashoffset: -0.94;
+      opacity: 1;
+    }
+    41%,
+    100% {
+      stroke-dashoffset: -0.94;
+      opacity: 0;
+    }
+  }
+
+  /* Narrow screens: keep the pipeline, drop the small step labels */
+  @media (max-width: 900px) {
+    .sp .sp-step,
+    .sp .sp-dim {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.active-pane) .sp * {
+      animation: none !important;
+      clip-path: none !important;
+    }
+  }
+</style>

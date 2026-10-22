@@ -4,6 +4,25 @@
  * Reads from src/data/projects.json config file.
  */
 import projectsData from '../data/projects.json';
+import JailshLayers from './illustrations/JailshLayers.astro';
+import BlackSwanStress from './illustrations/BlackSwanStress.astro';
+import SemanticPdfRag from './illustrations/SemanticPdfRag.astro';
+import SnippetsSync from './illustrations/SnippetsSync.astro';
+import StreamVaultHls from './illustrations/StreamVaultHls.astro';
+
+// Hand-made illustrations, referenced from projects.json as { "type": "illustration", "name": ... }
+const ILLUSTRATIONS: Record<string, any> = {
+  'jailsh-layers': JailshLayers,
+  'black-swan-stress': BlackSwanStress,
+  'semanticpdf-rag': SemanticPdfRag,
+  'snippets-sync': SnippetsSync,
+  'streamvault-hls': StreamVaultHls,
+};
+
+type Media =
+  | { type: 'image'; src: string; alt: string; fit?: 'cover' | 'contain'; position?: string }
+  | { type: 'video'; src: string; alt: string; poster?: string; fit?: 'cover' | 'contain'; position?: string }
+  | { type: 'illustration'; name: string };
 
 interface Project {
   name: string;
@@ -14,6 +33,7 @@ interface Project {
   features: string[];
   github: string;
   live?: string;
+  media?: Media;
 }
 
 let projects: Project[] = projectsData as Project[];
@@ -73,8 +93,36 @@ let projects: Project[] = projectsData as Project[];
             </header>
 
             <!-- Center: Visual Area -->
-            <div class="detail-visual">
-              <div class="visual-pattern"></div>
+            <div class={`detail-visual${p.media ? ` has-media media-${p.media.type}` : ''}`}>
+              {!p.media && <div class="visual-pattern"></div>}
+              {p.media?.type === 'image' && (
+                <img
+                  class="visual-media"
+                  src={p.media.src}
+                  alt={p.media.alt}
+                  loading="lazy"
+                  decoding="async"
+                  style={`object-fit: ${p.media.fit ?? 'cover'}; object-position: ${p.media.position ?? 'center'}`}
+                />
+              )}
+              {p.media?.type === 'video' && (
+                <video
+                  class="visual-media"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  poster={p.media.poster}
+                  aria-label={p.media.alt}
+                  style={`object-fit: ${p.media.fit ?? 'cover'}; object-position: ${p.media.position ?? 'center'}`}
+                >
+                  <source src={p.media.src} type="video/mp4" />
+                </video>
+              )}
+              {p.media?.type === 'illustration' && (() => {
+                const Art = ILLUSTRATIONS[p.media.name];
+                return Art ? <Art /> : null;
+              })()}
             </div>
 
             <!-- Bottom: Description & Tech -->
@@ -199,12 +247,19 @@ let projects: Project[] = projectsData as Project[];
     }
 
     updateActivePane() {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       this.panes.forEach((pane, i) => {
-        if (i === this.previewIndex) {
-          pane.classList.add('active-pane');
-        } else {
-          pane.classList.remove('active-pane');
-        }
+        const active = i === this.previewIndex;
+        pane.classList.toggle('active-pane', active);
+
+        // Only the visible project's clip plays; reduced motion keeps the poster frame
+        pane.querySelectorAll('video').forEach((video) => {
+          if (active && !reduceMotion) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
       });
       
       // Reset scroll state on mobile wrapper
@@ -643,6 +698,41 @@ let projects: Project[] = projectsData as Project[];
   /* Slight parallax on hover over the visual area */
   .detail-visual:hover .visual-pattern {
     transform: scale(1.05) translate(1%, 1%);
+  }
+
+  /* --- Media: images, video and illustrations --- */
+  .detail-visual.has-media {
+    height: auto;
+    aspect-ratio: 2 / 1;
+  }
+
+  /* Illustrations set their own height and stay crisp, so no vignette */
+  .detail-visual.media-illustration {
+    aspect-ratio: auto;
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  .detail-visual.media-illustration::after {
+    display: none;
+  }
+
+  /* Screenshots and clips are pulled into the amber palette until hovered */
+  .visual-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(0.85) sepia(0.3) brightness(0.75) contrast(1.1);
+    transition: filter 0.6s ease, transform 0.8s ease;
+  }
+
+  .detail-visual:hover .visual-media {
+    filter: none;
+    transform: scale(1.02);
+  }
+
+  .detail-visual.has-media::after {
+    background: radial-gradient(circle at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
   }
 
   /* Overlay vignette for the cinematic feel */

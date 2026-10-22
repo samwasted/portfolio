@@ -1,0 +1,360 @@
+---
+/**
+ * StreamVaultHls — upload to adaptive playback, from StreamVault's
+ * VideoServiceImpl: FFmpeg writes three HLS variants (640w @ 800k,
+ * 1280w @ 2800k, 1920w @ 5000k) in 5-second segments under master.m3u8,
+ * and HLS.js picks a variant per segment as bandwidth changes.
+ *
+ * The bandwidth curve and the chosen path are illustrative. Plays when its
+ * pane becomes active, then loops the playback.
+ */
+
+const variants = [
+  { label: "1920w", rate: "5000k", y: 72, h: 30 },
+  { label: "1280w", rate: "2800k", y: 112, h: 22 },
+  { label: "640w", rate: "800k", y: 146, h: 14 },
+];
+
+const GRID_X = 250;
+const SEG_W = 46;
+const SEG_GAP = 6;
+const STEP = SEG_W + SEG_GAP;
+const SEGMENTS = 7;
+const GRID_END = GRID_X + SEGMENTS * STEP - SEG_GAP;
+const LOOP = 7; // seconds: one per segment
+
+// Variant HLS.js plays for each segment: starts low, climbs, drops on a dip, recovers
+const chosen = [2, 1, 0, 0, 2, 1, 0];
+
+const cx = (i: number) => GRID_X + i * STEP + SEG_W / 2;
+const playPath = chosen.map((v, i) => `${i ? "L" : "M"}${cx(i)} ${variants[v].y}`).join(" ");
+
+// Bandwidth tracks the choices, dipping just before the drop
+const BW_Y = { 0: 206, 1: 222, 2: 238 } as Record<number, number>;
+const bwPoints: [number, number][] = [[GRID_X, 236]];
+chosen.forEach((v, i) => {
+  bwPoints.push([cx(i), BW_Y[v]]);
+  if (chosen[i + 1] === 2) bwPoints.push([cx(i) + STEP * 0.6, 240]);
+});
+bwPoints.push([GRID_END, 210]);
+const bwPath = bwPoints.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y}`).join(" ");
+
+const PLAYER = { x: 640, y: 52, w: 136, h: 90 };
+---
+
+<svg
+  class="sv"
+  viewBox="0 0 800 266"
+  role="img"
+  aria-label="An uploaded video is transcoded by FFmpeg into three HLS variants, 640, 1280 and 1920 pixels wide, cut into five-second segments. During playback HLS.js picks a variant for each segment as bandwidth changes, dropping quality during a dip and recovering after."
+  style={`--loop: ${LOOP}s`}
+>
+  <!-- Upload -->
+  <g class="sv-source">
+    <rect x="24" y="82" width="86" height="56" rx="3" />
+    {Array.from({ length: 6 }, (_, i) => (
+      <>
+        <rect class="sv-hole" x={30 + i * 13} y="86" width="6" height="5" />
+        <rect class="sv-hole" x={30 + i * 13} y="129" width="6" height="5" />
+      </>
+    ))}
+    <text x="24" y="156">upload.mp4</text>
+  </g>
+
+  <path class="sv-arrow" d="M114 110 H152" pathLength="1" />
+  <text class="sv-step sv-step-ffmpeg" x="116" y="100">ffmpeg</text>
+
+  <!-- Variants: one row per rendition, tiles are 5s segments -->
+  <text class="sv-master" x="160" y="40">master.m3u8<tspan class="sv-dim" dx="10">3 variants, 5s segments</tspan></text>
+
+  {variants.map((v, r) => (
+    <g class="sv-variant" style={`--r: ${r}`}>
+      <text class="sv-rate" x="160" y={v.y + 4}>{v.label}<tspan class="sv-dim" dx="6">{v.rate}</tspan></text>
+      {Array.from({ length: SEGMENTS }, (_, i) => (
+        <rect
+          class={`sv-seg${chosen[i] === r ? " is-chosen" : ""}`}
+          x={GRID_X + i * STEP}
+          y={v.y - v.h / 2}
+          width={SEG_W}
+          height={v.h}
+          rx="2"
+          style={`--i: ${i}`}
+        />
+      ))}
+    </g>
+  ))}
+
+  <path class="sv-path" d={playPath} />
+
+  <!-- Why it switches -->
+  <text class="sv-dim sv-bw-label" x="160" y="226">bandwidth</text>
+  <path class="sv-bw" d={bwPath} pathLength="1" />
+  <text class="sv-dim sv-time" x={GRID_X} y="258">segment_000.ts … every 5s</text>
+
+  <line class="sv-playhead" x1={GRID_X} y1="50" x2={GRID_X} y2="244" />
+
+  <!-- Player -->
+  <path class="sv-arrow sv-arrow-out" d={`M${GRID_END + 6} 97 H${PLAYER.x - 6}`} pathLength="1" />
+  <g class="sv-player">
+    <rect class="sv-screen" x={PLAYER.x} y={PLAYER.y} width={PLAYER.w} height={PLAYER.h} rx="6" />
+    <path class="sv-play" d={`M${PLAYER.x + 60} ${PLAYER.y + 30} l20 12 l-20 12 z`} />
+    <rect class="sv-track" x={PLAYER.x + 10} y={PLAYER.y + PLAYER.h - 12} width={PLAYER.w - 20} height="3" rx="1.5" />
+    <rect class="sv-progress" x={PLAYER.x + 10} y={PLAYER.y + PLAYER.h - 12} width={PLAYER.w - 20} height="3" rx="1.5" />
+    {chosen.map((v, i) => (
+      <text
+        class={`sv-quality${i === SEGMENTS - 1 ? " is-last" : ""}`}
+        x={PLAYER.x + PLAYER.w - 10}
+        y={PLAYER.y + 18}
+        text-anchor="end"
+        style={`--i: ${i}`}
+      >{variants[v].label}</text>
+    ))}
+    <text x={PLAYER.x} y={PLAYER.y + PLAYER.h + 18}>HLS.js</text>
+  </g>
+</svg>
+
+<style>
+  .sv {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0, "liga" 0;
+  }
+
+  .sv text {
+    font-size: 12px;
+    fill: #d4c594;
+  }
+
+  .sv .sv-dim,
+  .sv .sv-step {
+    font-size: 11px;
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .sv .sv-master {
+    fill: #fff3c7;
+  }
+
+  .sv-source > rect:first-child {
+    fill: rgba(255, 243, 199, 0.06);
+    stroke: rgba(212, 197, 148, 0.6);
+  }
+
+  .sv-hole {
+    fill: rgba(212, 197, 148, 0.45);
+  }
+
+  .sv-arrow {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.5);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .sv-seg {
+    fill: rgba(212, 197, 148, 0.05);
+    stroke: rgba(212, 197, 148, 0.35);
+  }
+
+  .sv-seg.is-chosen {
+    fill: rgba(255, 243, 199, 0.75);
+    stroke: #fff3c7;
+  }
+
+  .sv-path {
+    fill: none;
+    stroke: rgba(255, 243, 199, 0.5);
+    stroke-dasharray: 2 3;
+  }
+
+  .sv-bw {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.6);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .sv-playhead {
+    stroke: #e05a47;
+    stroke-width: 1;
+    opacity: 0;
+  }
+
+  .sv-screen {
+    fill: #0d0c0a;
+    stroke: rgba(212, 197, 148, 0.6);
+  }
+
+  .sv-play {
+    fill: rgba(255, 243, 199, 0.5);
+  }
+
+  .sv-track {
+    fill: rgba(212, 197, 148, 0.2);
+  }
+
+  .sv-progress {
+    fill: #fff3c7;
+  }
+
+  .sv .sv-quality {
+    font-size: 11px;
+    fill: #fff3c7;
+    opacity: 0;
+  }
+
+  .sv .sv-quality.is-last {
+    opacity: 1;
+  }
+
+  /* --- Sequence, only while this project is on screen --- */
+  :global(.active-pane) .sv-source {
+    animation: sv-fade 0.4s ease 0.1s backwards;
+  }
+
+  :global(.active-pane) .sv-arrow {
+    animation: sv-draw 0.4s ease 0.5s backwards;
+  }
+
+  :global(.active-pane) .sv-step-ffmpeg {
+    animation: sv-fade 0.3s ease 0.5s backwards;
+  }
+
+  /* Transcoding: segments appear column by column across all three variants */
+  :global(.active-pane) .sv-rate {
+    animation: sv-fade 0.3s ease calc(0.8s + var(--r) * 0.1s) backwards;
+  }
+
+  :global(.active-pane) .sv-seg {
+    animation: sv-fade 0.25s ease calc(0.9s + var(--i) * 0.14s) backwards;
+  }
+
+  :global(.active-pane) .sv-master {
+    animation: sv-fade 0.4s ease 1.9s backwards;
+  }
+
+  :global(.active-pane) .sv-arrow-out {
+    animation-delay: 2s;
+  }
+
+  :global(.active-pane) .sv-player,
+  :global(.active-pane) .sv-bw-label,
+  :global(.active-pane) .sv-time {
+    animation: sv-fade 0.4s ease 2.1s backwards;
+  }
+
+  :global(.active-pane) .sv-bw {
+    animation: sv-draw 1s ease 2.2s backwards;
+  }
+
+  :global(.active-pane) .sv-path {
+    animation: sv-fade 0.4s ease 2.6s backwards;
+  }
+
+  /* Playback loop: the playhead walks the segments, chosen tiles flare as they play,
+     and the player shows the variant in use */
+  :global(.active-pane) .sv-playhead {
+    animation: sv-playhead var(--loop) linear 2.8s infinite;
+  }
+
+  :global(.active-pane) .sv-seg.is-chosen {
+    animation:
+      sv-fade 0.25s ease calc(0.9s + var(--i) * 0.14s) backwards,
+      sv-flare var(--loop) linear calc(2.8s + var(--i) * 1s) infinite;
+  }
+
+  :global(.active-pane) .sv-progress {
+    transform-box: fill-box;
+    transform-origin: left;
+    animation: sv-progress var(--loop) linear 2.8s infinite backwards;
+  }
+
+  /* No backwards fill: labels wait hidden until their slot comes round */
+  :global(.active-pane) .sv .sv-quality {
+    opacity: 0;
+    animation: sv-quality var(--loop) steps(1) calc(2.8s + var(--i) * 1s) infinite;
+  }
+
+  @keyframes sv-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes sv-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes sv-playhead {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(358px);
+    }
+  }
+
+  /* Bright for the one second this segment is playing */
+  @keyframes sv-flare {
+    0% {
+      fill: #fff3c7;
+      filter: drop-shadow(0 0 6px rgba(255, 243, 199, 0.8));
+    }
+    14% {
+      fill: #fff3c7;
+      filter: drop-shadow(0 0 6px rgba(255, 243, 199, 0.8));
+    }
+    20%,
+    100% {
+      fill: rgba(255, 243, 199, 0.55);
+      filter: none;
+    }
+  }
+
+  @keyframes sv-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Each label shows for its one-second slot of the loop */
+  @keyframes sv-quality {
+    0% {
+      opacity: 1;
+    }
+    14.28%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Narrow screens: keep the grid and player, drop the small labels */
+  @media (max-width: 900px) {
+    .sv .sv-dim,
+    .sv .sv-step {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.active-pane) .sv * {
+      animation: none !important;
+    }
+
+    :global(.active-pane) .sv .sv-quality.is-last {
+      opacity: 1;
+    }
+  }
+</style>

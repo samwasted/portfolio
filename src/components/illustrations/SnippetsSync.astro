@@ -1,0 +1,396 @@
+---
+/**
+ * SnippetsSync — real-time collaboration in Snippets, from its README:
+ * two windows on one space, an editor's drag relayed through the WebSocket
+ * server (/ws/space/:id) to a viewer, whose own drag is refused by the
+ * space's role-based access. Changes persist to Postgres via Prisma.
+ *
+ * Plays when its pane becomes active, then loops the sync and the refusal.
+ */
+
+// Two windows on the same space; B mirrors A, offset to the right
+const WIN = { w: 240, h: 180, y: 24 };
+const A = 24;
+const B = 536;
+const CARD = { w: 64, h: 40 };
+
+// Positions relative to the window; the moved card travels by (DX, DY)
+const cards = [
+  { x: 24, y: 40, tag: "#d4c594", moved: false },
+  { x: 110, y: 104, tag: "#fff3c7", moved: true },
+  { x: 24, y: 110, tag: "#b9dce0", moved: false },
+];
+
+// Editor's drag, relayed straight through the server to the viewer
+const MID = WIN.y + WIN.h / 2;
+const wire = `M${A + WIN.w} ${MID} H${B}`;
+
+const windows = [
+  { x: A, role: "editor", side: "a" },
+  { x: B, role: "viewer (read-only)", side: "b" },
+];
+---
+
+<svg
+  class="sn"
+  viewBox="0 0 800 226"
+  role="img"
+  aria-label="Two windows on the same Snippets space. An editor drags a snippet card; the move travels through the WebSocket server and the card moves in the viewer's window too. When the viewer tries to drag, the read-only role refuses it. Changes persist to Postgres through Prisma."
+>
+  <!-- Server side -->
+  <path class="sn-wire" d={wire} pathLength="1" />
+  <path class="sn-packet" d={wire} pathLength="1" />
+
+  <g class="sn-server">
+    <rect x="325" y={MID - 25} width="150" height="50" rx="6" />
+    <text x="337" y={MID - 8}>ws server</text>
+    <text class="sn-dim" x="337" y={MID + 6}>/ws/space/:id</text>
+    <text class="sn-dim" x="337" y={MID + 19}>ping/pong 30s</text>
+  </g>
+
+  <g class="sn-db">
+    <line x1="400" y1={MID + 25} x2="400" y2={MID + 56} />
+    <text class="sn-dim" x="408" y={MID + 44}>persist</text>
+    <rect x="335" y={MID + 56} width="130" height="32" rx="6" />
+    <text x="347" y={MID + 76}>Postgres<tspan class="sn-dim" dx="8">Prisma</tspan></text>
+  </g>
+
+  <!-- The two windows -->
+  {windows.map((w) => (
+    <g class={`sn-window sn-${w.side}`}>
+      <rect class="sn-frame" x={w.x} y={WIN.y} width={WIN.w} height={WIN.h} rx="8" />
+      <line class="sn-bar" x1={w.x} y1={WIN.y + 22} x2={w.x + WIN.w} y2={WIN.y + 22} />
+      <text x={w.x + 12} y={WIN.y + 15}>algorithms</text>
+      <text class="sn-role" x={w.x + WIN.w - 12} y={WIN.y + 15} text-anchor="end">{w.role}</text>
+
+      {cards.map((c, i) => (
+        <g class={`sn-card${c.moved ? " is-moved" : ""}${i === 0 ? " is-first" : ""}`}>
+          <rect x={w.x + c.x} y={WIN.y + c.y} width={CARD.w} height={CARD.h} rx="4" />
+          <rect class="sn-tag" x={w.x + c.x} y={WIN.y + c.y} width={CARD.w} height="3" rx="1.5" style={`fill: ${c.tag}`} />
+          {[0, 1, 2].map((l) => (
+            <line
+              x1={w.x + c.x + 8}
+              y1={WIN.y + c.y + 14 + l * 8}
+              x2={w.x + c.x + (l === 1 ? 46 : 32)}
+              y2={WIN.y + c.y + 14 + l * 8}
+            />
+          ))}
+          {/* The hand doing the moving: the editor drags this card, the viewer tries the first */}
+          {((w.side === "a" && c.moved) || (w.side === "b" && i === 0)) && (
+            <path
+              class="sn-cursor"
+              d={`M${w.x + c.x + 44} ${WIN.y + c.y + 22} l0 14 l4 -4 l3 6 l2 -1 l-3 -6 l5 0 z`}
+            />
+          )}
+        </g>
+      ))}
+    </g>
+  ))}
+
+  <text class="sn-denied" x={B + 24} y={WIN.y + 36}>✕ read-only</text>
+</svg>
+
+<style>
+  .sn {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0, "liga" 0;
+  }
+
+  .sn text {
+    font-size: 12px;
+    fill: #d4c594;
+  }
+
+  .sn .sn-dim {
+    font-size: 11px;
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .sn .sn-role {
+    font-size: 11px;
+    fill: rgba(255, 243, 199, 0.75);
+  }
+
+  .sn-frame {
+    fill: rgba(212, 197, 148, 0.03);
+    stroke: rgba(212, 197, 148, 0.5);
+  }
+
+  .sn-bar {
+    stroke: rgba(212, 197, 148, 0.25);
+  }
+
+  .sn-card > rect:first-child {
+    fill: rgba(255, 243, 199, 0.07);
+    stroke: rgba(212, 197, 148, 0.45);
+  }
+
+  .sn-card line {
+    stroke: rgba(212, 197, 148, 0.4);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* At rest the moved card sits at its new place in both windows: in sync */
+  .sn-card.is-moved {
+    transform: translate(38px, -58px);
+  }
+
+  .sn-card.is-moved > rect:first-child {
+    stroke: #fff3c7;
+  }
+
+  .sn-cursor {
+    fill: #fff3c7;
+    stroke: #0a0a0a;
+    stroke-width: 0.8;
+    opacity: 0;
+  }
+
+  .sn-server rect,
+  .sn-db rect {
+    fill: #12110f;
+    stroke: rgba(212, 197, 148, 0.6);
+  }
+
+  .sn-db line {
+    stroke: rgba(212, 197, 148, 0.4);
+    stroke-dasharray: 2 3;
+  }
+
+  .sn-wire {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.35);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .sn-packet {
+    fill: none;
+    stroke: #fff3c7;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 0.04 1;
+    stroke-dashoffset: 0.04;
+    opacity: 0;
+  }
+
+  .sn .sn-denied {
+    font-size: 11px;
+    fill: #e05a47;
+    opacity: 0;
+  }
+
+  /* --- Sequence, only while this project is on screen --- */
+  :global(.active-pane) .sn-window {
+    animation: sn-fade 0.4s ease 0.1s backwards;
+  }
+
+  :global(.active-pane) .sn-b {
+    animation-delay: 0.3s;
+  }
+
+  :global(.active-pane) .sn-wire {
+    animation: sn-draw 0.8s ease 0.7s backwards;
+  }
+
+  :global(.active-pane) .sn-server,
+  :global(.active-pane) .sn-db {
+    animation: sn-fade 0.4s ease 1s backwards;
+  }
+
+  /* One 7s loop: editor drags, the move is relayed, the viewer's copy follows,
+     then the viewer's own drag is refused */
+  :global(.active-pane) .sn-a .sn-card.is-moved {
+    animation: sn-drag-a 7s ease-in-out 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-a .sn-cursor {
+    animation: sn-cursor-a 7s ease 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-packet {
+    animation: sn-relay 7s linear 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-b .sn-card.is-moved {
+    animation: sn-drag-b 7s ease-in-out 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-b .sn-cursor {
+    animation: sn-cursor-b 7s ease 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-b .sn-card.is-first {
+    animation: sn-refuse 7s ease 1.6s infinite backwards;
+  }
+
+  :global(.active-pane) .sn-denied {
+    animation: sn-denied 7s ease 1.6s infinite backwards;
+  }
+
+  @keyframes sn-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes sn-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes sn-drag-a {
+    0%,
+    8% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+    28%,
+    92% {
+      transform: translate(38px, -58px);
+      opacity: 1;
+    }
+    95% {
+      transform: translate(38px, -58px);
+      opacity: 0;
+    }
+    96% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes sn-cursor-a {
+    0%,
+    3% {
+      opacity: 0;
+    }
+    6%,
+    30% {
+      opacity: 1;
+    }
+    34%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes sn-relay {
+    0%,
+    28% {
+      stroke-dashoffset: 0.04;
+      opacity: 0;
+    }
+    29% {
+      opacity: 1;
+    }
+    47% {
+      stroke-dashoffset: -0.96;
+      opacity: 1;
+    }
+    48%,
+    100% {
+      stroke-dashoffset: -0.96;
+      opacity: 0;
+    }
+  }
+
+  @keyframes sn-drag-b {
+    0%,
+    48% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+    58%,
+    92% {
+      transform: translate(38px, -58px);
+      opacity: 1;
+    }
+    95% {
+      transform: translate(38px, -58px);
+      opacity: 0;
+    }
+    96% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(0, 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes sn-cursor-b {
+    0%,
+    64% {
+      opacity: 0;
+    }
+    67%,
+    86% {
+      opacity: 1;
+    }
+    90%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* The viewer's grab only shakes the card */
+  @keyframes sn-refuse {
+    0%,
+    71% {
+      transform: translate(0, 0);
+    }
+    73% {
+      transform: translate(4px, 0);
+    }
+    75% {
+      transform: translate(-3px, 0);
+    }
+    77% {
+      transform: translate(2px, 0);
+    }
+    79%,
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+
+  @keyframes sn-denied {
+    0%,
+    72% {
+      opacity: 0;
+    }
+    74%,
+    88% {
+      opacity: 1;
+    }
+    92%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Narrow screens: keep the windows and the relay, drop the small labels */
+  @media (max-width: 900px) {
+    .sn .sn-dim {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.active-pane) .sn * {
+      animation: none !important;
+    }
+  }
+</style>

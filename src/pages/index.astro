@@ -7,6 +7,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ShaderBackground from "../components/ShaderBackground.astro";
 import Nav from "../components/Nav.astro";
 import FujiShaderOverlay from "../components/FujiShaderOverlay.astro";
+import EventLedger from "../components/EventLedger.astro";
 import { existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 
@@ -113,98 +114,7 @@ const resume = existsSync(resumePath)
             System Log // Event Ledger
           </div>
 
-          <div class="font-mono text-base flex flex-col gap-5 text-white/60 relative">
-            <!-- Vertical line behind nodes -->
-            <div class="absolute left-[176px] top-2 bottom-2 w-px bg-white/10 z-0 hidden md:block"></div>
-
-            <!-- [BASE] Standard -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [BASE] 2024-07
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
-              </div>
-              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                System initialization: Admitted to Indian Institute of Technology (IIT) BHU, Varanasi. Enrolled in Mathematics and Computing (IDD).
-              </div>
-            </div>
-
-
-
-            <!-- [INDUCT] Standard -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [INDUCT] 2025-06
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
-              </div>
-              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                Club of Programmers (COPS) selection following full-stack Next.js, Redis, and WebSocket application deployments.
-              </div>
-            </div>
-
-
-
-            <!-- [AWARD] Highlight -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
-                [AWARD] 2025-12
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
-              </div>
-              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
-                Bronze Medal at Inter IIT Tech Meet 14.0 (Quant Problem Statement). Market models and backtesting pipeline architecture.
-              </div>
-            </div>
-
-            <!-- [INDUCT] Standard -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#D4C594]/60 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [INDUCT] 2026-01
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-[#1a1a1a] border border-white/20 group-hover:border-white/40 group-hover:bg-white/10 transition-colors"></div>
-              </div>
-              <div class="text-white/20 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/40 leading-relaxed group-hover:text-white/70 transition-colors flex-1">
-                Algorithmic Trading vertical selection at The Quant Club (TQC), IIT BHU.
-              </div>
-            </div>
-
-            <!-- [RANK] Medium -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#FFF3C7]/80 whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity">
-                [RANK] 2026-02
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-white/70 shadow-[0_0_8px_rgba(255,255,255,0.3)] transition-colors"></div>
-              </div>
-              <div class="text-white/40 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white/80 leading-relaxed group-hover:text-white transition-colors flex-1">
-                Reached Expert rank on Codeforces.
-              </div>
-            </div>
-
-            <!-- [CORE] Highlight -->
-            <div class="flex gap-4 group items-start relative z-10">
-              <div class="text-[#FFF3C7] whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-opacity">
-                [CORE] 2026-04
-              </div>
-              <div class="flex-col items-center justify-start w-[10px] flex-shrink-0 hidden md:flex" style="transform: translateY(10px);">
-                <div class="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8),0_0_20px_rgba(255,255,255,0.4)]"></div>
-              </div>
-              <div class="text-white/60 select-none md:hidden flex-shrink-0">|</div>
-              <div class="text-white leading-relaxed font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] flex-1">
-                "jailsh" C++17 interactive execution sandbox and container runtime. Engineered a strict double-fork PID 1 init model, IPC handshakes, and cgroups v2 boundaries.
-              </div>
-            </div>
-          </div>
+          <EventLedger />
         </div>
 
         <!-- Right Panes 2 & 3 (Top Right & Bottom Right) -->
@@ -221,80 +131,59 @@ const resume = existsSync(resumePath)
 
             <div
               class="font-mono text-base text-white/30 leading-loose flex flex-col"
+              data-tree-print
             >
-              <div>├── <span class="text-[#D4C594]/80">stack/</span></div>
+              <div><span class="tree-glyph">├──</span> <span class="text-[#D4C594]/80">stack/</span></div>
 
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white">cpp17</span>
+                <span class="tree-glyph">│&nbsp;&nbsp;├──</span> <span class="text-white">cpp17</span>
                 <span class="text-[#D4C594]/50 text-sm ml-2"
                   >#define int ll</span>
               </div>
               <div>
-                │&nbsp;&nbsp;└── <span class="text-white">python3</span>
+                <span class="tree-glyph">│&nbsp;&nbsp;└──</span> <span class="text-white">python3</span>
               </div>
-              <div>├── <span class="text-[#D4C594]/80">domains/</span></div>
+              <div><span class="tree-glyph">├──</span> <span class="text-[#D4C594]/80">domains/</span></div>
 
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white">competitive_programming</span>
+                <span class="tree-glyph">│&nbsp;&nbsp;├──</span> <span class="text-white">competitive_programming</span>
               </div>
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white"
+                <span class="tree-glyph">│&nbsp;&nbsp;├──</span> <span class="text-white"
                   >process_isolation</span>
               </div>
               <div>
-                │&nbsp;&nbsp;├── <span class="text-white"
+                <span class="tree-glyph">│&nbsp;&nbsp;├──</span> <span class="text-white"
                   >low_latency</span>
               </div>
               <div>
-                │&nbsp;&nbsp;└── <span class="text-white"
+                <span class="tree-glyph">│&nbsp;&nbsp;└──</span> <span class="text-white"
                   >quantitative_finance</span>
               </div>  
               <div>
-                └── <span class="text-[#D4C594]/80">remote/</span>
+                <span class="tree-glyph">└──</span> <span class="text-[#D4C594]/80">remote/</span>
                 <span class="text-[#D4C594]/50 text-sm ml-2"
                   ># hyperlinks btw</span>
               </div>
 
               <div class="inline-flex items-center link-group group w-fit">
-                &nbsp;&nbsp;&nbsp;├──&nbsp;<a
+                <span class="tree-glyph">&nbsp;&nbsp;&nbsp;├──&nbsp;</span><a
                   href="https://codeforces.com/profile/aceclofenac"
                   target="_blank"
-                  class="cyan-text magenta-hover transition-colors underline underline-offset-4 ml-1"
+                  rel="noopener"
+                  class="tree-link ml-1"
                   >codeforces</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
+                ><span class="tree-link-arrow" aria-hidden="true">↗</span>
               </div>
 
               <div class="inline-flex items-center link-group group w-fit">
-                &nbsp;&nbsp;&nbsp;└──&nbsp;<a
+                <span class="tree-glyph">&nbsp;&nbsp;&nbsp;└──&nbsp;</span><a
                   href="https://github.com/samwasted"
                   target="_blank"
-                  class="cyan-text magenta-hover transition-colors underline decoration-cyan-400/20 underline-offset-4 ml-1"
+                  rel="noopener"
+                  class="tree-link ml-1"
                   >github</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
+                ><span class="tree-link-arrow" aria-hidden="true">↗</span>
               </div>
             </div>
           </div>
@@ -677,6 +566,39 @@ const resume = existsSync(resumePath)
     },
     { capture: true },
   );
+
+  // Draw the registry tree's connectors line by line every time it scrolls
+  // into view (reset once it has fully left); the names themselves stay put
+  function initTreePrint() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll<HTMLElement>("[data-tree-print]:not([data-tree-init])").forEach((tree) => {
+      tree.dataset.treeInit = "";
+      if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+      Array.from(tree.children).forEach((line, i) => {
+        (line as HTMLElement).style.setProperty("--line", String(i));
+      });
+
+      // Hidden only once JS is running, so the tree still shows without it
+      tree.classList.add("tree-pending");
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.intersectionRatio >= 0.25) {
+              tree.classList.add("tree-print");
+            } else if (!e.isIntersecting) {
+              tree.classList.remove("tree-print");
+            }
+          }
+        },
+        { threshold: [0, 0.25] },
+      );
+      io.observe(tree);
+    });
+  }
+
+  initTreePrint();
+  document.addEventListener("astro:page-load", initTreePrint);
 </script>
 
 <style>
@@ -930,22 +852,74 @@ const resume = existsSync(resumePath)
     }
   }
 
-  /* --- Flower Petal Unfurling Effect --- */
-  .flower-petal {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    transition: stroke-dashoffset 1.2s ease-out;
+  /* --- Registry tree: only the connectors draw in, line by line; names stay put --- */
+  .tree-glyph {
+    display: inline-block;
   }
 
-  .link-group:hover .flower-petal {
-    stroke-dashoffset: 0;
+  .tree-pending .tree-glyph {
+    clip-path: inset(0 100% 0 0);
   }
 
-  /* Force magenta hover color, bypassing Tailwind arbitrary values */
-  .link-group:hover .magenta-hover {
-    color: #ff00ff !important;
+  .tree-print .tree-glyph {
+    /* Starts 0.5s after it comes into view, so the ledger's stroke leads */
+    animation: tree-line 0.3s cubic-bezier(0.3, 0, 0.4, 1) calc(0.5s + var(--line) * 80ms) forwards;
   }
-  .cyan-text { /** fix for the cyan color in hyperlinks btw */
-    color: #b9dce0 !important;
+
+  @keyframes tree-line {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* --- Registry links: cyan at rest; on hover the text warms to cream,
+     a brush stroke sweeps in underneath and an arrow marks the new tab --- */
+  .tree-link {
+    position: relative;
+    color: #b9dce0;
+    text-decoration: underline;
+    text-decoration-color: rgba(185, 220, 224, 0.25);
+    text-underline-offset: 4px;
+    transition: color 0.25s ease, text-decoration-color 0.25s ease;
+  }
+
+  .tree-link::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    height: 5px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'%3E%3Cpath d='M0 3.6C18 1.8 58 1.2 100 2.4L98.5 4.1C60 5.4 24 5.7 1.5 4.8Z' fill='%23fff3c7'/%3E%3C/svg%3E")
+      center / 100% 100% no-repeat;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.86, 0, 0.07, 1);
+  }
+
+  .tree-link-arrow {
+    margin-left: 0.5rem;
+    font-size: 0.85em;
+    color: #d4c594;
+    opacity: 0;
+    transform: translate(-4px, 2px);
+    transition: opacity 0.25s ease, transform 0.35s ease;
+  }
+
+  .link-group:hover .tree-link,
+  .tree-link:focus-visible {
+    color: #fff3c7;
+    text-decoration-color: transparent;
+  }
+
+  .link-group:hover .tree-link::after,
+  .tree-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .link-group:hover .tree-link-arrow,
+  .link-group:focus-within .tree-link-arrow {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 </style>

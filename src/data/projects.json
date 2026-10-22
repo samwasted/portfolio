@@ -11,7 +11,8 @@
       "Solved fork/SIGCHLD race conditions that caused ghost background jobs"
     ],
     "techStack": ["C++17", "seccomp-BPF", "cgroups v2", "Linux Namespaces", "libseccomp", "libreadline"],
-    "github": "https://github.com/samwasted/jailsh"
+    "github": "https://github.com/samwasted/jailsh",
+    "media": { "type": "illustration", "name": "jailsh-layers" }
   },
   {
     "name": "Black Swan",
@@ -25,7 +26,8 @@
       "Tax engine for US / UK / India capital gains with slippage and fee modeling"
     ],
     "techStack": ["Python", "Optuna", "pandas-ta", "Monte Carlo", "yFinance", "Finnhub API", "A2A JSON-RPC", "OpenAI API"],
-    "github": "https://github.com/samwasted/black-swan-agent"
+    "github": "https://github.com/samwasted/black-swan-agent",
+    "media": { "type": "illustration", "name": "black-swan-stress" }
   },
   {
     "name": "SemanticPDF",
@@ -40,7 +42,8 @@
     ],
     "techStack": ["Next.js 15", "tRPC", "TypeScript", "OpenAI API", "Pinecone", "Supabase", "Razorpay", "Kinde Auth", "shadcn/ui"],
     "github": "https://github.com/samwasted/semanticpdf",
-    "live": "https://semanticpdf.vercel.app"
+    "live": "https://semanticpdf.vercel.app",
+    "media": { "type": "illustration", "name": "semanticpdf-rag" }
   },
   {
     "name": "Snippets",
@@ -55,7 +58,8 @@
     ],
     "techStack": ["React", "TypeScript", "Express.js", "WebSocket", "Prisma", "PostgreSQL", "dnd-kit", "CodeMirror", "Turbo", "JWT"],
     "github": "https://github.com/samwasted/snippets-list",
-    "live": "https://snippets-list.vercel.app"
+    "live": "https://snippets-list.vercel.app",
+    "media": { "type": "illustration", "name": "snippets-sync" }
   },
   {
     "name": "StreamVault",
@@ -69,6 +73,7 @@
       "Public streaming without login — auth only required to upload or create playlists"
     ],
     "techStack": ["Spring Boot", "Java", "FFmpeg", "HLS.js", "React", "Vite", "MySQL", "JWT", "Tailwind CSS"],
-    "github": "https://github.com/samwasted/streamvault"
+    "github": "https://github.com/samwasted/streamvault",
+    "media": { "type": "illustration", "name": "streamvault-hls" }
   }
 ]

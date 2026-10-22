@@ -1,0 +1,220 @@
+---
+/**
+ * JailshLayers — how `jail` wraps a process, outside in:
+ * cgroups v2 → namespaces → capabilities → seccomp-BPF → the binary.
+ * Everything shown is taken from the jailsh README.
+ *
+ * Plays when its project pane becomes active (.active-pane), then loops a
+ * disallowed syscall being killed at the seccomp boundary. Without motion
+ * (reduced motion, or an inactive pane) it rests on the finished drawing.
+ */
+const layers = [
+  { x: 300, y: 20, w: 470, h: 320, label: "cgroups v2", detail: "memory.max" },
+  { x: 335, y: 55, w: 400, h: 250, label: "namespaces", detail: "user mnt pid net" },
+  { x: 370, y: 90, w: 330, h: 180, label: "capabilities", detail: "dropped" },
+  { x: 405, y: 125, w: 260, h: 110, label: "seccomp-BPF", detail: "allowlist" },
+];
+
+const notes = [
+  "# fresh /tmp/jailsh-jail-XXXXXX",
+  "# binary copied to /workspace",
+  "# unshare(USER | NS | PID | NET)",
+  "# memory capped in jailsh-<pid>",
+  "# on exit: workspace + cgroup gone",
+];
+---
+
+<svg
+  class="jl"
+  viewBox="0 0 800 360"
+  role="img"
+  aria-label="jail wraps a binary in four layers: cgroups v2, namespaces, dropped capabilities and a seccomp syscall allowlist. A syscall outside the allowlist kills the process."
+>
+  <g class="jl-terminal">
+    <text class="jl-cmd" x="24" y="60">$ jail --mem 128M ./sketchy_binary</text>
+    {notes.map((note, i) => (
+      <text class="jl-note" x="24" y={100 + i * 26} style={`--i: ${i}`}>{note}</text>
+    ))}
+  </g>
+
+  {layers.map((l, i) => (
+    <g class="jl-layer" style={`--i: ${i}`}>
+      <rect x={l.x} y={l.y} width={l.w} height={l.h} rx="12" pathLength="1" />
+      <text class="jl-label" x={l.x + 14} y={l.y + 22}>
+        {l.label}<tspan class="jl-detail" dx="10">{l.detail}</tspan>
+      </text>
+    </g>
+  ))}
+
+  <g class="jl-core">
+    <rect x="455" y="168" width="160" height="44" rx="6" />
+    <text x="535" y="195" text-anchor="middle">./sketchy_binary</text>
+  </g>
+
+  <!-- A syscall outside the allowlist travels out and is killed at the seccomp wall -->
+  <g class="jl-syscall">
+    <circle class="jl-dot" cx="535" cy="166" r="4" />
+    <text class="jl-kill" x="690" y="118" text-anchor="end">✕ SCMP_ACT_KILL</text>
+  </g>
+</svg>
+
+<style>
+  .jl {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    /* Flags like --mem must not become ligature dashes */
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0, "liga" 0;
+  }
+
+  .jl-cmd {
+    font-size: 12px;
+    fill: #fff3c7;
+  }
+
+  .jl-note {
+    font-size: 12px;
+    fill: rgba(212, 197, 148, 0.55);
+  }
+
+  .jl-layer rect {
+    fill: rgba(212, 197, 148, 0.025);
+    stroke: rgba(212, 197, 148, 0.55);
+    stroke-width: 1.2;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .jl-label {
+    font-size: 12px;
+    fill: #d4c594;
+  }
+
+  .jl-detail {
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .jl-core rect {
+    fill: rgba(255, 243, 199, 0.08);
+    stroke: #fff3c7;
+    stroke-width: 1.2;
+  }
+
+  .jl-core text {
+    font-size: 13px;
+    fill: #fff3c7;
+  }
+
+  .jl-dot {
+    fill: #e05a47;
+    opacity: 0;
+  }
+
+  .jl-kill {
+    font-size: 12px;
+    fill: #e05a47;
+    opacity: 0;
+  }
+
+  /* --- Sequence, only while this project is on screen --- */
+  :global(.active-pane) .jl-cmd {
+    clip-path: inset(0 100% 0 0);
+    animation: jl-type 0.9s steps(34) 0.1s forwards;
+  }
+
+  :global(.active-pane) .jl-layer rect {
+    animation: jl-draw 0.8s cubic-bezier(0.6, 0, 0.3, 1) calc(0.35s + var(--i) * 0.3s) backwards;
+  }
+
+  :global(.active-pane) .jl-label,
+  :global(.active-pane) .jl-note {
+    animation: jl-fade 0.4s ease calc(0.8s + var(--i) * 0.3s) backwards;
+  }
+
+  :global(.active-pane) .jl-core {
+    animation: jl-fade 0.5s ease 1.8s backwards;
+  }
+
+  :global(.active-pane) .jl-dot {
+    animation: jl-syscall 3.2s ease-in 2.6s infinite;
+  }
+
+  :global(.active-pane) .jl-kill {
+    animation: jl-killed 3.2s ease 2.6s infinite;
+  }
+
+  @keyframes jl-type {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes jl-draw {
+    from {
+      stroke-dashoffset: 1;
+      fill-opacity: 0;
+    }
+  }
+
+  @keyframes jl-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Out from the binary, stopped dead at the seccomp boundary (y = 125) */
+  @keyframes jl-syscall {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    8% {
+      opacity: 1;
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-40px);
+    }
+    40%,
+    100% {
+      opacity: 0;
+      transform: translateY(-40px);
+    }
+  }
+
+  @keyframes jl-killed {
+    0%,
+    28% {
+      opacity: 0;
+    }
+    32%,
+    70% {
+      opacity: 1;
+    }
+    85%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Narrow screens: drop the notes and let the layers fill the frame */
+  @media (max-width: 900px) {
+    .jl {
+      width: 163%;
+      margin-left: -59%;
+    }
+
+    .jl-terminal {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.active-pane) .jl * {
+      animation: none !important;
+      clip-path: none !important;
+    }
+  }
+</style>
