@@ -101,17 +101,21 @@ const notes = [
     ))}
   </g>
 
-  <!-- Stress paths, the stitched OOS curve on top -->
-  <g class="bs-fan">
-    {fan.map((p, i) => <path d={toPath(p)} pathLength="1" style={`--i: ${i}`} />)}
+  <!-- Stress paths, the stitched OOS curve on top. Grouped so narrow screens
+       can stretch the chart across the width the hidden notes leave free -->
+  <g class="bs-chart">
+    <g class="bs-fan">
+      {fan.map((p, i) => <path d={toPath(p)} pathLength="1" style={`--i: ${i}`} />)}
+    </g>
+
+    <g class="bs-worst">
+      <line x1={OOS_START} y1={worstY} x2={OOS_END} y2={worstY} />
+    </g>
+
+    <path class="bs-oos" d={toPath(oos)} pathLength="1" />
   </g>
 
-  <g class="bs-worst">
-    <line x1={OOS_START} y1={worstY} x2={OOS_END} y2={worstY} />
-    <text x={OOS_END - 4} y={worstY - 6} text-anchor="end">worst 5%</text>
-  </g>
-
-  <path class="bs-oos" d={toPath(oos)} pathLength="1" />
+  <text class="bs-worst-label" x={OOS_END - 4} y={worstY - 6} text-anchor="end">worst 5%</text>
   <text class="bs-oos-label" x={OOS_START + 4} y="350">stitched out-of-sample equity</text>
 </svg>
 
@@ -177,7 +181,7 @@ const notes = [
     stroke-dasharray: 4 4;
   }
 
-  .bs-worst text {
+  .bs-worst-label {
     font-size: 11px;
     fill: #e05a47;
   }
@@ -231,7 +235,8 @@ const notes = [
     animation: bs-attack 6s ease-out calc(2.9s + var(--i) * 0.05s) infinite backwards;
   }
 
-  :global(.active-pane) .bs-worst {
+  :global(.active-pane) .bs-worst,
+  :global(.active-pane) .bs-worst-label {
     animation: bs-fade 0.5s ease 4s backwards;
   }
 
@@ -273,8 +278,24 @@ const notes = [
     }
 
     .bs-notes,
-    .bs-head .bs-dim {
+    .bs-head .bs-dim,
+    .bs-guides {
       display: none;
+    }
+
+    /* The notes are unreadable at this size, so the chart takes their place:
+       x' = 2.2x − 864 maps the out-of-sample span 420–720 onto 60–720 */
+    .bs-chart {
+      transform: matrix(2.2, 0, 0, 1, -864, 0);
+    }
+
+    .bs-chart path,
+    .bs-chart line {
+      vector-effect: non-scaling-stroke;
+    }
+
+    .bs-oos-label {
+      transform: translateX(-360px);
     }
   }
 
