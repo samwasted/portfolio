@@ -56,7 +56,8 @@ const TEXT_CLASS: Record<LedgerLevel, string> = {
 </div>
 
 <script>
-  // Draw the stroke top to bottom the first time the ledger scrolls into view.
+  // Draw the stroke top to bottom every time the ledger scrolls into view,
+  // and reset it once it has fully left, so each visit replays the reveal.
   // Timing is measured per row so the brush moves at one speed through every segment.
   const MIN_SPEED = 0.45; // px per ms
   const MAX_TOTAL = 2200; // ms, so long ledgers on mobile don't crawl
@@ -84,11 +85,15 @@ const TEXT_CLASS: Record<LedgerLevel, string> = {
       ledger.classList.add("brush-pending");
       const io = new IntersectionObserver(
         (entries) => {
-          if (!entries.some((e) => e.isIntersecting)) return;
-          io.disconnect();
-          draw(ledger);
+          for (const e of entries) {
+            if (e.intersectionRatio >= 0.25 && !ledger.classList.contains("brush-draw")) {
+              draw(ledger);
+            } else if (!e.isIntersecting) {
+              ledger.classList.remove("brush-draw");
+            }
+          }
         },
-        { threshold: 0.25 },
+        { threshold: [0, 0.25] },
       );
       io.observe(ledger);
     });

@@ -170,42 +170,20 @@ const resume = existsSync(resumePath)
                 <span class="tree-glyph">&nbsp;&nbsp;&nbsp;├──&nbsp;</span><a
                   href="https://codeforces.com/profile/aceclofenac"
                   target="_blank"
-                  class="cyan-text magenta-hover transition-colors underline underline-offset-4 ml-1"
+                  rel="noopener"
+                  class="tree-link ml-1"
                   >codeforces</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
+                ><span class="tree-link-arrow" aria-hidden="true">↗</span>
               </div>
 
               <div class="inline-flex items-center link-group group w-fit">
                 <span class="tree-glyph">&nbsp;&nbsp;&nbsp;└──&nbsp;</span><a
                   href="https://github.com/samwasted"
                   target="_blank"
-                  class="cyan-text magenta-hover transition-colors underline decoration-cyan-400/20 underline-offset-4 ml-1"
+                  rel="noopener"
+                  class="tree-link ml-1"
                   >github</a
-                ><svg
-                  class="w-4 h-4 ml-2 text-[#FF00FF]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><path
-                    class="flower-petal"
-                    pathLength="100"
-                    d="M12 16 C8 16 2 12 4 8 C8 6 12 12 12 16 M12 16 C16 16 22 12 20 8 C16 6 12 12 12 16"
-                  ></path></svg>
+                ><span class="tree-link-arrow" aria-hidden="true">↗</span>
               </div>
             </div>
           </div>
@@ -589,8 +567,8 @@ const resume = existsSync(resumePath)
     { capture: true },
   );
 
-  // Draw the registry tree's connectors line by line the first time it
-  // scrolls into view; the names themselves stay put
+  // Draw the registry tree's connectors line by line every time it scrolls
+  // into view (reset once it has fully left); the names themselves stay put
   function initTreePrint() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.querySelectorAll<HTMLElement>("[data-tree-print]:not([data-tree-init])").forEach((tree) => {
@@ -605,11 +583,15 @@ const resume = existsSync(resumePath)
       tree.classList.add("tree-pending");
       const io = new IntersectionObserver(
         (entries) => {
-          if (!entries.some((e) => e.isIntersecting)) return;
-          io.disconnect();
-          tree.classList.add("tree-print");
+          for (const e of entries) {
+            if (e.intersectionRatio >= 0.25) {
+              tree.classList.add("tree-print");
+            } else if (!e.isIntersecting) {
+              tree.classList.remove("tree-print");
+            }
+          }
         },
-        { threshold: 0.25 },
+        { threshold: [0, 0.25] },
       );
       io.observe(tree);
     });
@@ -890,22 +872,54 @@ const resume = existsSync(resumePath)
     }
   }
 
-  /* --- Flower Petal Unfurling Effect --- */
-  .flower-petal {
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    transition: stroke-dashoffset 1.2s ease-out;
+  /* --- Registry links: cyan at rest; on hover the text warms to cream,
+     a brush stroke sweeps in underneath and an arrow marks the new tab --- */
+  .tree-link {
+    position: relative;
+    color: #b9dce0;
+    text-decoration: underline;
+    text-decoration-color: rgba(185, 220, 224, 0.25);
+    text-underline-offset: 4px;
+    transition: color 0.25s ease, text-decoration-color 0.25s ease;
   }
 
-  .link-group:hover .flower-petal {
-    stroke-dashoffset: 0;
+  .tree-link::after {
+    content: "";
+    position: absolute;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    height: 5px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'%3E%3Cpath d='M0 3.6C18 1.8 58 1.2 100 2.4L98.5 4.1C60 5.4 24 5.7 1.5 4.8Z' fill='%23fff3c7'/%3E%3C/svg%3E")
+      center / 100% 100% no-repeat;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s cubic-bezier(0.86, 0, 0.07, 1);
   }
 
-  /* Force magenta hover color, bypassing Tailwind arbitrary values */
-  .link-group:hover .magenta-hover {
-    color: #ff00ff !important;
+  .tree-link-arrow {
+    margin-left: 0.5rem;
+    font-size: 0.85em;
+    color: #d4c594;
+    opacity: 0;
+    transform: translate(-4px, 2px);
+    transition: opacity 0.25s ease, transform 0.35s ease;
   }
-  .cyan-text { /** fix for the cyan color in hyperlinks btw */
-    color: #b9dce0 !important;
+
+  .link-group:hover .tree-link,
+  .tree-link:focus-visible {
+    color: #fff3c7;
+    text-decoration-color: transparent;
+  }
+
+  .link-group:hover .tree-link::after,
+  .tree-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .link-group:hover .tree-link-arrow,
+  .link-group:focus-within .tree-link-arrow {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 </style>
