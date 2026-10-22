@@ -289,7 +289,8 @@ const notes = [
       transform: matrix(2.2, 0, 0, 1, -864, 0);
     }
 
-    .bs-chart path,
+    /* Only the static dashed line: on the animated paths, non-scaling-stroke
+       breaks pathLength, so the draw-in dash no longer covers the whole path */
     .bs-chart line {
       vector-effect: non-scaling-stroke;
     }

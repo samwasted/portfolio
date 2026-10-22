@@ -29,7 +29,9 @@ body {
   font-weight: 300;
   background: var(--bg-primary);
   color: var(--text-primary);
-  overflow-x: hidden;
+  /* clip, not hidden: hidden would make body its own scroll container and
+     steal the home page's scroll-snap points from the real scroller (html) */
+  overflow-x: clip;
   line-height: 1.6;
 }
 

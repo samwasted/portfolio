@@ -91,7 +91,7 @@ const resume = existsSync(resumePath)
   </div>
 
   <!-- Spacer to push the scroll content down by one screen height -->
-  <div class="h-[100vh] w-full relative z-0 pointer-events-none"></div>
+  <div class="hero-snap h-[100vh] w-full relative z-0 pointer-events-none"></div>
 
   <!-- About Section (Scrolls up) -->
   <section
@@ -253,238 +253,83 @@ const resume = existsSync(resumePath)
 </BaseLayout>
 
 <script>
+  // Scrolling between the hero and About is native: CSS scroll snap (see <style>)
+  // settles on either section, so wheel and touch keep the device's own momentum.
+  // This script only drives the scroll-linked hero fades.
+
   let isTicking = false;
+  let els: Record<string, HTMLElement | null> = {};
+
+  // Look the elements up once per page load, not on every frame
+  function cacheElements() {
+    const ids = ["fuji-shader-overlay", "image-bg", "scroll-indicator-container", "hero-greeting", "hero-label", "hero-tags", "hero-subtitle", "hero-sticky-group", "about"];
+    els = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+  }
 
   function updateScrollState() {
+    // Read everything first, then write, so styles never force a layout mid-frame
     const scrollY = window.scrollY;
     const height = window.innerHeight;
+    const sticky = els["hero-sticky-group"];
+    const heroHeight = sticky?.parentElement?.offsetHeight ?? 0;
+    const aboutTop = els["about"]?.offsetTop ?? height;
 
-    // Fetch elements dynamically so they are always accurate after Astro ViewTransitions
-    const fuji = document.getElementById("fuji-shader-overlay");
-    const bg = document.getElementById("image-bg");
-    const indicator = document.getElementById("scroll-indicator-container");
-    const greeting = document.getElementById("hero-greeting");
-    const label = document.getElementById("hero-label");
-    const tags = document.getElementById("hero-tags");
-    const subtitle = document.getElementById("hero-subtitle");
-    const stickyGroup = document.getElementById("hero-sticky-group");
-
-    // 1. Hide scroll indicator
+    const indicator = els["scroll-indicator-container"];
     if (indicator) {
       indicator.style.opacity = scrollY > 50 ? "0" : "1";
       indicator.style.pointerEvents = scrollY > 50 ? "none" : "auto";
     }
 
-    // 2. Fade out secondary text in the first 200px of scrolling
+    // Fade out the secondary hero text over the first 200px
     const fadeOpacity = Math.max(0, 1 - scrollY / 200).toString();
     const pointerEvents = scrollY > 150 ? "none" : "auto";
-    
-    if (greeting) {
-      greeting.style.opacity = fadeOpacity;
-      greeting.style.pointerEvents = pointerEvents;
-    }
-    if (label) {
-      label.style.opacity = fadeOpacity;
-      label.style.pointerEvents = pointerEvents;
-    }
-    if (tags) {
-      tags.style.opacity = fadeOpacity;
-      tags.style.pointerEvents = pointerEvents;
-    }
-    if (subtitle) {
-      subtitle.style.opacity = fadeOpacity;
-      subtitle.style.pointerEvents = pointerEvents;
+    for (const id of ["hero-greeting", "hero-label", "hero-tags", "hero-subtitle"]) {
+      const el = els[id];
+      if (!el) continue;
+      el.style.opacity = fadeOpacity;
+      el.style.pointerEvents = pointerEvents;
     }
 
-    // 3. Keep the Name and "3rd year" text completely fixed
-    const scrollThreshold = height * 0.4;
-    if (stickyGroup) {
+    // The name rises with the page, stops near the top, then fades as About passes under it
+    if (sticky) {
+      const scrollThreshold = height * 0.4;
       if (scrollY > scrollThreshold) {
-        const pushUpAmount = scrollY - scrollThreshold;
-        if (stickyGroup.parentElement) {
-          const heroRect = stickyGroup.parentElement.getBoundingClientRect();
-          const initialTop = height * 0.35 - heroRect.height / 2;
-          
-          // Pull the name higher up, but keep it on screen
-          const maxPushUp = initialTop + 10; 
-          const clampedPushUp = Math.min(pushUpAmount, maxPushUp);
-
-          stickyGroup.style.transform = `translateY(-${clampedPushUp}px)`;
-
-          const about = document.getElementById("about");
-          const overscroll = about ? scrollY - about.offsetTop : 0;
-          stickyGroup.style.opacity = Math.max(0, Math.min(1, 1 - overscroll / 120)).toString();
-        }
+        const initialTop = height * 0.35 - heroHeight / 2;
+        const pushUp = Math.min(scrollY - scrollThreshold, initialTop + 10);
+        sticky.style.transform = `translateY(-${pushUp}px)`;
+        sticky.style.opacity = Math.max(0, Math.min(1, 1 - (scrollY - aboutTop) / 120)).toString();
       } else {
-        stickyGroup.style.transform = `translateY(0px)`;
-        stickyGroup.style.opacity = "1";
+        sticky.style.transform = "translateY(0px)";
+        sticky.style.opacity = "1";
       }
     }
 
-    // Shader and Background fades
-    if (fuji) {
-      const opacity = Math.max(0.3, 1 - scrollY / (height * 0.6));
-      fuji.style.opacity = opacity.toString();
-    }
-    if (bg) {
-      bg.style.filter = `brightness(${Math.max(0.2, 1 - scrollY / 800)})`;
-    }
+    const fuji = els["fuji-shader-overlay"];
+    if (fuji) fuji.style.opacity = Math.max(0.3, 1 - scrollY / (height * 0.6)).toString();
+    const bg = els["image-bg"];
+    if (bg) bg.style.filter = `brightness(${Math.max(0.2, 1 - scrollY / 800)})`;
   }
 
-  let lastScrollY = window.scrollY;
-
-  window.addEventListener("scroll", () => {
-    if (!isTicking) {
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (isTicking || window.location.pathname !== "/") return;
+      isTicking = true;
       window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
         updateScrollState();
-        
-        // Momentum Scroll Snapping Logic
-        if (!isAutoScrolling) {
-          const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
-          const aboutSection = document.getElementById('about');
-          const targetScroll = aboutSection ? aboutSection.offsetTop : (document.body.scrollHeight - window.innerHeight);
-          const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
-          
-          const scrollingUp = currentScrollY < lastScrollY;
-          
-          // If scrolling up natively and we cross the threshold into the home screen, snap to top
-          if (scrollingUp && currentScrollY <= snapThreshold && currentScrollY > 50) {
-            isAutoScrolling = true;
-            customSmoothScroll(0, 1000);
-            setTimeout(() => { isAutoScrolling = false; }, 1200);
-          }
-        }
-        
-        lastScrollY = currentScrollY;
         isTicking = false;
       });
-      isTicking = true;
-    }
-  });
+    },
+    { passive: true },
+  );
 
   // Instantly sync state when returning to the page via Astro ViewTransitions
-  document.addEventListener('astro:page-load', () => {
-    if (window.location.pathname === '/') {
+  document.addEventListener("astro:page-load", () => {
+    if (window.location.pathname === "/") {
+      cacheElements();
       updateScrollState();
     }
   });
-
-  // Custom smooth scroll function for butter-smooth button click
-  function customSmoothScroll(targetPosition: number, duration: number) {
-    const startPosition = window.scrollY;
-    const distance = targetPosition - startPosition;
-    let startTime: number | null = null;
-
-    function animation(currentTime: number) {
-      if (startTime === null) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-
-      // Easing function (easeInOutCubic)
-      const ease =
-        progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-      // Do NOT use Math.round, it causes stair-step stutter on 120Hz/Retina screens
-      window.scrollTo(0, startPosition + distance * ease);
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animation);
-      }
-    }
-    requestAnimationFrame(animation);
-  }
-
-  // Auto-scroll logic via wheel event
-  let isAutoScrolling = false;
-
-  window.addEventListener(
-    "wheel",
-    (e) => {
-      // ONLY run this cinematic scroll on the home page!
-      // Otherwise it hijacks scrolling on all other pages during View Transitions.
-      if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
-
-      if (isAutoScrolling) {
-        e.preventDefault();
-        return;
-      }
-
-      const scrollY = window.scrollY;
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const scrollingDown = e.deltaY > 0;
-
-      const aboutSection = document.getElementById('about');
-      const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
-
-      const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
-      const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
-
-      // If at the top and scrolling down
-      if (scrollingDown && scrollY < 50) {
-        e.preventDefault();
-        isAutoScrolling = true;
-        customSmoothScroll(targetScroll, 1000);
-        setTimeout(() => {
-          isAutoScrolling = false;
-        }, 1200);
-      }
-      // If pulled past the top of the About section and scrolling up
-      else if (!scrollingDown && scrollY <= snapThreshold && scrollY > 50) {
-        e.preventDefault();
-        isAutoScrolling = true;
-        customSmoothScroll(0, 1000);
-        setTimeout(() => {
-          isAutoScrolling = false;
-        }, 1200);
-      }
-    },
-    { passive: false }
-  );
-
-  let touchStartY = 0;
-  window.addEventListener('touchstart', (e) => {
-    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
-    touchStartY = e.touches[0].clientY;
-  }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
-    if (isAutoScrolling) {
-      e.preventDefault();
-      return;
-    }
-    
-    const touchEndY = e.touches[0].clientY;
-    const deltaY = touchStartY - touchEndY;
-    const scrollY = window.scrollY;
-    const maxScroll = document.body.scrollHeight - window.innerHeight;
-    
-    const aboutSection = document.getElementById('about');
-    const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
-    
-    // Only trigger cinematic scroll if the swipe is significant enough
-    if (Math.abs(deltaY) < 40) return;
-    
-    const scrollingDown = deltaY > 0;
-    
-    const isMobile = window.innerWidth <= 900 || window.innerHeight <= 650;
-    const snapThreshold = isMobile ? targetScroll - 250 : targetScroll + 100;
-
-    if (scrollingDown && scrollY < 50) {
-      e.preventDefault();
-      isAutoScrolling = true;
-      customSmoothScroll(targetScroll, 1000);
-      setTimeout(() => { isAutoScrolling = false; }, 1200);
-    } else if (!scrollingDown && scrollY <= snapThreshold && scrollY > 50) {
-      e.preventDefault();
-      isAutoScrolling = true;
-      customSmoothScroll(0, 1000);
-      setTimeout(() => { isAutoScrolling = false; }, 1200);
-    }
-  }, { passive: false });
 
   // Use event delegation in the CAPTURE phase so listeners intercept the click
   // BEFORE Astro's ViewTransitions router can see it and trigger a reload.
@@ -499,16 +344,16 @@ const resume = existsSync(resumePath)
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        
+
         navigator.clipboard.writeText("samarpan.verma.mat24@itbhu.ac.in").catch(() => {});
-        
+
         const btnText = document.getElementById("mail-btn-text");
         const btnComment = document.getElementById("mail-btn-comment");
-        
+
         if (btnText && btnComment) {
           btnText.textContent = "text_copied_to_clipboard";
           btnComment.textContent = "ACK";
-          
+
           setTimeout(() => {
             btnText.textContent = "initiate_remote_protocol";
             btnComment.textContent = "# copy my mail";
@@ -517,51 +362,15 @@ const resume = existsSync(resumePath)
         return;
       }
 
-      // Smooth scroll for the down arrow
+      // "More about me": the browser's own smooth scroll, which hands off to scroll snap
       if (target.closest("#scroll-down-btn")) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
 
-        const aboutSection = document.getElementById('about');
-        const targetScroll = aboutSection ? aboutSection.offsetTop : (document.body.scrollHeight - window.innerHeight);
-
-        if (isAutoScrolling) return;
-        isAutoScrolling = true;
-        customSmoothScroll(targetScroll, 1000);
-        setTimeout(() => {
-          isAutoScrolling = false;
-        }, 1200);
-        return;
-      }
-
-      // Toggle scroll for the "About me" nav link
-      if (target.closest("#nav-about-link")) {
-        // If we are on the home page, intercept the click and scroll
-        if (window.location.pathname === "/") {
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-
-          if (isAutoScrolling) return;
-
-          const maxScroll = document.body.scrollHeight - window.innerHeight;
-          isAutoScrolling = true;
-
-          const aboutSection = document.getElementById('about');
-          const targetScroll = aboutSection ? aboutSection.offsetTop : maxScroll;
-
-          // If we're at the top, scroll down to About. If we're at the bottom, scroll up to Home.
-          if (window.scrollY < targetScroll / 2) {
-            customSmoothScroll(targetScroll, 1000);
-          } else {
-            customSmoothScroll(0, 1000);
-          }
-
-          setTimeout(() => {
-            isAutoScrolling = false;
-          }, 1200);
-        }
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const about = document.getElementById("about");
+        window.scrollTo({ top: about ? about.offsetTop : window.innerHeight, behavior: reduceMotion ? "auto" : "smooth" });
       }
     },
     { capture: true },
@@ -602,8 +411,25 @@ const resume = existsSync(resumePath)
 </script>
 
 <style>
-  html {
-    /* No scroll-snap, we handle it via JS now to avoid pulling bugs */
+  /* Native snapping between the hero and About. Desktop is mandatory, so one
+     wheel step moves a whole section; phones and short screens use proximity,
+     so a flick keeps its momentum and the long stacked About scrolls freely. */
+  :global(html) {
+    scroll-snap-type: y proximity;
+  }
+
+  @media (min-width: 769px) and (min-height: 651px) {
+    :global(html) {
+      scroll-snap-type: y mandatory;
+    }
+  }
+
+  /* Snap points: the top of the page and the top of About. The spacer holds the
+     hero's place while it is fixed; on phones the hero is in the flow itself. */
+  .hero-snap,
+  .home-viewport,
+  #about {
+    scroll-snap-align: start;
   }
 
   .home-viewport {
