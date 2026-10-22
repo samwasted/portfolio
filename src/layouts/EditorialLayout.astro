@@ -18,7 +18,7 @@ export interface Props {
 const { title, author, date, abstract, layout_type = 'single' } = Astro.props;
 ---
 
-<BaseLayout title={`${title} - Samarpan Verma`} description={abstract || `Editorial: ${title}`}>
+<BaseLayout title={`${title} - Samarpan Verma`} description={abstract || `Editorial: ${title}`} preloadMath={true}>
   <ShaderBackground />
 
   <div class="editorial-page">

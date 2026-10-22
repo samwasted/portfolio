@@ -8,18 +8,7 @@ import AboutShaderOverlay from '../../components/AboutShaderOverlay.astro';
 import Nav from '../../components/Nav.astro';
 import { loadEditorials } from '../../lib/editorial-loader';
 
-const editorials = loadEditorials();
-
-// INJECT DUMMY DATA TO TEST SCROLLABILITY
-const dummyEditorials = Array.from({ length: 15 }).map((_, i) => ({
-  slug: `dummy-${i}`,
-  title: `Scroll Test Article Number ${i + 1}`,
-  date: new Date(Date.now() - i * 86400000).toISOString(),
-  tags: ['TEST'],
-  abstract: 'Just a dummy article for testing scroll bounds.',
-}));
-
-const allEditorials = [...editorials, ...dummyEditorials];
+const allEditorials = loadEditorials();
 ---
 
 <BaseLayout title="Editorials - Samarpan Verma" description="Technical editorials and reports" preloadMath={true}>

@@ -77,6 +77,9 @@ const {
       document.addEventListener('astro:before-swap', (e) => {
         renderMath(e.newDocument);
       });
+
+      // Fallback for navigations where KaTeX only loads with the new page
+      document.addEventListener('astro:page-load', () => renderMath(document));
     </script>
 
     <!-- Vercel Analytics globally injected -->

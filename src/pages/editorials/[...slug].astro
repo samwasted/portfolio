@@ -12,7 +12,9 @@ export async function getStaticPaths() {
   
   const mdModules = import.meta.glob('../../data/editorials/**/*.md', { eager: true });
   
-  const mdPaths = Object.entries(mdModules).map(([path, mod]: [string, any]) => {
+  const mdPaths = Object.entries(mdModules)
+    .filter(([, mod]: [string, any]) => !mod.frontmatter?.draft)
+    .map(([path, mod]: [string, any]) => {
     const parts = path.split('/');
     let slug = parts[parts.length - 2];
     if (parts[parts.length - 1] !== 'index.md' && parts[parts.length - 1] !== 'main.md') {
@@ -25,7 +27,8 @@ export async function getStaticPaths() {
     };
   });
 
-  const htmlPaths = editorials.map(e => ({
+  // Markdown editorials are routed above; only pre-rendered HTML ones belong here
+  const htmlPaths = editorials.filter(e => e.html).map(e => ({
     params: { slug: e.slug },
     props: { type: 'html', editorial: e },
   }));
@@ -73,7 +76,7 @@ if (type === 'html') {
   author = fm.author;
   date = fm.date;
   abstract = fm.abstract;
-  layout_type = fm.layout || 'single';
+  layout_type = fm.layout_type || fm.layout || 'single';
 }
 ---
 

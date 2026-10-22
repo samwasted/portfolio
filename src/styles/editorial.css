@@ -82,6 +82,7 @@
   column-gap: 2.5rem;
   column-rule: 1px solid var(--border-strong);
   text-align: justify;
+  hyphens: auto;
   font-size: 1rem; /* slightly smaller for two columns */
 }
 .layout-ieee .editorial-abstract,
@@ -113,6 +114,7 @@
 }
 
 /* Prevent orphaned headings */
+.editorial-body h1,
 .editorial-body h2,
 .editorial-body h3,
 .editorial-body h4 {
@@ -122,6 +124,10 @@
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: 500;
+}
+
+.editorial-body h1 {
+  font-size: 1.4rem;
 }
 
 .editorial-body h2 {
@@ -196,6 +202,19 @@
 .editorial-body ol {
   margin: 0 0 1.5rem 1.5rem;
   color: var(--text-secondary);
+}
+
+/* Tailwind preflight strips list markers */
+.editorial-body ul {
+  list-style: disc;
+}
+
+.editorial-body ol {
+  list-style: decimal;
+}
+
+.editorial-body li::marker {
+  color: var(--text-muted);
 }
 
 .editorial-body li {
