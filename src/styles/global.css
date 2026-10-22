@@ -379,12 +379,13 @@ body.no-scroll {
 .nav-link::after {
   content: '';
   position: absolute;
-  width: 100%;
+  width: calc(100% + 6px);
   transform: scaleX(0);
-  height: 1px;
-  bottom: 0;
-  left: 0;
-  background-color: #FFFFFF;
+  height: 5px;
+  bottom: -3px;
+  left: -3px;
+  /* Tapered brush stroke, matching the ledger */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'%3E%3Cpath d='M0 3.6C18 1.8 58 1.2 100 2.4L98.5 4.1C60 5.4 24 5.7 1.5 4.8Z' fill='%23ffffff'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
   transform-origin: bottom right;
   transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
 }

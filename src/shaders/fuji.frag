@@ -35,70 +35,91 @@ float fbm(vec2 p) {
     return value;
 }
 
+// Composite a layer over the accumulated (premultiplied) colour
+void over(inout vec3 acc, inout float accA, vec3 col, float a) {
+    acc = col * a + acc * (1.0 - a);
+    accA = a + accA * (1.0 - a);
+}
+
+const vec2 SUN = vec2(0.6, 0.3);
+const vec3 SUN_COL = vec3(0.9, 0.16, 0.14);
+
 void main() {
     vec2 fragCoord = vUv * uResolution;
-    float iTime = uTime;
-    vec2 iResolution = uResolution;
+    vec2 uv = (fragCoord - 0.5 * uResolution.xy) / uResolution.y;
 
-    vec2 uv = (fragCoord - 0.5 * iResolution.xy) / iResolution.y;
-    
-    // animation times
-    float t = iTime * 0.8; 
-    float t_sun = clamp((t - 0.5) / 1.5, 0.0, 1.0); 
-    float t_mnt = clamp((t - 0.8) / 2.0, 0.0, 1.0); 
-    
-    vec3 rgb = vec3(0.0);
-    float alpha = 0.0;
+    // Reveal timeline (one-off), then a clock that keeps running for the mist
+    float t = uTime * 0.8;
+    float t_sun = clamp((t - 0.5) / 1.5, 0.0, 1.0);
+    float t_mnt = clamp((t - 0.8) / 2.0, 0.0, 1.0);
+    float t_mist = clamp((t - 2.4) / 2.5, 0.0, 1.0);
+    float drift = uTime;
+
+    vec3 acc = vec3(0.0);
+    float accA = 0.0;
     float wetEdgeJitter = fbm(uv * 40.0) * 0.08;
 
-    // THE RED SUN 
-    vec2 sunUV = uv - vec2(0.6, 0.3); 
-    float sunRadius = 0.18; // slightly larger
-    float sunDist = length(sunUV) - sunRadius + fbm(uv * 10.0) * 0.04; // softer, less intense noise displacement
-    float sunShape = smoothstep(0.05, -0.05, sunDist); // much softer edges
+    // SKY GLOW: the sun lights the air around it, breathing very slowly
+    vec2 sunUV = uv - SUN;
+    float glow = exp(-max(length(sunUV) - 0.16, 0.0) * 5.5);
+    glow *= (0.07 + 0.012 * sin(drift * 0.5)) * t_sun;
+    over(acc, accA, SUN_COL * 0.7, glow);
+
+    // THE SUN: a soft watercolour disc
+    float sunDist = length(sunUV) - 0.18 + fbm(uv * 10.0) * 0.04;
+    float sunShape = smoothstep(0.05, -0.05, sunDist);
     float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
-    
-    // less internal contrast, looks more like a flat watercolor wash
     sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
-    float a_sun = clamp(sunShape * 0.6, 0.0, 1.0); // lower opacity overall
-    a_sun = clamp(a_sun * 1.1, 0.0, 1.0); 
-    rgb = mix(rgb, vec3(0.9, 0.15, 0.15), a_sun); // slightly softer red
-    alpha = max(alpha, a_sun);
+    over(acc, accA, SUN_COL, clamp(sunShape * 0.66, 0.0, 1.0));
 
-    // MOUNTAIN
-    vec2 mntUV = uv;
-    mntUV.x += fbm(uv * 10.0) * 0.05;
-    mntUV.y += fbm(uv * 15.0) * 0.03;
-    
-    float fujiX = mntUV.x + 0.05; 
-    float mountainShape = -0.1 - pow(abs(fujiX), 0.8) * 0.6; 
-    float mountainMask = smoothstep(0.0, 0.02, mountainShape - mntUV.y);
-    float mntReveal = smoothstep(0.05, -0.05, (mntUV.x + mntUV.y) - (t_mnt * 2.0 - 1.0) + wetEdgeJitter);
-    
-    float outlineDist = abs(mountainShape - mntUV.y);
-    float mntOutline = smoothstep(0.01, 0.002, outlineDist) * smoothstep(0.0, 0.05, mntUV.y + 0.15);
-    float ridgeTexture = fbm(vec2(mntUV.x * 25.0, mntUV.y * 5.0)); 
-    float lightSide = smoothstep(-0.15, 0.25, fujiX + ridgeTexture * 0.1);
-    
-    vec3 deepBlackInk = vec3(0.04, 0.04, 0.05);
-    vec3 grayWaterWash = vec3(0.6, 0.6, 0.65);
-    vec3 baseMntColor = mix(deepBlackInk, grayWaterWash, lightSide);
-    baseMntColor *= (0.6 + 0.4 * fbm(uv * 40.0)); 
+    // MOUNTAIN: Fuji's profile, a flat notched crater rim over concave slopes
+    vec2 m = uv;
+    m.x += fbm(uv * 10.0) * 0.05;
+    m.y += fbm(uv * 15.0) * 0.03;
+    float fx = m.x + 0.05;
+    const float CRATER = 0.04;
+    float ax = max(abs(fx) - CRATER, 0.0);
+    float ridgeY = -0.115 - pow(ax, 0.8) * 0.62;
+    ridgeY -= (1.0 - step(CRATER, abs(fx))) * fbm(vec2(fx * 70.0, 3.0)) * 0.014;
 
-    float snowLine = -0.22 + abs(fujiX) * 0.5 + (fbm(uv * 30.0) * 0.04);
-    float snowCap = smoothstep(snowLine - 0.01, snowLine + 0.01, mntUV.y);
-    vec3 mountainColor = mix(baseMntColor, vec3(0.98, 0.99, 1.0), snowCap);
-    mountainColor = mix(mountainColor, vec3(0.02), mntOutline); 
+    float inside = smoothstep(0.0, 0.012, ridgeY - m.y);
+    float mntReveal = smoothstep(0.05, -0.05, (m.x + m.y) - (t_mnt * 2.0 - 1.0) + wetEdgeJitter);
 
-    float a_mnt = mountainMask * mntReveal;
-    
-    // Grayscale with a slight cool/blue tint to match background universe
-    vec3 mntColorDesat = vec3(dot(mountainColor, vec3(0.333)));
-    mntColorDesat *= vec3(0.85, 0.9, 0.95); 
-    
-    rgb = mix(rgb, mntColorDesat, a_mnt);
-    alpha = max(alpha, a_mnt * 0.8); // Softer mountain opacity
+    // Lit from the sun's side (right). Shading follows which way the cone's
+    // surface faces (offset over depth below the summit), so the terminator
+    // fans out from the crater along the gullies instead of running straight down
+    float gullies = fbm(vec2(fx * 26.0, m.y * 5.0));
+    float facing = fx / max(0.05, -0.1 - m.y);
+    float lit = smoothstep(-0.55, 0.85, facing + (gullies - 0.5) * 0.7);
 
-    // Output transparent colors for overlapping
-    fragColor = vec4(rgb, alpha);
+    vec3 rockShadow = vec3(0.07, 0.075, 0.09);
+    vec3 rockLit = vec3(0.52, 0.49, 0.48);
+    vec3 rock = mix(rockShadow, rockLit, lit) * (0.65 + 0.35 * fbm(uv * 40.0));
+
+    // Snow takes the same light: warm where the sun reaches, cool blue in shadow
+    float snowLine = -0.23 + abs(fx) * 0.5 + fbm(uv * 30.0) * 0.04;
+    float snow = smoothstep(snowLine - 0.01, snowLine + 0.01, m.y);
+    vec3 snowShadow = vec3(0.36, 0.39, 0.47);
+    vec3 snowLit = vec3(0.93, 0.86, 0.82);
+    vec3 snowCol = mix(snowShadow, snowLit, lit) * (0.86 + 0.14 * fbm(uv * 30.0));
+    vec3 mountainColor = mix(rock, snowCol, snow);
+
+    // A thin warm rim where the sunlit ridge meets the sky
+    float rim = smoothstep(0.018, 0.0, ridgeY - m.y) * inside * lit;
+    mountainColor += vec3(0.85, 0.35, 0.25) * 0.28 * rim;
+
+    // Atmospheric depth: the base dissolves into haze instead of hitting the frame
+    float haze = smoothstep(-0.24, -0.5, m.y);
+    mountainColor = mix(mountainColor, vec3(0.13, 0.13, 0.15), haze * 0.55);
+    float a_mnt = inside * mntReveal * 0.88 * (1.0 - haze * 0.5);
+    over(acc, accA, mountainColor, a_mnt);
+
+    // MIST: two banks drifting slowly across the lower slopes, in front of the mountain
+    float bank = exp(-pow((uv.y + 0.29) / 0.07, 2.0)) + 0.8 * exp(-pow((uv.y + 0.43) / 0.08, 2.0));
+    float mistNoise = fbm(vec2(uv.x * 2.2 + drift * 0.035, uv.y * 7.0 - drift * 0.01));
+    float mist = smoothstep(0.32, 0.72, mistNoise) * bank * 0.6 * t_mist;
+    over(acc, accA, vec3(0.62, 0.59, 0.58), mist);
+
+    // Un-premultiply for a non-premultiplied canvas
+    fragColor = vec4(accA > 0.0001 ? acc / accA : vec3(0.0), accA);
 }

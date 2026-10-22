@@ -1,204 +1,142 @@
 ---
 /**
- * EventLedger — System log style timeline component.
+ * EventLedger — system log style timeline with a brush stroke spine.
+ * Entries come from src/data/ledger.ts unless passed in; the stroke is
+ * regenerated from each entry's level, so adding or removing entries
+ * keeps the design intact.
  */
+import { ledger, type LedgerEntry, type LedgerLevel } from "../data/ledger";
+import { brushSegments } from "../lib/brush-stroke";
 
-interface Event {
-  tag: string;
-  date: string;
-  description: string;
-  highlight: boolean | "medium";
+export interface Props {
+  entries?: LedgerEntry[];
 }
 
-const events: Event[] = [
-  { 
-    tag: "BASE", 
-    date: "2024-07", 
-    description: "System initialization: Admitted to Indian Institute of Technology (IIT) BHU, Varanasi. Enrolled in Mathematics and Computing (IDD).", 
-    highlight: false 
-  },
+const { entries = ledger } = Astro.props;
 
-  { 
-    tag: "INDUCT", 
-    date: "2025-06", 
-    description: "Club of Programmers (COPS) selection following full-stack Next.js, Redis, and WebSocket application deployments.", 
-    highlight: false 
-  },
+const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date));
+const strokes = brushSegments(sorted.map((e) => e.level));
 
-  { 
-    tag: "AWARD", 
-    date: "2025-12", 
-    description: "Bronze Medal at Inter IIT Tech Meet 14.0 (Quant Problem Statement). Market models and backtesting pipeline architecture.", 
-    highlight: true 
-  },
-  { 
-    tag: "INDUCT", 
-    date: "2026-01", 
-    description: "Algorithmic Trading vertical selection at The Quant Club (TQC), IIT BHU.", 
-    highlight: false 
-  },
-  { 
-    tag: "RANK", 
-    date: "2026-02", 
-    description: "Codeforces Expert Rank profile validation via advanced data structures and algorithmic execution.", 
-    highlight: "medium"
-  },
-  { 
-    tag: "CORE", 
-    date: "2026-04", 
-    description: "\"jailsh\" C++17 interactive execution sandbox and container runtime. Engineered a strict double-fork PID 1 init model, IPC handshakes, and cgroups v2 boundaries.", 
-    highlight: true 
-  }
-];
+// Class strings are written out in full so Tailwind can see them
+const TAG_CLASS: Record<LedgerLevel, string> = {
+  standard: "text-[#D4C594]/60",
+  medium: "text-[#FFF3C7]/80",
+  highlight: "text-[#FFF3C7] drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]",
+};
+
+const TEXT_CLASS: Record<LedgerLevel, string> = {
+  standard: "text-white/40 group-hover:text-white/70 transition-colors",
+  medium: "text-white/80 group-hover:text-white transition-colors",
+  highlight: "text-white font-medium drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]",
+};
 ---
 
-<div class="event-ledger">
-  <div class="ledger-line"></div>
-  
-  <div class="ledger-events">
-    {events.map(event => (
-      <div class={`ledger-event ${event.highlight === true ? 'is-highlight' : event.highlight === 'medium' ? 'is-medium' : 'is-standard'}`}>
-        <div class="ledger-node"></div>
-        <div class="ledger-content">
-          <span class="ledger-meta">
-            <span class="ledger-tag">[{event.tag}]</span> 
-            <span class="ledger-date">{event.date}</span>
-            <span class="ledger-separator">|</span>
-          </span>
-          <span class="ledger-desc">{event.description}</span>
-        </div>
+<div class="font-mono text-base flex flex-col text-white/60 relative" data-brush-ledger>
+  <!-- Rough edge for the brush stroke -->
+  <svg width="0" height="0" aria-hidden="true" class="absolute">
+    <filter id="brush-edge" x="-50%" y="0" width="200%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.6 0.04" numOctaves="2" seed="3" result="n" />
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.3" />
+    </filter>
+  </svg>
+
+  {sorted.map((entry, i) => (
+    <div class="flex gap-4 group items-start relative z-10">
+      <div class={`${TAG_CLASS[entry.level]} whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity`}>
+        [{entry.tag}] {entry.date}
       </div>
-    ))}
-  </div>
+      <span class="ledger-stroke" aria-hidden="true">
+        <svg viewBox="0 0 10 100" preserveAspectRatio="none"><path d={strokes[i]} /></svg>
+      </span>
+      <div class={`${TEXT_CLASS[entry.level]} leading-relaxed flex-1 pb-5`}>
+        {entry.text}
+      </div>
+    </div>
+  ))}
 </div>
 
-<style>
-  .event-ledger {
-    position: relative;
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    line-height: 1.6;
-    max-width: 800px;
-    margin: 4rem auto;
-    padding: 4rem 0 2rem;
-  }
+<script>
+  // Draw the stroke top to bottom the first time the ledger scrolls into view.
+  // Timing is measured per row so the brush moves at one speed through every segment.
+  const MIN_SPEED = 0.45; // px per ms
+  const MAX_TOTAL = 2200; // ms, so long ledgers on mobile don't crawl
 
-  .ledger-line {
-    position: absolute;
-    top: 4rem;
-    bottom: 2rem;
-    left: 4px;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1) 10%, rgba(255, 255, 255, 0.1) 90%, transparent);
-    z-index: 1;
-  }
-
-  .ledger-events {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .ledger-event {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-    position: relative;
-  }
-
-  /* Node styling */
-  .ledger-node {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    margin-top: 0.4rem;
-    transform: translateY(4px);
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-  }
-
-  .is-standard .ledger-node {
-    background: #333;
-    border: 1px solid #444;
-  }
-  
-  .is-medium .ledger-node {
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-  }
-
-  .is-highlight .ledger-node {
-    background: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4);
-  }
-
-  /* Content styling */
-  .ledger-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-
-  @media (min-width: 768px) {
-    .ledger-content {
-      flex-direction: row;
-      gap: 0.75rem;
-      align-items: flex-start;
+  function draw(ledger: HTMLElement) {
+    const strokes = Array.from(ledger.querySelectorAll<HTMLElement>(".ledger-stroke"));
+    const total = strokes.reduce((sum, s) => sum + s.offsetHeight, 0);
+    const speed = Math.max(MIN_SPEED, total / MAX_TOTAL);
+    let offset = 0;
+    for (const s of strokes) {
+      s.style.setProperty("--draw-delay", `${offset / speed}ms`);
+      s.style.setProperty("--draw-duration", `${s.offsetHeight / speed}ms`);
+      offset += s.offsetHeight;
     }
+    ledger.classList.add("brush-draw");
   }
 
-  .ledger-meta {
+  function initBrushLedgers() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll<HTMLElement>("[data-brush-ledger]:not([data-brush-init])").forEach((ledger) => {
+      ledger.dataset.brushInit = "";
+      if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+      // Hidden only once JS is running, so the stroke still shows without it
+      ledger.classList.add("brush-pending");
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          draw(ledger);
+        },
+        { threshold: 0.25 },
+      );
+      io.observe(ledger);
+    });
+  }
+
+  initBrushLedgers();
+  document.addEventListener("astro:page-load", initBrushLedgers);
+</script>
+
+<style>
+  /* The cell stretches to the row; the SVG fills it absolutely so it never sets the row height */
+  .ledger-stroke {
+    position: relative;
+    align-self: stretch;
     flex-shrink: 0;
-    white-space: nowrap;
+    width: 14px;
   }
 
-  .is-standard .ledger-meta {
-    color: rgba(255, 255, 255, 0.4);
-  }
-  
-  .is-medium .ledger-meta {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .is-highlight .ledger-meta {
-    color: rgba(255, 255, 255, 0.9);
+  .ledger-stroke svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: #fff3c7;
+    filter: url(#brush-edge) drop-shadow(0 0 6px rgba(255, 243, 199, 0.35));
   }
 
-  .ledger-tag {
-    font-weight: 600;
+  /* Wet-edge reveal: a mask twice the row's height slides up, its soft
+     boundary acting as the bleeding front of the ink */
+  .brush-pending .ledger-stroke svg {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0 48%, transparent 54%);
+    mask-image: linear-gradient(to bottom, #000 0 48%, transparent 54%);
+    -webkit-mask-size: 100% 220%;
+    mask-size: 100% 220%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
   }
 
-  .ledger-separator {
-    margin: 0 0.5rem;
-    color: rgba(255, 255, 255, 0.2);
+  .brush-draw .ledger-stroke svg {
+    animation: brush-draw var(--draw-duration) linear var(--draw-delay) forwards;
   }
 
-  /* Description styling */
-  .is-standard .ledger-desc {
-    color: rgba(255, 255, 255, 0.4);
-  }
-  
-  .is-medium .ledger-desc {
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .is-highlight .ledger-desc {
-    color: #fff;
-    font-weight: 500;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-  }
-
-  /* Hover effect for all events to make them readable if needed */
-  .ledger-event:hover .ledger-node {
-    background: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    border-color: #fff;
-  }
-
-  .ledger-event:hover .ledger-meta,
-  .ledger-event:hover .ledger-desc {
-    color: #fff;
+  @keyframes brush-draw {
+    to {
+      -webkit-mask-position: 0 0;
+      mask-position: 0 0;
+    }
   }
 </style>

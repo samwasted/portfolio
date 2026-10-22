@@ -1,0 +1,286 @@
+---
+/**
+ * BlackSwanStress — how Black Swan judges a strategy, from its README:
+ * rolling walk-forward windows (train 6m with 150 Optuna trials, then trade
+ * 1m out-of-sample), the OOS equity curve stitched from those test months,
+ * and the Monte Carlo regimes that attack it.
+ *
+ * Paths come from a fixed seed: they illustrate the shape of the analysis,
+ * not a real backtest. Plays when its pane becomes active; the stress fan loops.
+ */
+
+// --- Walk-forward staircase ---
+const X0 = 60; // timeline start
+const U = 60; // one month
+const ROWS = 5;
+const windows = Array.from({ length: ROWS }, (_, k) => ({
+  trainX: X0 + k * U,
+  testX: X0 + (k + 6) * U,
+  y: 30 + k * 20,
+}));
+const OOS_START = X0 + 6 * U; // 420: the first test month
+const OOS_END = OOS_START + ROWS * U; // 720
+
+// --- Seeded paths ---
+function rng(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+function gauss(r: () => number) {
+  return Math.sqrt(-2 * Math.log(1 - r())) * Math.cos(2 * Math.PI * r());
+}
+
+const START_Y = 268;
+const STEPS = 40;
+
+// Screen y grows downward, so a positive drift (up the page) is a negative dy
+function walk(seed: number, drift: number, vol: number) {
+  const r = rng(seed);
+  let y = START_Y;
+  const pts: [number, number][] = [[OOS_START, y]];
+  for (let i = 1; i <= STEPS; i++) {
+    y = Math.min(328, Math.max(168, y - drift + vol * gauss(r)));
+    pts.push([OOS_START + (i * (OOS_END - OOS_START)) / STEPS, y]);
+  }
+  return pts;
+}
+
+const toPath = (pts: [number, number][]) =>
+  pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
+
+const oos = walk(11, 1.5, 3.2);
+const fan = Array.from({ length: 18 }, (_, k) => walk(100 + k, 1.3 - (k % 6) * 0.42, 5.5));
+
+// Second-worst terminal value of 18 paths: roughly the 5% tail
+const worstY = fan.map((p) => p[p.length - 1][1]).sort((a, b) => b - a)[1];
+
+const notes = [
+  { key: "objective", value: "Sharpe − 2 × MaxDD", y: 182 },
+  { key: "execution", value: "t+1 lag, fees, slippage, tax", y: 206 },
+  { key: "attacks", value: "drop 20% of trades", y: 244 },
+  { key: "", value: "shuffle trade order", y: 266 },
+  { key: "", value: "shuffle market days", y: 288 },
+  { key: "", value: "100 GBM price paths", y: 310 },
+];
+---
+
+<svg
+  class="bs"
+  viewBox="0 0 800 360"
+  role="img"
+  aria-label="Walk-forward optimization trains on six months and trades the next month out-of-sample, rolling forward. The out-of-sample months form one equity curve, which is then attacked with Monte Carlo stress paths to find the worst five percent."
+>
+  <!-- Walk-forward windows -->
+  <text class="bs-head" x={X0} y="20">walk-forward<tspan class="bs-dim" dx="10">train 6m, 150 Optuna trials</tspan></text>
+  <text class="bs-head bs-oos-head" x={OOS_START} y="20">out-of-sample 1m</text>
+
+  {windows.map((w, k) => (
+    <g class="bs-row" style={`--k: ${k}`}>
+      <rect class="bs-train" x={w.trainX} y={w.y} width={6 * U} height="12" rx="2" pathLength="1" />
+      <rect class="bs-test" x={w.testX} y={w.y} width={U} height="12" rx="2" />
+    </g>
+  ))}
+
+  <!-- Each test month feeds one stretch of the curve below -->
+  <g class="bs-guides">
+    {Array.from({ length: ROWS + 1 }, (_, k) => (
+      <line x1={OOS_START + k * U} y1="132" x2={OOS_START + k * U} y2="336" />
+    ))}
+  </g>
+
+  <!-- What happens to the stitched curve -->
+  <g class="bs-notes">
+    {notes.map((n, i) => (
+      <text x={X0} y={n.y} style={`--i: ${i}`}>
+        <tspan class="bs-key">{n.key}</tspan><tspan class="bs-dim" x={X0 + 92}>{n.value}</tspan>
+      </text>
+    ))}
+  </g>
+
+  <!-- Stress paths, the stitched OOS curve on top -->
+  <g class="bs-fan">
+    {fan.map((p, i) => <path d={toPath(p)} pathLength="1" style={`--i: ${i}`} />)}
+  </g>
+
+  <g class="bs-worst">
+    <line x1={OOS_START} y1={worstY} x2={OOS_END} y2={worstY} />
+    <text x={OOS_END - 4} y={worstY - 6} text-anchor="end">worst 5%</text>
+  </g>
+
+  <path class="bs-oos" d={toPath(oos)} pathLength="1" />
+  <text class="bs-oos-label" x={OOS_START + 4} y="350">stitched out-of-sample equity</text>
+</svg>
+
+<style>
+  .bs {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+    font-feature-settings: "calt" 0, "liga" 0;
+  }
+
+  .bs-head {
+    font-size: 12px;
+    fill: #d4c594;
+  }
+
+  .bs-oos-head {
+    fill: #fff3c7;
+  }
+
+  .bs-dim {
+    fill: rgba(255, 255, 255, 0.4);
+  }
+
+  .bs-train {
+    fill: rgba(212, 197, 148, 0.05);
+    stroke: rgba(212, 197, 148, 0.55);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .bs-test {
+    fill: rgba(255, 243, 199, 0.8);
+  }
+
+  .bs-guides line {
+    stroke: rgba(212, 197, 148, 0.12);
+    stroke-dasharray: 2 4;
+  }
+
+  .bs-notes text {
+    font-size: 12px;
+  }
+
+  .bs-key {
+    fill: #d4c594;
+  }
+
+  .bs-fan path {
+    fill: none;
+    stroke: rgba(212, 197, 148, 0.28);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  .bs-worst line {
+    stroke: #e05a47;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .bs-worst text {
+    font-size: 11px;
+    fill: #e05a47;
+  }
+
+  .bs-oos {
+    fill: none;
+    stroke: #fff3c7;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 4px rgba(255, 243, 199, 0.35));
+  }
+
+  .bs-oos-label {
+    font-size: 11px;
+    fill: rgba(255, 243, 199, 0.7);
+  }
+
+  /* --- Sequence, only while this project is on screen --- */
+  :global(.active-pane) .bs-head {
+    animation: bs-fade 0.4s ease 0.1s backwards;
+  }
+
+  :global(.active-pane) .bs-train {
+    animation: bs-draw 0.5s ease calc(0.2s + var(--k) * 0.22s) backwards;
+  }
+
+  :global(.active-pane) .bs-test {
+    animation: bs-fade 0.3s ease calc(0.6s + var(--k) * 0.22s) backwards;
+  }
+
+  :global(.active-pane) .bs-guides {
+    animation: bs-fade 0.5s ease 1.5s backwards;
+  }
+
+  :global(.active-pane) .bs-oos {
+    animation: bs-draw 1.2s cubic-bezier(0.5, 0, 0.3, 1) 1.6s backwards;
+  }
+
+  :global(.active-pane) .bs-oos-label {
+    animation: bs-fade 0.4s ease 2.2s backwards;
+  }
+
+  :global(.active-pane) .bs-notes text {
+    animation: bs-fade 0.4s ease calc(1.7s + var(--i) * 0.15s) backwards;
+  }
+
+  /* The attack repeats: paths sweep out, hold, and clear */
+  :global(.active-pane) .bs-fan path {
+    animation: bs-attack 6s ease-out calc(2.9s + var(--i) * 0.05s) infinite backwards;
+  }
+
+  :global(.active-pane) .bs-worst {
+    animation: bs-fade 0.5s ease 4s backwards;
+  }
+
+  @keyframes bs-draw {
+    from {
+      stroke-dashoffset: 1;
+      fill-opacity: 0;
+    }
+  }
+
+  @keyframes bs-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes bs-attack {
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 1;
+    }
+    35%,
+    80% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+
+  /* Narrow screens: the notes would be unreadable at this scale */
+  @media (max-width: 900px) {
+    /* Crop the side margins so the timeline fills the frame */
+    .bs {
+      width: 118%;
+      margin-left: -7.5%;
+    }
+
+    .bs-notes,
+    .bs-head .bs-dim {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.active-pane) .bs * {
+      animation: none !important;
+    }
+  }
+</style>
