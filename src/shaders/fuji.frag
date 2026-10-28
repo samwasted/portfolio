@@ -68,7 +68,6 @@ float fogBank(vec2 uv, float drift, float speed, float seed) {
     return fbm5(q + vec2(drift * speed, 0.0) + warp * 1.25);
 }
 
-const vec2 SUN = vec2(0.6, 0.3);
 const vec3 SUN_COL = vec3(0.9, 0.16, 0.14);
 
 void main() {
@@ -91,8 +90,20 @@ void main() {
     float accA = 0.0;
     float wetEdgeJitter = fbm(uv * 40.0) * 0.08;
 
+    // COMPOSITION: laid out for a wide screen. On portrait screens the sun would
+    // land far outside the frame, so it moves into the top-right corner and
+    // shrinks, and the mountain scales down a little so its shape still reads
+    float aspect = uResolution.x / uResolution.y;
+    float portrait = smoothstep(1.1, 0.65, aspect);
+    vec2 SUN = mix(vec2(0.6, 0.3), vec2(aspect * 0.5 - 0.09, 0.385), portrait);
+    float sunR = mix(0.18, 0.085, portrait);
+    float mntK = mix(1.0, 1.3, portrait);
+    float mntOy = mix(0.0, -0.0815, portrait);
+
     vec2 sunUV = uv - SUN;
-    float sunNear = exp(-length(sunUV) * 1.7);
+    // Warmth falls off relative to the sun's size, so a small portrait sun
+    // doesn't tint the whole narrow sky
+    float sunNear = exp(-length(sunUV) * 1.7 * (0.18 / sunR));
     float t_sky = smoothstep(0.0, 0.6, uTime);
 
     // Everything in the sky is translucent, so the background photo's grain shows through.
@@ -110,13 +121,14 @@ void main() {
     over(acc, accA, cloudCol, cloud * mix(0.55, 0.75, sunNear) * t_sky);
 
     // SKY GLOW: the sun lights the air around it, breathing very slowly
-    float glow = exp(-max(length(sunUV) - 0.16, 0.0) * 5.5);
+    float glow = exp(-max(length(sunUV) - (sunR - 0.02), 0.0) * 5.5);
     glow *= (0.07 + 0.012 * sin(drift * 0.5)) * t_sun;
     over(acc, accA, SUN_COL * 0.7, glow);
 
     // THE SUN: a soft watercolour disc
-    float sunDist = length(sunUV) - 0.18 + fbm(uv * 10.0) * 0.04;
-    float sunShape = smoothstep(0.05, -0.05, sunDist);
+    float sunDist = length(sunUV) - sunR + fbm(uv * 10.0) * 0.04 * (sunR / 0.18);
+    float edge = 0.05 * (sunR / 0.18);
+    float sunShape = smoothstep(edge, -edge, sunDist);
     float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
     sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
     over(acc, accA, SUN_COL, clamp(sunShape * 0.66, 0.0, 1.0));
@@ -127,9 +139,11 @@ void main() {
     over(acc, accA, vec3(0.06, 0.03, 0.03), wisp * 0.55);
 
     // MOUNTAIN: Fuji's profile, a flat notched crater rim over concave slopes
-    vec2 m = uv;
-    m.x += fbm(uv * 10.0) * 0.05;
-    m.y += fbm(uv * 15.0) * 0.03;
+    // Mountain space: identity on wide screens, scaled down and lowered on portrait
+    vec2 mu = (uv - vec2(0.0, mntOy)) * mntK;
+    vec2 m = mu;
+    m.x += fbm(mu * 10.0) * 0.05;
+    m.y += fbm(mu * 15.0) * 0.03;
     float fx = m.x + 0.05;
     const float CRATER = 0.04;
     float ax = max(abs(fx) - CRATER, 0.0);
@@ -148,14 +162,14 @@ void main() {
 
     vec3 rockShadow = vec3(0.07, 0.075, 0.09);
     vec3 rockLit = vec3(0.52, 0.49, 0.48);
-    vec3 rock = mix(rockShadow, rockLit, lit) * (0.65 + 0.35 * fbm(uv * 40.0));
+    vec3 rock = mix(rockShadow, rockLit, lit) * (0.65 + 0.35 * fbm(mu * 40.0));
 
     // Snow takes the same light: warm where the sun reaches, cool blue in shadow
-    float snowLine = -0.23 + abs(fx) * 0.5 + fbm(uv * 30.0) * 0.04;
+    float snowLine = -0.23 + abs(fx) * 0.5 + fbm(mu * 30.0) * 0.04;
     float snow = smoothstep(snowLine - 0.01, snowLine + 0.01, m.y);
     vec3 snowShadow = vec3(0.36, 0.39, 0.47);
     vec3 snowLit = vec3(0.93, 0.86, 0.82);
-    vec3 snowCol = mix(snowShadow, snowLit, lit) * (0.86 + 0.14 * fbm(uv * 30.0));
+    vec3 snowCol = mix(snowShadow, snowLit, lit) * (0.86 + 0.14 * fbm(mu * 30.0));
     vec3 mountainColor = mix(rock, snowCol, snow);
 
     // A thin warm rim where the sunlit ridge meets the sky

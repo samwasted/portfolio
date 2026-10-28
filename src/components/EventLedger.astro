@@ -42,14 +42,20 @@ const TEXT_CLASS: Record<LedgerLevel, string> = {
 
   {sorted.map((entry, i) => (
     <div class="flex gap-4 group items-start relative z-10">
-      <div class={`${TAG_CLASS[entry.level]} whitespace-nowrap w-[155px] flex-shrink-0 text-left md:text-right transition-opacity`}>
+      <!-- Wide screens: date column, stroke, text. Phones: stroke on the left, date above the text -->
+      <div class={`${TAG_CLASS[entry.level]} hidden md:block whitespace-nowrap w-[155px] flex-shrink-0 text-right transition-opacity`}>
         [{entry.tag}] {entry.date}
       </div>
       <span class="ledger-stroke" aria-hidden="true">
         <svg viewBox="0 0 10 100" preserveAspectRatio="none"><path d={strokes[i]} /></svg>
       </span>
-      <div class={`${TEXT_CLASS[entry.level]} leading-relaxed flex-1 pb-5`}>
-        {entry.text}
+      <div class="flex-1 min-w-0 pb-5">
+        <div class={`${TAG_CLASS[entry.level]} md:hidden text-sm mb-1`}>
+          [{entry.tag}] {entry.date}
+        </div>
+        <div class={`${TEXT_CLASS[entry.level]} leading-relaxed`}>
+          {entry.text}
+        </div>
       </div>
     </div>
   ))}
