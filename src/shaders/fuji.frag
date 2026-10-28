@@ -112,13 +112,24 @@ void main() {
 
     // High cloud bands above the mountain and a lower bank behind it, warm toward
     // the sun and cool grey away from it
-    float band = smoothstep(-0.02, 0.1, uv.y) * smoothstep(0.5, 0.3, uv.y)
-               + 0.6 * exp(-pow((uv.y + 0.14) / 0.07, 2.0));
+    // Wide screens: a broad band across the upper sky. Portrait: the intro text
+    // fills the middle, so clouds keep to the empty sky around the sun at the top
+    // and just above the summit
+    float bandWide = smoothstep(-0.02, 0.1, uv.y) * smoothstep(0.5, 0.3, uv.y);
+    float bandTall = smoothstep(0.27, 0.35, uv.y) * smoothstep(0.52, 0.43, uv.y);
+    float lowY = mix(-0.14, -0.2, portrait);
+    float lowW = mix(0.07, 0.05, portrait);
+    float band = mix(bandWide, bandTall, portrait)
+               + mix(0.6, 0.9, portrait) * exp(-pow((uv.y - lowY) / lowW, 2.0));
+
+    // The streaks are long and wide; on a narrow screen, tighten them sideways so
+    // whole wisps fit across instead of one flat slice of a single streak
+    vec2 cuv = vec2(uv.x * mix(1.0, 2.4, portrait), uv.y);
     // Lower threshold than a dark sky would need: over the photo the streak
     // cores have to reach full density to read
-    float cloud = smoothstep(0.28, 0.52, cloudBands(uv, drift)) * band;
+    float cloud = smoothstep(0.28, 0.52, cloudBands(cuv, drift)) * band;
     vec3 cloudCol = mix(vec3(0.2, 0.2, 0.23), vec3(0.55, 0.17, 0.14), sunNear);
-    over(acc, accA, cloudCol, cloud * mix(0.55, 0.75, sunNear) * t_sky);
+    over(acc, accA, cloudCol, cloud * mix(0.55, 0.75, sunNear) * mix(1.0, 1.25, portrait) * t_sky);
 
     // SKY GLOW: the sun lights the air around it, breathing very slowly
     float glow = exp(-max(length(sunUV) - (sunR - 0.02), 0.0) * 5.5);
@@ -134,7 +145,7 @@ void main() {
     over(acc, accA, SUN_COL, clamp(sunShape * 0.66, 0.0, 1.0));
 
     // A thin wisp drifts across the sun's face, dark against it, for depth
-    float wisp = smoothstep(0.58, 0.85, cloudBands(uv + vec2(0.0, 0.03), drift))
+    float wisp = smoothstep(0.58, 0.85, cloudBands(cuv + vec2(0.0, 0.03), drift))
                * exp(-pow((uv.y - SUN.y + 0.02) / 0.05, 2.0)) * sunShape;
     over(acc, accA, vec3(0.06, 0.03, 0.03), wisp * 0.55);
 

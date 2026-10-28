@@ -410,12 +410,12 @@ body.no-scroll {
 
 @media (max-width: 768px) and (orientation: portrait) {
   /* On home page, we want the links stacked centrally and scrolling away naturally */
-  /* Home on phones: one row of links just under the intro, lined up with it,
-     so the mountain below stays clear. The intro is centred at 35% of the
-     screen height and about 15rem tall, so 35svh + 9.5rem clears its tags */
+  /* Home on phones: one row of links under the intro, lined up with it, so the
+     mountain below stays clear. The intro is centred at 35% of the screen height
+     and about 15rem tall; 35svh + 11.5rem leaves a clear gap below its tags */
   .fixed-nav.is-home {
     position: absolute;
-    top: calc(35svh + 9.5rem);
+    top: calc(35svh + 11.5rem);
     left: 6%;
     right: auto;
     bottom: auto;
@@ -436,7 +436,19 @@ body.no-scroll {
 
   .fixed-nav.is-home .nav-link,
   .fixed-nav.is-home .nav-link-sm {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    opacity: 1;
+  }
+
+  /* A short rule marks the links as their own row, apart from the tags */
+  .fixed-nav.is-home::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -0.9rem;
+    width: 2.5rem;
+    height: 1px;
+    background: rgba(212, 197, 148, 0.45);
   }
 
   .fixed-nav.is-home .mobile-menu-btn {
