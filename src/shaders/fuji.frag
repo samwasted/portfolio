@@ -16,13 +16,16 @@ float hash(vec2 p) {
 }
 
 float noise(vec2 p) {
-    vec2 i = floor(p);
+    // Corners come from integers so neighbouring cells hash the exact same value.
+    // With float offsets (i + 1.0) some phone compilers round each cell slightly
+    // differently, and the hash blows that up into hard-edged blocks
+    ivec2 i = ivec2(floor(p));
     vec2 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
+    float a = hash(vec2(i));
+    float b = hash(vec2(i + ivec2(1, 0)));
+    float c = hash(vec2(i + ivec2(0, 1)));
+    float d = hash(vec2(i + ivec2(1, 1)));
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
