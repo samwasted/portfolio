@@ -41,6 +41,33 @@ void over(inout vec3 acc, inout float accA, vec3 col, float a) {
     accA = a + accA * (1.0 - a);
 }
 
+// Five octaves for clouds and mist; the 3-octave fbm stays for the paint textures
+float fbm5(vec2 p) {
+    float value = 0.0;
+    float amp = 0.5;
+    for (int i = 0; i < 5; i++) {
+        value += amp * noise(p);
+        p = p * 2.03 + vec2(1.7, 9.2);
+        amp *= 0.5;
+    }
+    return value;
+}
+
+// Thin cloud bands: stretched sideways and domain-warped so they read as wisps
+float cloudBands(vec2 uv, float drift) {
+    vec2 p = vec2(uv.x * 1.6 + drift * 0.028, uv.y * 7.5);
+    vec2 warp = vec2(fbm5(p * 0.6 + vec2(0.0, drift * 0.012)), fbm5(p * 0.6 + vec2(5.2, 1.3 - drift * 0.008)));
+    return fbm5(p + warp * 1.4);
+}
+
+// Fog that churns as it drifts: the flow carries it sideways while a slowly
+// changing warp reshapes it, instead of one rigid pattern sliding across
+float fogBank(vec2 uv, float drift, float speed, float seed) {
+    vec2 q = vec2(uv.x * 2.0, uv.y * 6.5) + vec2(seed, 0.0);
+    vec2 warp = vec2(fbm5(q * 0.5 + vec2(0.0, drift * 0.02)), fbm5(q * 0.5 + vec2(4.1, -drift * 0.016)));
+    return fbm5(q + vec2(drift * speed, 0.0) + warp * 1.25);
+}
+
 const vec2 SUN = vec2(0.6, 0.3);
 const vec3 SUN_COL = vec3(0.9, 0.16, 0.14);
 
@@ -52,15 +79,37 @@ void main() {
     float t = uTime * 0.8;
     float t_sun = clamp((t - 0.5) / 1.5, 0.0, 1.0);
     float t_mnt = clamp((t - 0.8) / 2.0, 0.0, 1.0);
-    float t_mist = clamp((t - 2.4) / 2.5, 0.0, 1.0);
-    float drift = uTime;
+    // Fog is there almost at once, so the mountain paints itself in behind it
+    float t_mist = smoothstep(0.2, 1.4, uTime);
+
+    // Clouds and fog start mid-drift, at a moment where they already cover the
+    // sky well, instead of forming from scratch in front of the visitor
+    const float DRIFT_START = 41.0;
+    float drift = uTime + DRIFT_START;
 
     vec3 acc = vec3(0.0);
     float accA = 0.0;
     float wetEdgeJitter = fbm(uv * 40.0) * 0.08;
 
-    // SKY GLOW: the sun lights the air around it, breathing very slowly
     vec2 sunUV = uv - SUN;
+    float sunNear = exp(-length(sunUV) * 1.7);
+    float t_sky = smoothstep(0.0, 0.6, uTime);
+
+    // Everything in the sky is translucent, so the background photo's grain shows through.
+    // A faint warm haze where the sun lights the air
+    over(acc, accA, vec3(0.32, 0.07, 0.06), sunNear * 0.22 * t_sky);
+
+    // High cloud bands above the mountain and a lower bank behind it, warm toward
+    // the sun and cool grey away from it
+    float band = smoothstep(-0.02, 0.1, uv.y) * smoothstep(0.5, 0.3, uv.y)
+               + 0.6 * exp(-pow((uv.y + 0.14) / 0.07, 2.0));
+    // Lower threshold than a dark sky would need: over the photo the streak
+    // cores have to reach full density to read
+    float cloud = smoothstep(0.28, 0.52, cloudBands(uv, drift)) * band;
+    vec3 cloudCol = mix(vec3(0.2, 0.2, 0.23), vec3(0.55, 0.17, 0.14), sunNear);
+    over(acc, accA, cloudCol, cloud * mix(0.55, 0.75, sunNear) * t_sky);
+
+    // SKY GLOW: the sun lights the air around it, breathing very slowly
     float glow = exp(-max(length(sunUV) - 0.16, 0.0) * 5.5);
     glow *= (0.07 + 0.012 * sin(drift * 0.5)) * t_sun;
     over(acc, accA, SUN_COL * 0.7, glow);
@@ -71,6 +120,11 @@ void main() {
     float sunReveal = smoothstep(0.02, -0.02, (sunUV.x + sunUV.y) - (t_sun * 0.6 - 0.3) + wetEdgeJitter);
     sunShape *= (fbm(uv * 20.0) * 0.3 + 0.7) * sunReveal;
     over(acc, accA, SUN_COL, clamp(sunShape * 0.66, 0.0, 1.0));
+
+    // A thin wisp drifts across the sun's face, dark against it, for depth
+    float wisp = smoothstep(0.58, 0.85, cloudBands(uv + vec2(0.0, 0.03), drift))
+               * exp(-pow((uv.y - SUN.y + 0.02) / 0.05, 2.0)) * sunShape;
+    over(acc, accA, vec3(0.06, 0.03, 0.03), wisp * 0.55);
 
     // MOUNTAIN: Fuji's profile, a flat notched crater rim over concave slopes
     vec2 m = uv;
@@ -114,11 +168,15 @@ void main() {
     float a_mnt = inside * mntReveal * 0.88 * (1.0 - haze * 0.5);
     over(acc, accA, mountainColor, a_mnt);
 
-    // MIST: two banks drifting slowly across the lower slopes, in front of the mountain
-    float bank = exp(-pow((uv.y + 0.29) / 0.07, 2.0)) + 0.8 * exp(-pow((uv.y + 0.43) / 0.08, 2.0));
-    float mistNoise = fbm(vec2(uv.x * 2.2 + drift * 0.035, uv.y * 7.0 - drift * 0.01));
-    float mist = smoothstep(0.32, 0.72, mistNoise) * bank * 0.6 * t_mist;
-    over(acc, accA, vec3(0.62, 0.59, 0.58), mist);
+    // MIST: two fog banks over the lower slopes. The farther one sits higher and
+    // drifts slower; both churn as they move, and their tops catch a little sunlight
+    float farBank = exp(-pow((uv.y + 0.29) / 0.07, 2.0));
+    float nearBank = exp(-pow((uv.y + 0.43) / 0.09, 2.0));
+    float farFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.02, 0.0)) * farBank;
+    float nearFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.045, 13.7)) * nearBank;
+    vec3 fogCol = mix(vec3(0.56, 0.54, 0.55), vec3(0.66, 0.58, 0.56), sunNear);
+    over(acc, accA, fogCol * 0.92, farFog * 0.5 * t_mist);
+    over(acc, accA, fogCol, nearFog * 0.62 * t_mist);
 
     // Un-premultiply for a non-premultiplied canvas
     fragColor = vec4(accA > 0.0001 ? acc / accA : vec3(0.0), accA);
