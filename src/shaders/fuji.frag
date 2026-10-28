@@ -116,9 +116,13 @@ void main() {
     // fills the middle, so clouds keep to the empty sky around the sun at the top
     // and just above the summit
     float bandWide = smoothstep(-0.02, 0.1, uv.y) * smoothstep(0.5, 0.3, uv.y);
-    float bandTall = smoothstep(0.27, 0.35, uv.y) * smoothstep(0.52, 0.43, uv.y);
-    float lowY = mix(-0.14, -0.2, portrait);
-    float lowW = mix(0.07, 0.05, portrait);
+    // Ragged lower edge, so the band never ends in a straight line
+    float edgeNoise = (fbm(vec2(uv.x * 6.0 + drift * 0.03, 2.0)) - 0.5) * 0.1;
+    float bandTall = smoothstep(0.22, 0.38, uv.y + edgeNoise) * smoothstep(0.52, 0.43, uv.y);
+    // Low wisp: behind the summit on wide screens; on portrait the mountain fills
+    // the width there, so it floats in the open sky just above the peak instead
+    float lowY = mix(-0.14, -0.145, portrait);
+    float lowW = mix(0.07, 0.03, portrait);
     float band = mix(bandWide, bandTall, portrait)
                + mix(0.6, 0.9, portrait) * exp(-pow((uv.y - lowY) / lowW, 2.0));
 
@@ -188,8 +192,11 @@ void main() {
     mountainColor += vec3(0.85, 0.35, 0.25) * 0.28 * rim;
 
     // Atmospheric depth: the base dissolves into haze instead of hitting the frame
-    float haze = smoothstep(-0.24, -0.5, m.y);
-    mountainColor = mix(mountainColor, vec3(0.13, 0.13, 0.15), haze * 0.55);
+    // On portrait the mountain fills the bottom of the screen, so its lower slopes
+    // fall into deeper dusk shadow; that keeps the lighter fog readable against them
+    float haze = smoothstep(mix(-0.24, -0.12, portrait), -0.5, m.y);
+    vec3 hazeCol = mix(vec3(0.13, 0.13, 0.15), vec3(0.055, 0.055, 0.07), portrait);
+    mountainColor = mix(mountainColor, hazeCol, haze * mix(0.55, 0.8, portrait));
     float a_mnt = inside * mntReveal * 0.88 * (1.0 - haze * 0.5);
     over(acc, accA, mountainColor, a_mnt);
 
@@ -200,8 +207,9 @@ void main() {
     float farFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.02, 0.0)) * farBank;
     float nearFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.045, 13.7)) * nearBank;
     vec3 fogCol = mix(vec3(0.56, 0.54, 0.55), vec3(0.66, 0.58, 0.56), sunNear);
-    over(acc, accA, fogCol * 0.92, farFog * 0.5 * t_mist);
-    over(acc, accA, fogCol, nearFog * 0.62 * t_mist);
+    float fogBoost = mix(1.0, 1.3, portrait);
+    over(acc, accA, fogCol * 0.92, min(farFog * 0.5 * fogBoost, 1.0) * t_mist);
+    over(acc, accA, fogCol, min(nearFog * 0.62 * fogBoost, 1.0) * t_mist);
 
     // Un-premultiply for a non-premultiplied canvas
     fragColor = vec4(accA > 0.0001 ? acc / accA : vec3(0.0), accA);
