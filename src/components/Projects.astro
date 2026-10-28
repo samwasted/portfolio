@@ -75,7 +75,7 @@ let projects: Project[] = projectsData as Project[];
             <!-- Top: Title & Summary -->
             <header class="detail-header">
               <h1 class="detail-name">{p.name}</h1>
-              <a class="github-link mobile-header-link" href={p.github} target="_blank" rel="noopener">
+              <a class="github-link header-link" href={p.github} target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                 </svg>
@@ -83,7 +83,7 @@ let projects: Project[] = projectsData as Project[];
                 <span class="external-arrow">↗</span>
               </a>
               {p.live && (
-                <a class="github-link mobile-header-link" href={p.live} target="_blank" rel="noopener">
+                <a class="github-link header-link" href={p.live} target="_blank" rel="noopener">
                   <span class="github-text">{p.live.replace(/^https?:\/\//, '')}</span>
                   <span class="external-arrow">↗</span>
                 </a>
@@ -154,22 +154,6 @@ let projects: Project[] = projectsData as Project[];
               </div>
             </div>
 
-            <!-- Footer: Links -->
-            <footer class="detail-footer">
-              <a class="github-link" href={p.github} target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="github-icon">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-                <span class="github-text">{p.github.replace('https://github.com/', '')}</span>
-                <span class="external-arrow">↗</span>
-              </a>
-              {p.live && (
-                <a class="github-link" href={p.live} target="_blank" rel="noopener">
-                  <span class="github-text">{p.live.replace(/^https?:\/\//, '')}</span>
-                  <span class="external-arrow">↗</span>
-                </a>
-              )}
-            </footer>
           </div>
         )) : (
           <div class="detail-container active-pane">
@@ -636,6 +620,15 @@ let projects: Project[] = projectsData as Project[];
     transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
   }
 
+  /* Faded-out panes sit on top of the active one for the crossfade but leave the
+     layout, so the panel is only as tall as the project being shown */
+  .detail-container:not(.active-pane) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
   .detail-container.active-pane {
     opacity: 1;
     pointer-events: auto;
@@ -712,6 +705,18 @@ let projects: Project[] = projectsData as Project[];
     background-color: rgba(0, 0, 0, 0.35);
   }
 
+  /* Desktop and landscape: the visual shrinks on short screens so the
+     description stays close to the fold */
+  @media (min-width: 901px), (orientation: landscape) {
+    .detail-visual.has-media:not(.media-illustration) {
+      max-height: clamp(180px, 30vh, 360px);
+    }
+
+    .detail-visual.media-illustration :global(svg) {
+      max-height: clamp(180px, 30vh, 360px);
+    }
+  }
+
   .detail-visual.media-illustration::after {
     display: none;
   }
@@ -755,8 +760,11 @@ let projects: Project[] = projectsData as Project[];
     flex: 2;
   }
 
-  .mobile-header-link {
-    display: none !important;
+  /* Source and live links sit under the title on every screen size,
+     so they never end up below the fold */
+  .header-link {
+    display: inline-flex;
+    margin: 0.25rem 1.75rem 0.75rem 0;
   }
 
   .detail-meta {
@@ -826,16 +834,6 @@ let projects: Project[] = projectsData as Project[];
     background: var(--surface-hover);
     border-color: var(--border-strong);
     color: var(--text-primary);
-  }
-
-  /* Footer */
-  .detail-footer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    margin-top: auto;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
   }
 
   .github-link {
@@ -975,15 +973,8 @@ let projects: Project[] = projectsData as Project[];
       font-size: 2.5rem;
     }
 
-    .mobile-header-link {
-      display: inline-flex !important;
-      margin-top: 0.5rem;
-      margin-bottom: 0.5rem;
-      margin-right: 1.5rem;
-    }
-
-    .detail-footer {
-      display: none;
+    .header-link {
+      margin: 0.5rem 1.5rem 0.5rem 0;
     }
   }
 

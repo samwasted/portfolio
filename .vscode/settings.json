@@ -1,3 +1,5 @@
 {
-  "css.lint.unknownAtRules": "ignore"
+  "css.lint.unknownAtRules": "ignore",
+  // package-lock.json is this project's lockfile; ~/pnpm-lock.yaml belongs to an unrelated home-folder install
+  "npm.packageManager": "npm"
 }
