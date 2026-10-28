@@ -1,5 +1,7 @@
 #version 300 es
-precision mediump float;
+// highp, not mediump: phone GPUs run mediump as 16-bit floats, which flattens the
+// noise hash (no clouds, no fog, flat sun). WebGL2 guarantees highp here.
+precision highp float;
 
 uniform float uTime;
 uniform vec2 uResolution;
@@ -33,6 +35,12 @@ float fbm(vec2 p) {
         amp *= 0.5;
     }
     return value;
+}
+
+// Bell curve for soft horizontal bands. Written as d*d: pow(d, 2.0) is undefined
+// for negative d and returns NaN on some phone drivers, cutting holes in the canvas
+float gauss(float d) {
+    return exp(-d * d);
 }
 
 // Composite a layer over the accumulated (premultiplied) colour
@@ -124,7 +132,7 @@ void main() {
     float lowY = mix(-0.14, -0.145, portrait);
     float lowW = mix(0.07, 0.03, portrait);
     float band = mix(bandWide, bandTall, portrait)
-               + mix(0.6, 0.9, portrait) * exp(-pow((uv.y - lowY) / lowW, 2.0));
+               + mix(0.6, 0.9, portrait) * gauss((uv.y - lowY) / lowW);
 
     // The streaks are long and wide; on a narrow screen, tighten them sideways so
     // whole wisps fit across instead of one flat slice of a single streak
@@ -150,7 +158,7 @@ void main() {
 
     // A thin wisp drifts across the sun's face, dark against it, for depth
     float wisp = smoothstep(0.58, 0.85, cloudBands(cuv + vec2(0.0, 0.03), drift))
-               * exp(-pow((uv.y - SUN.y + 0.02) / 0.05, 2.0)) * sunShape;
+               * gauss((uv.y - SUN.y + 0.02) / 0.05) * sunShape;
     over(acc, accA, vec3(0.06, 0.03, 0.03), wisp * 0.55);
 
     // MOUNTAIN: Fuji's profile, a flat notched crater rim over concave slopes
@@ -202,8 +210,8 @@ void main() {
 
     // MIST: two fog banks over the lower slopes. The farther one sits higher and
     // drifts slower; both churn as they move, and their tops catch a little sunlight
-    float farBank = exp(-pow((uv.y + 0.29) / 0.07, 2.0));
-    float nearBank = exp(-pow((uv.y + 0.43) / 0.09, 2.0));
+    float farBank = gauss((uv.y + 0.29) / 0.07);
+    float nearBank = gauss((uv.y + 0.43) / 0.09);
     float farFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.02, 0.0)) * farBank;
     float nearFog = smoothstep(0.34, 0.72, fogBank(uv, drift, 0.045, 13.7)) * nearBank;
     vec3 fogCol = mix(vec3(0.56, 0.54, 0.55), vec3(0.66, 0.58, 0.56), sunNear);
